@@ -2,7 +2,13 @@ import { useState } from "react";
 
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
-import { ChevronDown, CircleUserRound, LogOut, Settings } from "lucide-react";
+import {
+  ChevronDown,
+  CircleUserRound,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+} from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -96,9 +102,19 @@ export default function UserLayout() {
                   Settings
                 </Link>
 
+                {user?.is_admin && (
+                  <Link
+                    to="/admin"
+                    className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
+
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-danger"
+                  className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-danger"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout

@@ -34,6 +34,9 @@ import ResetPassword from "../pages/auth/ResetPassword";
 */
 
 import AdminDashboard from "../pages/admin/Dashboard";
+import ListUsers from "../pages/admin/users/ListUsers";
+import ViewUser from "../pages/admin/users/ViewUser";
+import EditUser from "../pages/admin/users/EditUser";
 
 /*
 |--------------------------------------------------------------------------
@@ -125,6 +128,18 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <AdminDashboard />,
+      },
+      {
+        path: "users",
+        element: <ListUsers />,
+      },
+      {
+        path: "users/:id",
+        element: <ViewUser />,
+      },
+      {
+        path: "users/:id/edit",
+        element: <EditUser />,
       },
     ],
   },

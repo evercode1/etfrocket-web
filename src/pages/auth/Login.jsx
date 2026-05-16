@@ -93,12 +93,12 @@ export default function Login() {
         </Link>
 
         <p className="text-brand-muted">
-          Already have an account?{" "}
+          Need an account?{" "}
           <Link
-            to="/auth/login"
+            to="/auth/register"
             className="font-semibold text-brand-primary hover:underline"
           >
-            Login
+            Create one
           </Link>
         </p>
       </div>

@@ -84,15 +84,24 @@ export default function Login() {
 
       <SubmitButton loading={loading}>Login</SubmitButton>
 
-      <p className="text-center text-sm text-brand-muted">
-        Need an account?{" "}
+      <div className="space-y-3 text-center text-sm">
         <Link
-          to="/auth/register"
-          className="font-semibold text-brand-primary hover:underline"
+          to="/auth/forgot-password"
+          className="block text-brand-muted hover:text-brand-primary hover:underline"
         >
-          Create one
+          Forgot your password?
         </Link>
-      </p>
+
+        <p className="text-brand-muted">
+          Already have an account?{" "}
+          <Link
+            to="/auth/login"
+            className="font-semibold text-brand-primary hover:underline"
+          >
+            Login
+          </Link>
+        </p>
+      </div>
     </form>
   );
 }

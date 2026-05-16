@@ -14,6 +14,7 @@ import UserLayout from "../layouts/UserLayout";
 */
 
 import LandingPage from "../pages/public/LandingPage";
+import VerifyAccount from "../pages/public/VerifyAccount";
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,8 @@ import LandingPage from "../pages/public/LandingPage";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +42,7 @@ import AdminDashboard from "../pages/admin/Dashboard";
 */
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
+import Settings from "../pages/user/settings/Settings";
 
 /*
 |--------------------------------------------------------------------------
@@ -79,20 +83,37 @@ const router = createBrowserRouter([
         index: true,
         element: <LandingPage />,
       },
+      {
+        path: "account/verify/:token",
+        element: <VerifyAccount />,
+      },
     ],
   },
 
   {
     path: "/auth",
+
     element: <AuthLayout />,
+
     children: [
       {
         path: "login",
         element: <Login />,
       },
+
       {
         path: "register",
         element: <Register />,
+      },
+
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+
+      {
+        path: "reset-password/:token",
+        element: <ResetPassword />,
       },
     ],
   },
@@ -119,6 +140,11 @@ const router = createBrowserRouter([
             index: true,
             element: <Dashboard />,
           },
+          {
+            path: "settings",
+            element: <Settings />,
+          },
+
           {
             path: "etfs",
             element: <EtfList />,

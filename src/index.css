@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-brand-background text-brand-text font-body;
+        background-image:
+            radial-gradient(
+                circle at 20% 30%,
+                rgba(0, 209, 255, 0.06) 0%,
+                transparent 40%
+            ),
+            radial-gradient(
+                circle at 80% 70%,
+                rgba(49, 49, 192, 0.08) 0%,
+                transparent 50%
+            );
+    }
+}
+
+@layer components {
+    .glass-card {
+        @apply border border-brand-primary/10 bg-brand-surface/70 shadow-glow backdrop-blur-xl;
+    }
+
+    .rocket-gradient-text {
+        @apply bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent;
+    }
+
+    .rocket-button-primary {
+        @apply rounded-xl bg-brand-primaryStrong px-6 py-3 font-bold text-brand-background shadow-glow transition hover:scale-105;
+    }
+
+    .rocket-button-secondary {
+        @apply rounded-xl border border-brand-outline px-6 py-3 font-bold text-brand-text transition hover:bg-brand-surfaceHighest;
+    }
+}

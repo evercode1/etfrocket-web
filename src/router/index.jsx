@@ -1,8 +1,19 @@
 import { createBrowserRouter } from "react-router-dom";
 
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+
+import PublicLayout from "../layouts/PublicLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import UserLayout from "../layouts/UserLayout";
+
+/*
+|--------------------------------------------------------------------------
+| Public Pages
+|--------------------------------------------------------------------------
+*/
+
+import LandingPage from "../pages/public/LandingPage";
 
 /*
 |--------------------------------------------------------------------------
@@ -60,136 +71,94 @@ import ListPortfolioTransactions from "../pages/user/portfolio-transactions/List
 import ImportPortfolioTransactions from "../pages/user/portfolio-transactions/ImportPortfolioTransactions";
 
 const router = createBrowserRouter([
-    /*
-    |--------------------------------------------------------------------------
-    | Auth Routes
-    |--------------------------------------------------------------------------
-    */
+  {
+    path: "/",
+    element: <PublicLayout />,
+    children: [
+      {
+        index: true,
+        element: <LandingPage />,
+      },
+    ],
+  },
 
-    {
-        path: "/auth",
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+    ],
+  },
 
-        element: <AuthLayout />,
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+    ],
+  },
 
-        children: [
-            {
-                path: "login",
-                element: <Login />,
-            },
-
-            {
-                path: "register",
-                element: <Register />,
-            },
-        ],
-    },
-
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Routes
-    |--------------------------------------------------------------------------
-    */
-
-    {
-        path: "/admin",
-
-        element: <AdminLayout />,
-
-        children: [
-            {
-                index: true,
-                element: <AdminDashboard />,
-            },
-        ],
-    },
-
-    /*
-    |--------------------------------------------------------------------------
-    | User Routes
-    |--------------------------------------------------------------------------
-    */
-
-    {
-        path: "/",
-
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/dashboard",
         element: <UserLayout />,
-
         children: [
-            /*
-            |--------------------------------------------------------------------------
-            | Dashboard
-            |--------------------------------------------------------------------------
-            */
-
-            {
-                index: true,
-                element: <Dashboard />,
-            },
-
-            /*
-            |--------------------------------------------------------------------------
-            | ETF Routes
-            |--------------------------------------------------------------------------
-            */
-
-            {
-                path: "etfs",
-                element: <EtfList />,
-            },
-
-            {
-                path: "etfs/compare",
-                element: <EtfCompare />,
-            },
-
-            {
-                path: "etfs/filters",
-                element: <EtfFilters />,
-            },
-
-            /*
-            |--------------------------------------------------------------------------
-            | Portfolio Routes
-            |--------------------------------------------------------------------------
-            */
-
-            {
-                path: "portfolios",
-                element: <ListPortfolios />,
-            },
-
-            {
-                path: "portfolios/create",
-                element: <CreatePortfolio />,
-            },
-
-            {
-                path: "portfolios/:id",
-                element: <ViewPortfolio />,
-            },
-
-            {
-                path: "portfolios/:id/edit",
-                element: <EditPortfolio />,
-            },
-
-            /*
-            |--------------------------------------------------------------------------
-            | Portfolio Transaction Routes
-            |--------------------------------------------------------------------------
-            */
-
-            {
-                path: "portfolios/:id/transactions",
-                element: <ListPortfolioTransactions />,
-            },
-
-            {
-                path: "portfolios/:id/transactions/import",
-                element: <ImportPortfolioTransactions />,
-            },
+          {
+            index: true,
+            element: <Dashboard />,
+          },
+          {
+            path: "etfs",
+            element: <EtfList />,
+          },
+          {
+            path: "etfs/compare",
+            element: <EtfCompare />,
+          },
+          {
+            path: "etfs/filters",
+            element: <EtfFilters />,
+          },
+          {
+            path: "portfolios",
+            element: <ListPortfolios />,
+          },
+          {
+            path: "portfolios/create",
+            element: <CreatePortfolio />,
+          },
+          {
+            path: "portfolios/:id",
+            element: <ViewPortfolio />,
+          },
+          {
+            path: "portfolios/:id/edit",
+            element: <EditPortfolio />,
+          },
+          {
+            path: "portfolios/:id/transactions",
+            element: <ListPortfolioTransactions />,
+          },
+          {
+            path: "portfolios/:id/transactions/import",
+            element: <ImportPortfolioTransactions />,
+          },
         ],
-    },
+      },
+    ],
+  },
 ]);
 
 export default router;

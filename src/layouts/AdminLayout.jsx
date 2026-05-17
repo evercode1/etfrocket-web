@@ -10,6 +10,8 @@ import {
   Rocket,
 } from "lucide-react";
 
+import AdminSupportBell from "../components/support/AdminSupportBell";
+
 import { useAuth } from "../context/AuthContext";
 
 export default function AdminLayout() {
@@ -56,49 +58,54 @@ export default function AdminLayout() {
             </nav>
           </div>
 
-          <div className="relative">
-            <button
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-3 rounded-full border border-brand-outline bg-brand-surfaceHigh px-4 py-2 transition hover:border-brand-primary"
-            >
-              <CircleUserRound className="h-5 w-5 text-brand-primary" />
+          <div className="flex items-center gap-3">
+            <AdminSupportBell />
 
-              <span className="hidden text-sm text-brand-muted md:inline">
-                Admin Pilot
-              </span>
+            <div className="relative">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-3 rounded-full border border-brand-outline bg-brand-surfaceHigh px-4 py-2 transition hover:border-brand-primary"
+              >
+                <CircleUserRound className="h-5 w-5 text-brand-primary" />
 
-              <ChevronDown className="h-4 w-4 text-brand-muted" />
-            </button>
+                <span className="hidden text-sm text-brand-muted md:inline">
+                  Admin Pilot
+                </span>
 
-            {isUserMenuOpen && (
-              <div className="absolute right-0 z-50 mt-3 w-56 rounded-2xl border border-brand-outline bg-brand-surface p-2 shadow-glow">
-                <div className="border-b border-brand-outline px-3 py-3">
-                  <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
-                    Signed In
-                  </p>
+                <ChevronDown className="h-4 w-4 text-brand-muted" />
+              </button>
 
-                  <p className="mt-1 truncate text-sm text-brand-muted">
-                    {user?.email}
-                  </p>
+              {isUserMenuOpen && (
+                <div className="absolute right-0 z-50 mt-3 w-56 rounded-2xl border border-brand-outline bg-brand-surface p-2 shadow-glow">
+                  <div className="border-b border-brand-outline px-3 py-3">
+                    <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+                      Signed In
+                    </p>
+
+                    <p className="mt-1 truncate text-sm text-brand-muted">
+                      {user?.email}
+                    </p>
+                  </div>
+
+                  <Link
+                    to="/dashboard/settings"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                  >
+                    <CircleUserRound className="h-4 w-4" />
+                    Account Settings
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-danger"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
                 </div>
-
-                <Link
-                  to="/dashboard/settings"
-                  className="mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
-                >
-                  <CircleUserRound className="h-4 w-4" />
-                  Account Settings
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-danger"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </header>

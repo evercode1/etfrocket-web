@@ -80,6 +80,8 @@ export default function ViewTicket() {
       setMessage(response.message || "Ticket closed.");
       setIsCloseDialogOpen(false);
 
+      window.dispatchEvent(new Event("admin-support-ticket-updated"));
+
       await loadTicket();
     } catch (err) {
       setError(err.response?.data?.message || "Unable to close ticket.");

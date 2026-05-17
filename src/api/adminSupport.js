@@ -27,3 +27,9 @@ export async function closeSupportTicket(payload) {
 
   return response.data;
 }
+
+export async function getOpenSupportTicketCount() {
+  const response = await api.get("/open-support-ticket-count");
+
+  return response.data;
+}

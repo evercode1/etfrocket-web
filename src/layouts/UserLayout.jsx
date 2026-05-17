@@ -2,8 +2,6 @@ import { useState } from "react";
 
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
-import SupportBell from "../components/support/SupportBell";
-
 import {
   BookOpen,
   ChevronDown,
@@ -13,6 +11,8 @@ import {
   LogOut,
   Settings,
 } from "lucide-react";
+
+import SupportBell from "../components/support/SupportBell";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -44,36 +44,17 @@ export default function UserLayout() {
             <nav className="ml-auto mr-8 flex gap-4 text-sm text-brand-muted">
               <Link
                 to="/dashboard"
-                className="transition hover:text-brand-primary"
+                className="flex items-center gap-2 transition hover:text-brand-primary"
               >
+                <LayoutDashboard className="h-4 w-4" />
                 Dashboard
-              </Link>
-
-              <Link
-                to="/dashboard/etfs"
-                className="transition hover:text-brand-primary"
-              >
-                ETFs
-              </Link>
-
-              <Link
-                to="/dashboard/etfs/compare"
-                className="transition hover:text-brand-primary"
-              >
-                Compare
-              </Link>
-
-              <Link
-                to="/dashboard/portfolios"
-                className="transition hover:text-brand-primary"
-              >
-                Portfolios
               </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-3">
             <SupportBell />
+
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -89,7 +70,10 @@ export default function UserLayout() {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 z-50 mt-3 w-56 rounded-2xl border border-brand-outline bg-brand-surface p-2 shadow-glow">
+                <div
+                  onMouseLeave={() => setIsUserMenuOpen(false)}
+                  className="absolute right-0 z-50 mt-3 w-64 rounded-2xl border border-brand-outline bg-brand-surface p-2 shadow-glow"
+                >
                   <div className="border-b border-brand-outline px-3 py-3">
                     <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
                       Signed In
@@ -101,33 +85,37 @@ export default function UserLayout() {
                   </div>
 
                   <Link
-                    to="/dashboard/settings"
-                    className="mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
-                  >
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </Link>
-                  <Link
                     to="/help"
                     onClick={() => setIsUserMenuOpen(false)}
-                    className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                    className="mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
                   >
                     <BookOpen className="h-4 w-4" />
                     Help Center
                   </Link>
+
                   <Link
                     to="/dashboard/support"
                     onClick={() => setIsUserMenuOpen(false)}
-                    className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
                   >
                     <Headset className="h-4 w-4" />
                     Support
                   </Link>
 
+                  <Link
+                    to="/dashboard/settings"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+
                   {user?.is_admin && (
                     <Link
                       to="/admin"
-                      className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       Admin
@@ -136,7 +124,7 @@ export default function UserLayout() {
 
                   <button
                     onClick={handleLogout}
-                    className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-danger"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-danger"
                   >
                     <LogOut className="h-4 w-4" />
                     Logout

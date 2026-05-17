@@ -1,6 +1,12 @@
 import { Link, Outlet } from "react-router-dom";
 
+import { useAuth } from "../context/AuthContext";
+
+import PublicFooter from "../components/layout/PublicFooter";
+
 export default function PublicLayout() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-brand-background text-brand-text">
       <header className="border-b border-brand-outline bg-brand-surface/80 backdrop-blur-xl">
@@ -14,25 +20,47 @@ export default function PublicLayout() {
 
           <nav className="flex items-center gap-4">
             <Link
-              to="/auth/login"
+              to="/help"
               className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
             >
-              Login
+              Help Center
             </Link>
 
-            <Link
-              to="/auth/register"
-              className="rounded-xl bg-brand-primaryStrong px-5 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:scale-105"
-            >
-              Get Started
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="rounded-xl bg-brand-primaryStrong px-5 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:scale-105"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/auth/login"
+                  className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/auth/register"
+                  className="rounded-xl bg-brand-primaryStrong px-5 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:scale-105"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
 
-      <main>
-        <Outlet />
-      </main>
+      <div className="flex min-h-[calc(100vh-88px)] flex-col">
+        <main className="flex-1">
+          <Outlet />
+        </main>
+
+        <PublicFooter />
+      </div>
     </div>
   );
 }

@@ -18,7 +18,7 @@ const adminSections = [
       "Review support tickets, respond to users, and manage open issues.",
     href: "/admin/support",
     icon: LifeBuoy,
-    status: "Coming Soon",
+    status: "Active",
   },
   {
     title: "Data Management",

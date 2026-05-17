@@ -7,72 +7,30 @@ import AuthLayout from "../layouts/AuthLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import UserLayout from "../layouts/UserLayout";
 
-/*
-|--------------------------------------------------------------------------
-| Public Pages
-|--------------------------------------------------------------------------
-*/
-
 import LandingPage from "../pages/public/LandingPage";
 import VerifyAccount from "../pages/public/VerifyAccount";
-
-/*
-|--------------------------------------------------------------------------
-| Auth Pages
-|--------------------------------------------------------------------------
-*/
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
-/*
-|--------------------------------------------------------------------------
-| Admin Pages
-|--------------------------------------------------------------------------
-*/
-
 import AdminDashboard from "../pages/admin/Dashboard";
 import ListUsers from "../pages/admin/users/ListUsers";
 import ViewUser from "../pages/admin/users/ViewUser";
 import EditUser from "../pages/admin/users/EditUser";
 
-/*
-|--------------------------------------------------------------------------
-| User Dashboard
-|--------------------------------------------------------------------------
-*/
-
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
-
-/*
-|--------------------------------------------------------------------------
-| ETF Pages
-|--------------------------------------------------------------------------
-*/
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
 import EtfFilters from "../pages/user/etfs/EtfFilters";
 
-/*
-|--------------------------------------------------------------------------
-| Portfolio Pages
-|--------------------------------------------------------------------------
-*/
-
 import ListPortfolios from "../pages/user/portfolios/ListPortfolios";
 import CreatePortfolio from "../pages/user/portfolios/CreatePortfolio";
 import EditPortfolio from "../pages/user/portfolios/EditPortfolio";
 import ViewPortfolio from "../pages/user/portfolios/ViewPortfolio";
-
-/*
-|--------------------------------------------------------------------------
-| Portfolio Transaction Pages
-|--------------------------------------------------------------------------
-*/
 
 import ListPortfolioTransactions from "../pages/user/portfolio-transactions/ListPortfolioTransactions";
 import ImportPortfolioTransactions from "../pages/user/portfolio-transactions/ImportPortfolioTransactions";
@@ -95,25 +53,20 @@ const router = createBrowserRouter([
 
   {
     path: "/auth",
-
     element: <AuthLayout />,
-
     children: [
       {
         path: "login",
         element: <Login />,
       },
-
       {
         path: "register",
         element: <Register />,
       },
-
       {
         path: "forgot-password",
         element: <ForgotPassword />,
       },
-
       {
         path: "reset-password/:token",
         element: <ResetPassword />,
@@ -122,31 +75,31 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/admin",
-    element: <AdminLayout />,
-    children: [
-      {
-        index: true,
-        element: <AdminDashboard />,
-      },
-      {
-        path: "users",
-        element: <ListUsers />,
-      },
-      {
-        path: "users/:id",
-        element: <ViewUser />,
-      },
-      {
-        path: "users/:id/edit",
-        element: <EditUser />,
-      },
-    ],
-  },
-
-  {
     element: <ProtectedRoute />,
     children: [
+      {
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <AdminDashboard />,
+          },
+          {
+            path: "users",
+            element: <ListUsers />,
+          },
+          {
+            path: "users/:id",
+            element: <ViewUser />,
+          },
+          {
+            path: "users/:id/edit",
+            element: <EditUser />,
+          },
+        ],
+      },
+
       {
         path: "/dashboard",
         element: <UserLayout />,
@@ -159,7 +112,6 @@ const router = createBrowserRouter([
             path: "settings",
             element: <Settings />,
           },
-
           {
             path: "etfs",
             element: <EtfList />,

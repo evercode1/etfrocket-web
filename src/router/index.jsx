@@ -9,6 +9,10 @@ import UserLayout from "../layouts/UserLayout";
 
 import LandingPage from "../pages/public/LandingPage";
 import VerifyAccount from "../pages/public/VerifyAccount";
+import HelpCenter from "../pages/public/help/HelpCenter";
+import HelpArticle from "../pages/public/help/HelpArticle";
+import PrivacyPolicy from "../pages/public/legal/PrivacyPolicy";
+import TermsOfService from "../pages/public/legal/TermsOfService";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -52,6 +56,22 @@ const router = createBrowserRouter([
       {
         path: "account/verify/:token",
         element: <VerifyAccount />,
+      },
+      {
+        path: "help",
+        element: <HelpCenter />,
+      },
+      {
+        path: "help/:slug",
+        element: <HelpArticle />,
+      },
+      {
+        path: "privacy-policy",
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: "terms-of-service",
+        element: <TermsOfService />,
       },
     ],
   },

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 
 import {
+  BookOpen,
   ChevronDown,
   CircleUserRound,
   Headset,
@@ -101,6 +102,14 @@ export default function UserLayout() {
                 >
                   <Settings className="h-4 w-4" />
                   Settings
+                </Link>
+                <Link
+                  to="/help"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Help Center
                 </Link>
                 <Link
                   to="/dashboard/support"

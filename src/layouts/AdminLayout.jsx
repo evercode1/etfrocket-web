@@ -76,7 +76,10 @@ export default function AdminLayout() {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 z-50 mt-3 w-56 rounded-2xl border border-brand-outline bg-brand-surface p-2 shadow-glow">
+                <div
+                  onMouseLeave={() => setIsUserMenuOpen(false)}
+                  className="absolute right-0 z-50 mt-3 w-56 rounded-2xl border border-brand-outline bg-brand-surface p-2 shadow-glow"
+                >
                   <div className="border-b border-brand-outline px-3 py-3">
                     <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
                       Signed In

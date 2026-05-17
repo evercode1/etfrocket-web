@@ -19,9 +19,14 @@ import AdminDashboard from "../pages/admin/Dashboard";
 import ListUsers from "../pages/admin/users/ListUsers";
 import ViewUser from "../pages/admin/users/ViewUser";
 import EditUser from "../pages/admin/users/EditUser";
+import ListTickets from "../pages/admin/support/ListTickets";
+import ViewTicket from "../pages/admin/support/ViewTicket";
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
+import ListMyTickets from "../pages/user/support/ListMyTickets";
+import CreateTicket from "../pages/user/support/CreateTicket";
+import ViewMyTicket from "../pages/user/support/ViewMyTicket";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -97,6 +102,14 @@ const router = createBrowserRouter([
             path: "users/:id/edit",
             element: <EditUser />,
           },
+          {
+            path: "support",
+            element: <ListTickets />,
+          },
+          {
+            path: "support/:id",
+            element: <ViewTicket />,
+          },
         ],
       },
 
@@ -147,6 +160,18 @@ const router = createBrowserRouter([
           {
             path: "portfolios/:id/transactions/import",
             element: <ImportPortfolioTransactions />,
+          },
+          {
+            path: "support",
+            element: <ListMyTickets />,
+          },
+          {
+            path: "support/create",
+            element: <CreateTicket />,
+          },
+          {
+            path: "support/:id",
+            element: <ViewMyTicket />,
           },
         ],
       },

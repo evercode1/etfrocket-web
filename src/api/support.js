@@ -37,3 +37,9 @@ export async function markSupportResponseAsRead(payload) {
 
   return response.data;
 }
+
+export async function getUnreadSupportResponses() {
+  const response = await api.get("/unread-support-responses");
+
+  return response.data;
+}

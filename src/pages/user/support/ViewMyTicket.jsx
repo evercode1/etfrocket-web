@@ -43,6 +43,8 @@ export default function ViewMyTicket() {
           ),
         );
 
+        window.dispatchEvent(new Event("support-responses-read"));
+
         loadedTicket.ticket_responses = loadedTicket.ticket_responses.map(
           (ticketResponse) => {
             if (!ticketResponse.is_from_customer && !ticketResponse.is_read) {

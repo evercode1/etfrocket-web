@@ -4,6 +4,7 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -40,7 +41,8 @@ const ranges = [
 ];
 
 export default function UserSignupChart() {
-  const [range, setRange] = useState("1y");
+  const [range, setRange] = useState("7d");
+  const [showVerified, setShowVerified] = useState(true);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -79,7 +81,7 @@ export default function UserSignupChart() {
           </h2>
 
           <p className="mt-3 max-w-2xl text-brand-muted">
-            Track new user registrations over time.
+            Track new registrations and verified accounts over time.
           </p>
         </div>
 
@@ -98,6 +100,18 @@ export default function UserSignupChart() {
               {item.label}
             </button>
           ))}
+
+          <button
+            type="button"
+            onClick={() => setShowVerified(!showVerified)}
+            className={`rounded-full border px-3 py-1.5 font-mono text-xs uppercase tracking-widest transition ${
+              showVerified
+                ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary"
+                : "border-brand-outline text-brand-muted hover:border-brand-secondary hover:text-brand-secondary"
+            }`}
+          >
+            Verified
+          </button>
         </div>
       </div>
 
@@ -115,7 +129,7 @@ export default function UserSignupChart() {
 
       {!loading && !error && stats && (
         <>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-2xl border border-brand-outline bg-black/20 p-5">
               <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
                 Total Users
@@ -133,6 +147,16 @@ export default function UserSignupChart() {
 
               <p className="mt-3 font-display text-4xl font-bold">
                 {stats.range_total}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-brand-outline bg-black/20 p-5">
+              <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+                Verified In Range
+              </p>
+
+              <p className="mt-3 font-display text-4xl font-bold">
+                {stats.range_verified_total}
               </p>
             </div>
           </div>
@@ -212,6 +236,16 @@ export default function UserSignupChart() {
                     r: 5,
                   }}
                 />
+
+                {showVerified && (
+                  <Line
+                    type="monotone"
+                    dataKey="verified"
+                    stroke="#c0c1ff"
+                    strokeWidth={3}
+                    dot={false}
+                  />
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>

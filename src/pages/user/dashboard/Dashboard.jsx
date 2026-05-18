@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import {
+  getMissionControl,
+  getPortfolioSelects,
+} from "../../../api/missionControl";
 
 import {
   AlertTriangle,
@@ -32,11 +37,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-// Flip this later from API data.
-const portfolioOptions = [];
-
-const hasPortfolio = portfolioOptions.length > 0;
 
 const portfolioTrendData = [
   { date: "Jan", value: 10000, income: 220 },
@@ -87,6 +87,39 @@ const activityData = [
 ];
 
 export default function Dashboard() {
+  const [missionControl, setMissionControl] = useState(null);
+  const [portfolioSelects, setPortfolioSelects] = useState({});
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function loadDashboard(portfolioId = null) {
+    setIsLoading(true);
+
+    try {
+      const selectsResponse = await getPortfolioSelects();
+
+      const selects = selectsResponse.data || {};
+
+      setPortfolioSelects(selects);
+
+      const missionResponse = await getMissionControl(portfolioId);
+
+      const missionData = missionResponse.data || null;
+
+      setMissionControl(missionData);
+
+      if (!portfolioId && missionData?.selected_portfolio?.id) {
+        setSelectedPortfolioId(missionData.selected_portfolio.id);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadDashboard(selectedPortfolioId);
+  }, [selectedPortfolioId]);
+
   return (
     <div className="space-y-8">
       <section className="glass-card overflow-hidden rounded-3xl p-8">
@@ -118,7 +151,9 @@ export default function Dashboard() {
                 </p>
 
                 <p className="mt-1 text-sm text-brand-muted">
-                  Systems online. Portfolio module warming up.
+                  {isLoading
+                    ? "Syncing mission telemetry..."
+                    : "Systems online. Portfolio module active."}
                 </p>
               </div>
             </div>
@@ -126,7 +161,13 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <PortfolioSnapshot />
+      <PortfolioSnapshot
+        missionControl={missionControl}
+        portfolioSelects={portfolioSelects}
+        selectedPortfolioId={selectedPortfolioId}
+        setSelectedPortfolioId={setSelectedPortfolioId}
+        isLoading={isLoading}
+      />
 
       <RiskOpportunityAlerts />
 
@@ -137,10 +178,34 @@ export default function Dashboard() {
   );
 }
 
-function PortfolioSnapshot() {
-  const [selectedPortfolio, setSelectedPortfolio] = useState(
-    portfolioOptions[0] || null,
-  );
+function PortfolioSnapshot({
+  missionControl,
+  portfolioSelects,
+  selectedPortfolioId,
+  setSelectedPortfolioId,
+  isLoading,
+}) {
+  const snapshot = missionControl?.portfolio_snapshot || null;
+  const flightPath = missionControl?.portfolio_flight_path || [];
+
+  const hasPortfolio = Object.keys(portfolioSelects || {}).length > 0;
+
+  if (isLoading) {
+    return (
+      <section className="space-y-5">
+        <SectionHeader
+          icon={Gauge}
+          eyebrow="Portfolio Snapshot"
+          title="State of the Mission"
+          description="Loading portfolio telemetry..."
+        />
+
+        <div className="glass-card rounded-3xl p-8 text-brand-muted">
+          Loading portfolio data...
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-5">
@@ -149,12 +214,14 @@ function PortfolioSnapshot() {
           icon={Gauge}
           eyebrow="Portfolio Snapshot"
           title="State of the Mission"
-          description="A future summary of yield, income, return, NAV health, and portfolio stability."
+          description="A summary of yield, income, return, NAV health, and portfolio stability."
         />
 
         <PortfolioControls
-          selectedPortfolio={selectedPortfolio}
-          setSelectedPortfolio={setSelectedPortfolio}
+          portfolioSelects={portfolioSelects}
+          selectedPortfolioId={selectedPortfolioId}
+          setSelectedPortfolioId={setSelectedPortfolioId}
+          hasPortfolio={hasPortfolio}
         />
       </div>
 
@@ -166,29 +233,29 @@ function PortfolioSnapshot() {
             <MetricCard
               icon={WalletCards}
               label="Portfolio Value"
-              value="$11,450"
-              detail="+14.5% since launch"
+              value={formatCurrency(snapshot?.portfolio_value)}
+              detail={`Cost basis: ${formatCurrency(snapshot?.cost_basis)}`}
             />
 
             <MetricCard
               icon={Snowflake}
               label="Monthly Income"
-              value="$292"
-              detail="Projected from current holdings"
+              value={formatCurrency(snapshot?.monthly_income)}
+              detail="Projected from recent distributions"
             />
 
             <MetricCard
               icon={TrendingUp}
               label="Total Return"
-              value="+9.8%"
-              detail="Price return + distributions"
+              value={formatPercent(snapshot?.total_return_percentage)}
+              detail={`Gain/Loss: ${formatCurrency(snapshot?.unrealized_gain_loss)}`}
             />
 
             <MetricCard
               icon={ShieldCheck}
               label="NAV Health"
-              value="Stable"
-              detail="No critical erosion detected"
+              value={snapshot?.nav_health || "Unknown"}
+              detail="Based on ETF metric signals"
             />
           </div>
 
@@ -197,12 +264,12 @@ function PortfolioSnapshot() {
               <CardTitle
                 icon={LineChartIcon}
                 title="Portfolio Flight Path"
-                subtitle="Placeholder portfolio value trend"
+                subtitle="Monthly portfolio value based on transactions and ETF prices"
               />
 
               <div className="mt-6 h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={portfolioTrendData}>
+                  <AreaChart data={flightPath}>
                     <defs>
                       <linearGradient
                         id="portfolioValue"
@@ -225,9 +292,20 @@ function PortfolioSnapshot() {
                     </defs>
 
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                    <XAxis dataKey="date" />
+
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+
                     <YAxis />
-                    <Tooltip />
+
+                    <Tooltip
+                      formatter={(value) =>
+                        Number(value).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        })
+                      }
+                    />
+
                     <Area
                       type="monotone"
                       dataKey="value"
@@ -253,7 +331,14 @@ function PortfolioSnapshot() {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip
+                      formatter={(value) =>
+                        Number(value).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        })
+                      }
+                    />
                     <Bar
                       dataKey="income"
                       fill="currentColor"
@@ -270,8 +355,25 @@ function PortfolioSnapshot() {
   );
 }
 
-function PortfolioControls({ selectedPortfolio, setSelectedPortfolio }) {
+function PortfolioControls({
+  portfolioSelects,
+  selectedPortfolioId,
+  setSelectedPortfolioId,
+  hasPortfolio,
+}) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const portfolioOptions = Object.entries(portfolioSelects || {}).map(
+    ([id, name]) => ({
+      id: Number(id),
+      name,
+    }),
+  );
+
+  const selectedPortfolio =
+    portfolioOptions.find(
+      (portfolio) => portfolio.id === Number(selectedPortfolioId),
+    ) || portfolioOptions[0];
 
   if (!hasPortfolio) {
     return (
@@ -310,7 +412,7 @@ function PortfolioControls({ selectedPortfolio, setSelectedPortfolio }) {
                   key={portfolio.id}
                   type="button"
                   onClick={() => {
-                    setSelectedPortfolio(portfolio);
+                    setSelectedPortfolioId(portfolio.id);
                     setIsOpen(false);
                   }}
                   className="block w-full rounded-xl px-3 py-2 text-left text-sm text-brand-muted transition hover:bg-brand-surfaceHighest hover:text-brand-primary"
@@ -392,9 +494,16 @@ function EmptyPortfolioState() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={portfolioTrendData}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                  <XAxis dataKey="date" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    formatter={(value) =>
+                      Number(value).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })
+                    }
+                  />
                   <Area
                     type="monotone"
                     dataKey="value"
@@ -534,7 +643,14 @@ function SystemActivity() {
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value) =>
+                    Number(value).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    })
+                  }
+                />
                 <Line
                   type="monotone"
                   dataKey="income"
@@ -580,7 +696,7 @@ function MetricCard({ icon: Icon, label, value, detail }) {
         </div>
 
         <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
-          Stub
+          Live
         </p>
       </div>
 
@@ -623,4 +739,23 @@ function PreviewChip({ label }) {
       {label}
     </span>
   );
+}
+
+function formatCurrency(value) {
+  if (value === null || value === undefined) {
+    return "$0.00";
+  }
+
+  return Number(value).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+}
+
+function formatPercent(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return `${Number(value).toFixed(2)}%`;
 }

@@ -46,15 +46,6 @@ const portfolioTrendData = [
   { date: "May", value: 11450, income: 292 },
 ];
 
-const incomeProjectionData = [
-  { month: "Jun", income: 310 },
-  { month: "Jul", income: 335 },
-  { month: "Aug", income: 360 },
-  { month: "Sep", income: 382 },
-  { month: "Oct", income: 410 },
-  { month: "Nov", income: 438 },
-];
-
 const watchlistData = [
   { ticker: "NVII", yield: "38.4%", nav: "Improving", momentum: "+8.7%" },
   { ticker: "CHPY", yield: "41.2%", nav: "Stable", momentum: "+4.1%" },
@@ -187,6 +178,7 @@ function PortfolioSnapshot({
 }) {
   const snapshot = missionControl?.portfolio_snapshot || null;
   const flightPath = missionControl?.portfolio_flight_path || [];
+  const incomeProjection = buildIncomeProjection(snapshot?.monthly_income);
 
   const hasPortfolio = Object.keys(portfolioSelects || {}).length > 0;
 
@@ -298,6 +290,19 @@ function PortfolioSnapshot({
                     <YAxis />
 
                     <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        borderColor: "#94a3b8",
+                        color: "#0f172a",
+                      }}
+                      labelStyle={{
+                        color: "#0f172a",
+                        fontWeight: 700,
+                      }}
+                      itemStyle={{
+                        color: "#1e293b",
+                        fontWeight: 600,
+                      }}
                       formatter={(value) =>
                         Number(value).toLocaleString("en-US", {
                           style: "currency",
@@ -322,16 +327,29 @@ function PortfolioSnapshot({
               <CardTitle
                 icon={CalendarClock}
                 title="Income Projection"
-                subtitle="Placeholder Dividend Snowball preview"
+                subtitle="Current monthly income projected forward"
               />
 
               <div className="mt-6 h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={incomeProjectionData}>
+                  <BarChart data={incomeProjection}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        borderColor: "#94a3b8",
+                        color: "#0f172a",
+                      }}
+                      labelStyle={{
+                        color: "#0f172a",
+                        fontWeight: 700,
+                      }}
+                      itemStyle={{
+                        color: "#1e293b",
+                        fontWeight: 600,
+                      }}
                       formatter={(value) =>
                         Number(value).toLocaleString("en-US", {
                           style: "currency",
@@ -347,6 +365,13 @@ function PortfolioSnapshot({
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+
+              <button
+                type="button"
+                className="mt-5 w-full rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              >
+                Change Assumptions
+              </button>
             </div>
           </div>
         </>
@@ -497,6 +522,19 @@ function EmptyPortfolioState() {
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis />
                   <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderColor: "#94a3b8",
+                      color: "#0f172a",
+                    }}
+                    labelStyle={{
+                      color: "#0f172a",
+                      fontWeight: 700,
+                    }}
+                    itemStyle={{
+                      color: "#1e293b",
+                      fontWeight: 600,
+                    }}
                     formatter={(value) =>
                       Number(value).toLocaleString("en-US", {
                         style: "currency",
@@ -644,6 +682,19 @@ function SystemActivity() {
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    borderColor: "#94a3b8",
+                    color: "#0f172a",
+                  }}
+                  labelStyle={{
+                    color: "#0f172a",
+                    fontWeight: 700,
+                  }}
+                  itemStyle={{
+                    color: "#1e293b",
+                    fontWeight: 600,
+                  }}
                   formatter={(value) =>
                     Number(value).toLocaleString("en-US", {
                       style: "currency",
@@ -758,4 +809,34 @@ function formatPercent(value) {
   }
 
   return `${Number(value).toFixed(2)}%`;
+}
+
+function buildIncomeProjection(monthlyIncome = 0) {
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const income = Number(monthlyIncome || 0);
+
+  const currentMonth = new Date().getMonth();
+
+  return Array.from({ length: 6 }, (_, index) => {
+    const monthIndex = (currentMonth + index) % 12;
+
+    return {
+      month: monthNames[monthIndex],
+      income,
+    };
+  });
 }

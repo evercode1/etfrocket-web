@@ -15,3 +15,9 @@ export async function getMissionControl(portfolioId = null) {
 
   return response.data;
 }
+
+export async function getPortfolioIncomeProjection(portfolioId) {
+  const response = await api.get(`/portfolio-income-projection/${portfolioId}`);
+
+  return response.data;
+}

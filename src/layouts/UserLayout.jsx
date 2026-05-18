@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
+  Rocket,
 } from "lucide-react";
 
 import SupportBell from "../components/support/SupportBell";
@@ -36,9 +37,13 @@ export default function UserLayout() {
           <div className="flex flex-1 items-center justify-between gap-6">
             <Link
               to="/dashboard"
-              className="font-display text-2xl font-bold text-brand-primary"
+              className="flex items-center gap-3 font-display text-2xl font-bold text-brand-primary"
             >
-              ETF Rocket
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
+                <Rocket className="h-5 w-5 text-brand-primary" />
+              </div>
+
+              <span>ETF Rocket</span>
             </Link>
 
             <nav className="ml-auto mr-8 flex gap-4 text-sm text-brand-muted">

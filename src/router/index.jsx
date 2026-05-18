@@ -25,6 +25,7 @@ import ViewUser from "../pages/admin/users/ViewUser";
 import EditUser from "../pages/admin/users/EditUser";
 import ListTickets from "../pages/admin/support/ListTickets";
 import ViewTicket from "../pages/admin/support/ViewTicket";
+import DataManagement from "../pages/admin/data/DataManagement";
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
@@ -129,6 +130,10 @@ const router = createBrowserRouter([
           {
             path: "support/:id",
             element: <ViewTicket />,
+          },
+          {
+            path: "data",
+            element: <DataManagement />,
           },
         ],
       },

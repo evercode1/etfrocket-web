@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LogOut,
   Rocket,
+  Compass,
 } from "lucide-react";
 
 import AdminSupportBell from "../components/support/AdminSupportBell";
@@ -34,9 +35,13 @@ export default function AdminLayout() {
           <div className="flex flex-1 items-center justify-between gap-6">
             <Link
               to="/admin"
-              className="font-display text-2xl font-bold text-brand-primary"
+              className="flex items-center gap-3 font-display text-2xl font-bold text-brand-primary"
             >
-              ETF Rocket Admin
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
+                <Rocket className="h-5 w-5 text-brand-primary" />
+              </div>
+
+              <span>ETF Rocket Admin</span>
             </Link>
 
             <nav className="ml-auto mr-8 flex gap-4 text-sm text-brand-muted">
@@ -52,7 +57,7 @@ export default function AdminLayout() {
                 to="/dashboard"
                 className="flex items-center gap-2 transition hover:text-brand-primary"
               >
-                <Rocket className="h-4 w-4" />
+                <Compass className="h-4 w-4" />
                 User Dashboard
               </Link>
             </nav>

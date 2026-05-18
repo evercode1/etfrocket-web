@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 
 import PublicFooter from "../components/layout/PublicFooter";
 
+import { Rocket } from "lucide-react";
+
 export default function PublicLayout() {
   const { user } = useAuth();
 
@@ -13,9 +15,13 @@ export default function PublicLayout() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <Link
             to="/"
-            className="font-display text-3xl font-bold text-brand-primary"
+            className="flex items-center gap-3 font-display text-2xl font-bold text-brand-primary"
           >
-            ETF Rocket
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
+              <Rocket className="h-5 w-5 text-brand-primary" />
+            </div>
+
+            <span>ETF Rocket</span>
           </Link>
 
           <nav className="flex items-center gap-4">

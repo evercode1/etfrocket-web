@@ -26,7 +26,7 @@ const adminSections = [
       "Monitor ETF imports, price history, dividend history, and data operations.",
     href: "/admin/data",
     icon: Database,
-    status: "Coming Soon",
+    status: "Active",
   },
 ];
 

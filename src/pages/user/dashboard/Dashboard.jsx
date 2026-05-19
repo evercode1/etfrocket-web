@@ -184,6 +184,13 @@ function PortfolioSnapshot({
 
   const hasPortfolio = Object.keys(portfolioSelects || {}).length > 0;
 
+  const detailPortfolioId =
+    selectedPortfolioId || missionControl?.selected_portfolio?.id;
+
+  const portfolioDetailUrl = detailPortfolioId
+    ? `/dashboard/portfolios/${detailPortfolioId}`
+    : null;
+
   if (isLoading) {
     return (
       <section className="space-y-5">
@@ -225,6 +232,7 @@ function PortfolioSnapshot({
         <>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
+              to={portfolioDetailUrl}
               icon={WalletCards}
               label="Portfolio Value"
               value={formatCurrency(snapshot?.portfolio_value)}
@@ -232,6 +240,7 @@ function PortfolioSnapshot({
             />
 
             <MetricCard
+              to={portfolioDetailUrl}
               icon={Snowflake}
               label="Monthly Income"
               value={formatCurrency(snapshot?.monthly_income)}
@@ -239,6 +248,7 @@ function PortfolioSnapshot({
             />
 
             <MetricCard
+              to={portfolioDetailUrl}
               icon={TrendingUp}
               label="Total Return"
               value={formatPercent(snapshot?.total_return_percentage)}
@@ -246,6 +256,7 @@ function PortfolioSnapshot({
             />
 
             <MetricCard
+              to={portfolioDetailUrl}
               icon={ShieldCheck}
               label="NAV Health"
               value={snapshot?.nav_health || "Unknown"}
@@ -449,12 +460,12 @@ function PortfolioControls({
               ))}
 
               <div className="mt-2 border-t border-brand-outline pt-2">
-                <button
-                  type="button"
+                <Link
+                  to="/dashboard/portfolios/create"
                   className="block w-full rounded-xl px-3 py-2 text-left text-sm text-brand-primary transition hover:bg-brand-surfaceHighest"
                 >
                   + New Portfolio
-                </button>
+                </Link>
               </div>
             </div>
           )}
@@ -470,7 +481,7 @@ function PortfolioControls({
         className="flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
       >
         <Settings className="h-4 w-4" />
-        Manage
+        Manage All
       </Link>
     </div>
   );
@@ -502,7 +513,7 @@ function EmptyPortfolioState() {
 
           <Link
             to="/dashboard/portfolios/create"
-            className="rocket-button-primary flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+            className="rocket-button-primary mt-6 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
           >
             <Plus className="h-4 w-4" />
             Create Portfolio
@@ -740,17 +751,18 @@ function SectionHeader({ icon: Icon, eyebrow, title, description }) {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, detail }) {
-  return (
-    <div className="glass-card rounded-3xl p-6">
+function MetricCard({ icon: Icon, label, value, detail, to = null }) {
+  const content = (
+    <div className="glass-card h-full rounded-3xl p-6 transition hover:-translate-y-1 hover:border-brand-primary/50">
       <div className="flex items-center justify-between">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary">
           <Icon className="h-5 w-5" />
         </div>
 
-        <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
-          Live
-        </p>
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-brand-primary">
+          <span>Live</span>
+          {to && <ArrowUpRight className="h-4 w-4" />}
+        </div>
       </div>
 
       <p className="mt-5 text-sm text-brand-muted">{label}</p>
@@ -759,6 +771,16 @@ function MetricCard({ icon: Icon, label, value, detail }) {
 
       <p className="mt-2 text-sm text-brand-muted">{detail}</p>
     </div>
+  );
+
+  if (!to) {
+    return content;
+  }
+
+  return (
+    <Link to={to} className="block h-full">
+      {content}
+    </Link>
   );
 }
 

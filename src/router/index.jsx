@@ -35,6 +35,8 @@ import ViewMyTicket from "../pages/user/support/ViewMyTicket";
 import Portfolios from "../pages/user/dashboard/portfolios/Portfolios";
 import CreatePortfolio from "../pages/user/dashboard/portfolios/CreatePortfolio";
 import PortfolioDetail from "../pages/user/dashboard/portfolios/PortfolioDetail";
+import UpdatePortfolio from "../pages/user/dashboard/portfolios/UpdatePortfolio";
+import AddPortfolioTransaction from "../pages/user/dashboard/transactions/AddPortfolioTransaction";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -172,6 +174,14 @@ const router = createBrowserRouter([
           {
             path: "portfolios/:id",
             element: <PortfolioDetail />,
+          },
+          {
+            path: "portfolios/:id/edit",
+            element: <UpdatePortfolio />,
+          },
+          {
+            path: "portfolios/:id/transactions/create",
+            element: <AddPortfolioTransaction />,
           },
           {
             path: "support",

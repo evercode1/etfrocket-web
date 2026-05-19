@@ -37,6 +37,7 @@ import CreatePortfolio from "../pages/user/dashboard/portfolios/CreatePortfolio"
 import PortfolioDetail from "../pages/user/dashboard/portfolios/PortfolioDetail";
 import UpdatePortfolio from "../pages/user/dashboard/portfolios/UpdatePortfolio";
 import AddPortfolioTransaction from "../pages/user/dashboard/transactions/AddPortfolioTransaction";
+import PortfolioTransactions from "../pages/user/dashboard/transactions/PortfolioTransactions";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -179,6 +180,10 @@ const router = createBrowserRouter([
           {
             path: "portfolios/:id/transactions/create",
             element: <AddPortfolioTransaction />,
+          },
+          {
+            path: "portfolios/:id/transactions",
+            element: <PortfolioTransactions />,
           },
           {
             path: "support",

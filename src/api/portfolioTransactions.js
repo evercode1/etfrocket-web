@@ -46,3 +46,11 @@ export async function listPortfolioTransactions(portfolioId, params = {}) {
 
   return response.data;
 }
+
+export async function deletePortfolioTransaction(transactionId) {
+  const response = await api.delete(
+    `/delete-portfolio-transaction/${transactionId}`,
+  );
+
+  return response.data;
+}

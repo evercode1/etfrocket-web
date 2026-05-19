@@ -431,7 +431,7 @@ export default function PortfolioDetail() {
           />
 
           <Link
-            to={`/dashboard/transactions/${portfolio.id}`}
+            to={`/dashboard/portfolios/${portfolio.id}/transactions`}
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
           >
             <Eye className="h-4 w-4" />

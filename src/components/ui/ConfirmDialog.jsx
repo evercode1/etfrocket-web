@@ -5,12 +5,18 @@ export default function ConfirmDialog({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   loading = false,
+  variant = "danger",
   onConfirm,
   onCancel,
 }) {
   if (!isOpen) {
     return null;
   }
+
+  const confirmButtonClass =
+    variant === "primary"
+      ? "rocket-button-primary"
+      : "rounded-xl border border-brand-danger/40 px-6 py-3 font-bold text-brand-danger transition hover:bg-brand-danger/10 disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
@@ -37,7 +43,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-xl border border-brand-danger/40 px-6 py-3 font-bold text-brand-danger transition hover:bg-brand-danger/10 disabled:cursor-not-allowed disabled:opacity-50"
+            className={confirmButtonClass}
           >
             {loading ? "Processing..." : confirmLabel}
           </button>

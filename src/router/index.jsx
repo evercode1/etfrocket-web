@@ -32,15 +32,15 @@ import Settings from "../pages/user/settings/Settings";
 import ListMyTickets from "../pages/user/support/ListMyTickets";
 import CreateTicket from "../pages/user/support/CreateTicket";
 import ViewMyTicket from "../pages/user/support/ViewMyTicket";
+import Portfolios from "../pages/user/dashboard/portfolios/Portfolios";
+import CreatePortfolio from "../pages/user/dashboard/portfolios/CreatePortfolio";
+import PortfolioDetail from "../pages/user/dashboard/portfolios/PortfolioDetail";
+import UpdatePortfolio from "../pages/user/dashboard/portfolios/UpdatePortfolio";
+import AddPortfolioTransaction from "../pages/user/dashboard/transactions/AddPortfolioTransaction";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
 import EtfFilters from "../pages/user/etfs/EtfFilters";
-
-import ListPortfolios from "../pages/user/portfolios/ListPortfolios";
-import CreatePortfolio from "../pages/user/portfolios/CreatePortfolio";
-import EditPortfolio from "../pages/user/portfolios/EditPortfolio";
-import ViewPortfolio from "../pages/user/portfolios/ViewPortfolio";
 
 import ListPortfolioTransactions from "../pages/user/portfolio-transactions/ListPortfolioTransactions";
 import ImportPortfolioTransactions from "../pages/user/portfolio-transactions/ImportPortfolioTransactions";
@@ -164,27 +164,24 @@ const router = createBrowserRouter([
           },
           {
             path: "portfolios",
-            element: <ListPortfolios />,
+            element: <Portfolios />,
           },
           {
             path: "portfolios/create",
             element: <CreatePortfolio />,
           },
+
           {
             path: "portfolios/:id",
-            element: <ViewPortfolio />,
+            element: <PortfolioDetail />,
           },
           {
             path: "portfolios/:id/edit",
-            element: <EditPortfolio />,
+            element: <UpdatePortfolio />,
           },
           {
-            path: "portfolios/:id/transactions",
-            element: <ListPortfolioTransactions />,
-          },
-          {
-            path: "portfolios/:id/transactions/import",
-            element: <ImportPortfolioTransactions />,
+            path: "portfolios/:id/transactions/create",
+            element: <AddPortfolioTransaction />,
           },
           {
             path: "support",

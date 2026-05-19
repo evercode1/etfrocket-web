@@ -268,6 +268,7 @@ export default function ViewTicket() {
       </section>
 
       <ConfirmDialog
+        variant="danger"
         isOpen={isCloseDialogOpen}
         title={`Close ticket #${ticket.id}?`}
         message="This will mark the support ticket as closed. You can still view the ticket history afterward."

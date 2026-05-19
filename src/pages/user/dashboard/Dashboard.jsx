@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { Link } from "react-router-dom";
+
 import {
   getMissionControl,
   getPortfolioSelects,
@@ -44,15 +46,6 @@ const portfolioTrendData = [
   { date: "Mar", value: 10150, income: 238 },
   { date: "Apr", value: 10900, income: 271 },
   { date: "May", value: 11450, income: 292 },
-];
-
-const incomeProjectionData = [
-  { month: "Jun", income: 310 },
-  { month: "Jul", income: 335 },
-  { month: "Aug", income: 360 },
-  { month: "Sep", income: 382 },
-  { month: "Oct", income: 410 },
-  { month: "Nov", income: 438 },
 ];
 
 const watchlistData = [
@@ -187,8 +180,16 @@ function PortfolioSnapshot({
 }) {
   const snapshot = missionControl?.portfolio_snapshot || null;
   const flightPath = missionControl?.portfolio_flight_path || [];
+  const incomeProjection = buildIncomeProjection(snapshot?.monthly_income);
 
   const hasPortfolio = Object.keys(portfolioSelects || {}).length > 0;
+
+  const detailPortfolioId =
+    selectedPortfolioId || missionControl?.selected_portfolio?.id;
+
+  const portfolioDetailUrl = detailPortfolioId
+    ? `/dashboard/portfolios/${detailPortfolioId}`
+    : null;
 
   if (isLoading) {
     return (
@@ -231,6 +232,7 @@ function PortfolioSnapshot({
         <>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
+              to={portfolioDetailUrl}
               icon={WalletCards}
               label="Portfolio Value"
               value={formatCurrency(snapshot?.portfolio_value)}
@@ -238,6 +240,7 @@ function PortfolioSnapshot({
             />
 
             <MetricCard
+              to={portfolioDetailUrl}
               icon={Snowflake}
               label="Monthly Income"
               value={formatCurrency(snapshot?.monthly_income)}
@@ -245,6 +248,7 @@ function PortfolioSnapshot({
             />
 
             <MetricCard
+              to={portfolioDetailUrl}
               icon={TrendingUp}
               label="Total Return"
               value={formatPercent(snapshot?.total_return_percentage)}
@@ -252,6 +256,7 @@ function PortfolioSnapshot({
             />
 
             <MetricCard
+              to={portfolioDetailUrl}
               icon={ShieldCheck}
               label="NAV Health"
               value={snapshot?.nav_health || "Unknown"}
@@ -298,6 +303,19 @@ function PortfolioSnapshot({
                     <YAxis />
 
                     <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        borderColor: "#94a3b8",
+                        color: "#0f172a",
+                      }}
+                      labelStyle={{
+                        color: "#0f172a",
+                        fontWeight: 700,
+                      }}
+                      itemStyle={{
+                        color: "#1e293b",
+                        fontWeight: 600,
+                      }}
                       formatter={(value) =>
                         Number(value).toLocaleString("en-US", {
                           style: "currency",
@@ -322,16 +340,29 @@ function PortfolioSnapshot({
               <CardTitle
                 icon={CalendarClock}
                 title="Income Projection"
-                subtitle="Placeholder Dividend Snowball preview"
+                subtitle="Current monthly income projected forward"
               />
 
               <div className="mt-6 h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={incomeProjectionData}>
+                  <BarChart data={incomeProjection}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        borderColor: "#94a3b8",
+                        color: "#0f172a",
+                      }}
+                      labelStyle={{
+                        color: "#0f172a",
+                        fontWeight: 700,
+                      }}
+                      itemStyle={{
+                        color: "#1e293b",
+                        fontWeight: 600,
+                      }}
                       formatter={(value) =>
                         Number(value).toLocaleString("en-US", {
                           style: "currency",
@@ -347,6 +378,13 @@ function PortfolioSnapshot({
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+
+              <button
+                type="button"
+                className="mt-5 w-full rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              >
+                Change Assumptions
+              </button>
             </div>
           </div>
         </>
@@ -378,13 +416,13 @@ function PortfolioControls({
   if (!hasPortfolio) {
     return (
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
+        <Link
+          to="/dashboard/portfolios/create"
           className="rocket-button-primary flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
         >
           <Plus className="h-4 w-4" />
           Create Portfolio
-        </button>
+        </Link>
       </div>
     );
   }
@@ -422,12 +460,12 @@ function PortfolioControls({
               ))}
 
               <div className="mt-2 border-t border-brand-outline pt-2">
-                <button
-                  type="button"
+                <Link
+                  to="/dashboard/portfolios/create"
                   className="block w-full rounded-xl px-3 py-2 text-left text-sm text-brand-primary transition hover:bg-brand-surfaceHighest"
                 >
                   + New Portfolio
-                </button>
+                </Link>
               </div>
             </div>
           )}
@@ -438,13 +476,13 @@ function PortfolioControls({
         </div>
       )}
 
-      <button
-        type="button"
+      <Link
+        to="/dashboard/portfolios"
         className="flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
       >
         <Settings className="h-4 w-4" />
-        Manage
-      </button>
+        Manage All
+      </Link>
     </div>
   );
 }
@@ -473,13 +511,13 @@ function EmptyPortfolioState() {
             <PreviewChip label="Project Snowball" />
           </div>
 
-          <button
-            type="button"
-            className="rocket-button-primary mt-8 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+          <Link
+            to="/dashboard/portfolios/create"
+            className="rocket-button-primary mt-6 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
           >
             <Plus className="h-4 w-4" />
             Create Portfolio
-          </button>
+          </Link>
         </div>
 
         <div className="lg:col-span-2">
@@ -497,6 +535,19 @@ function EmptyPortfolioState() {
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis />
                   <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderColor: "#94a3b8",
+                      color: "#0f172a",
+                    }}
+                    labelStyle={{
+                      color: "#0f172a",
+                      fontWeight: 700,
+                    }}
+                    itemStyle={{
+                      color: "#1e293b",
+                      fontWeight: 600,
+                    }}
                     formatter={(value) =>
                       Number(value).toLocaleString("en-US", {
                         style: "currency",
@@ -644,6 +695,19 @@ function SystemActivity() {
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    borderColor: "#94a3b8",
+                    color: "#0f172a",
+                  }}
+                  labelStyle={{
+                    color: "#0f172a",
+                    fontWeight: 700,
+                  }}
+                  itemStyle={{
+                    color: "#1e293b",
+                    fontWeight: 600,
+                  }}
                   formatter={(value) =>
                     Number(value).toLocaleString("en-US", {
                       style: "currency",
@@ -687,17 +751,18 @@ function SectionHeader({ icon: Icon, eyebrow, title, description }) {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, detail }) {
-  return (
-    <div className="glass-card rounded-3xl p-6">
+function MetricCard({ icon: Icon, label, value, detail, to = null }) {
+  const content = (
+    <div className="glass-card h-full rounded-3xl p-6 transition hover:-translate-y-1 hover:border-brand-primary/50">
       <div className="flex items-center justify-between">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary">
           <Icon className="h-5 w-5" />
         </div>
 
-        <p className="font-mono text-xs uppercase tracking-widest text-brand-primary">
-          Live
-        </p>
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-brand-primary">
+          <span>Live</span>
+          {to && <ArrowUpRight className="h-4 w-4" />}
+        </div>
       </div>
 
       <p className="mt-5 text-sm text-brand-muted">{label}</p>
@@ -706,6 +771,16 @@ function MetricCard({ icon: Icon, label, value, detail }) {
 
       <p className="mt-2 text-sm text-brand-muted">{detail}</p>
     </div>
+  );
+
+  if (!to) {
+    return content;
+  }
+
+  return (
+    <Link to={to} className="block h-full">
+      {content}
+    </Link>
   );
 }
 
@@ -758,4 +833,34 @@ function formatPercent(value) {
   }
 
   return `${Number(value).toFixed(2)}%`;
+}
+
+function buildIncomeProjection(monthlyIncome = 0) {
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const income = Number(monthlyIncome || 0);
+
+  const currentMonth = new Date().getMonth();
+
+  return Array.from({ length: 6 }, (_, index) => {
+    const monthIndex = (currentMonth + index) % 12;
+
+    return {
+      month: monthNames[monthIndex],
+      income,
+    };
+  });
 }

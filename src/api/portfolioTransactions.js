@@ -35,3 +35,14 @@ export async function csvUploadPortfolioTransactions(portfolioId, file) {
 
   return response.data;
 }
+
+export async function listPortfolioTransactions(portfolioId, params = {}) {
+  const response = await api.get(
+    `/list-portfolio-transactions/${portfolioId}`,
+    {
+      params,
+    },
+  );
+
+  return response.data;
+}

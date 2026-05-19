@@ -42,9 +42,6 @@ import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
 import EtfFilters from "../pages/user/etfs/EtfFilters";
 
-import ListPortfolioTransactions from "../pages/user/portfolio-transactions/ListPortfolioTransactions";
-import ImportPortfolioTransactions from "../pages/user/portfolio-transactions/ImportPortfolioTransactions";
-
 const router = createBrowserRouter([
   {
     path: "/",

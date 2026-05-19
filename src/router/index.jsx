@@ -33,6 +33,8 @@ import ListMyTickets from "../pages/user/support/ListMyTickets";
 import CreateTicket from "../pages/user/support/CreateTicket";
 import ViewMyTicket from "../pages/user/support/ViewMyTicket";
 import Portfolios from "../pages/user/dashboard/portfolios/Portfolios";
+import CreatePortfolio from "../pages/user/dashboard/portfolios/CreatePortfolio";
+import PortfolioDetail from "../pages/user/dashboard/portfolios/PortfolioDetail";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -162,7 +164,15 @@ const router = createBrowserRouter([
             path: "portfolios",
             element: <Portfolios />,
           },
+          {
+            path: "portfolios/create",
+            element: <CreatePortfolio />,
+          },
 
+          {
+            path: "portfolios/:id",
+            element: <PortfolioDetail />,
+          },
           {
             path: "support",
             element: <ListMyTickets />,

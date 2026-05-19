@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   BarChart3,
   Edit,
+  Eye,
   PieChart as PieChartIcon,
   Plus,
   Rocket,
@@ -22,7 +23,10 @@ import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 
 import { deletePortfolio, viewPortfolio } from "../../../../api/portfolios";
 
-import { csvUploadPortfolioTransactions } from "../../../../api/portfolioTransactions";
+import {
+  csvUploadPortfolioTransactions,
+  listPortfolioTransactions,
+} from "../../../../api/portfolioTransactions";
 
 export default function PortfolioDetail() {
   const { id } = useParams();
@@ -30,6 +34,7 @@ export default function PortfolioDetail() {
   const fileInputRef = useRef(null);
 
   const [portfolio, setPortfolio] = useState(null);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -47,6 +52,12 @@ export default function PortfolioDetail() {
       const response = await viewPortfolio(id);
 
       setPortfolio(response.data || null);
+
+      const transactionsResponse = await listPortfolioTransactions(id, {
+        limit: 10,
+      });
+
+      setRecentTransactions(transactionsResponse.data || []);
     } finally {
       setIsLoading(false);
     }
@@ -412,22 +423,90 @@ export default function PortfolioDetail() {
       </section>
 
       <section className="glass-card rounded-3xl p-6">
-        <CardTitle
-          icon={BarChart3}
-          title="Recent Transactions"
-          subtitle="Placeholder area for buys, sells, imports, and edits"
-        />
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <CardTitle
+            icon={BarChart3}
+            title="Recent Transactions"
+            subtitle="Latest 10 buys and sells for this portfolio"
+          />
 
-        <div className="mt-6 rounded-2xl border border-dashed border-brand-outline bg-brand-surfaceHigh p-8 text-center">
-          <p className="font-display text-2xl font-bold">
-            Transactions Coming Next
-          </p>
-
-          <p className="mt-3 text-brand-muted">
-            This section will show recent buys, sells, imported rows, and
-            portfolio adjustments once transaction management is wired in.
-          </p>
+          <Link
+            to={`/dashboard/transactions/${portfolio.id}`}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+          >
+            <Eye className="h-4 w-4" />
+            View All Transactions
+          </Link>
         </div>
+
+        {recentTransactions.length === 0 ? (
+          <EmptyPanel message="No transactions yet. Add a transaction or import a CSV to start building this portfolio." />
+        ) : (
+          <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-brand-surfaceHigh text-brand-muted">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Date</th>
+                  <th className="px-4 py-3 font-semibold">ETF</th>
+                  <th className="px-4 py-3 font-semibold">Type</th>
+                  <th className="px-4 py-3 font-semibold">Shares</th>
+                  <th className="px-4 py-3 font-semibold">Price</th>
+                  <th className="px-4 py-3 font-semibold">Value</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {recentTransactions.map((transaction) => (
+                  <tr
+                    key={transaction.id}
+                    className="border-t border-brand-outline text-brand-muted"
+                  >
+                    <td className="px-4 py-4">
+                      {formatDate(transaction.transaction_date)}
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <p className="font-semibold text-brand-text">
+                        {transaction.etf?.symbol || transaction.symbol || "—"}
+                      </p>
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest ${
+                          Number(transaction.transaction_type_id) === 1
+                            ? "bg-brand-primary/10 text-brand-primary"
+                            : "bg-brand-danger/10 text-brand-danger"
+                        }`}
+                      >
+                        {transaction.transaction_type?.transaction_type_name ||
+                          transaction.transaction_type_name ||
+                          getTransactionTypeLabel(
+                            transaction.transaction_type_id,
+                          )}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-4">
+                      {Number(transaction.shares || 0).toLocaleString()}
+                    </td>
+
+                    <td className="px-4 py-4">
+                      {formatCurrency(transaction.price_per_share)}
+                    </td>
+
+                    <td className="px-4 py-4 font-semibold text-brand-text">
+                      {formatCurrency(
+                        Number(transaction.shares || 0) *
+                          Number(transaction.price_per_share || 0),
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <ConfirmDialog
@@ -501,4 +580,28 @@ function formatPercent(value) {
   }
 
   return `${Number(value).toFixed(2)}%`;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "—";
+  }
+
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function getTransactionTypeLabel(transactionTypeId) {
+  if (Number(transactionTypeId) === 1) {
+    return "Buy";
+  }
+
+  if (Number(transactionTypeId) === 2) {
+    return "Sell";
+  }
+
+  return "Unknown";
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { Link } from "react-router-dom";
+
 import {
   getMissionControl,
   getPortfolioSelects,
@@ -403,13 +405,13 @@ function PortfolioControls({
   if (!hasPortfolio) {
     return (
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
+        <Link
+          to="/dashboard/portfolios/create"
           className="rocket-button-primary flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
         >
           <Plus className="h-4 w-4" />
           Create Portfolio
-        </button>
+        </Link>
       </div>
     );
   }
@@ -463,13 +465,13 @@ function PortfolioControls({
         </div>
       )}
 
-      <button
-        type="button"
+      <Link
+        to="/dashboard/portfolios"
         className="flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
       >
         <Settings className="h-4 w-4" />
         Manage
-      </button>
+      </Link>
     </div>
   );
 }
@@ -498,13 +500,13 @@ function EmptyPortfolioState() {
             <PreviewChip label="Project Snowball" />
           </div>
 
-          <button
-            type="button"
-            className="rocket-button-primary mt-8 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+          <Link
+            to="/dashboard/portfolios/create"
+            className="rocket-button-primary flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
           >
             <Plus className="h-4 w-4" />
             Create Portfolio
-          </button>
+          </Link>
         </div>
 
         <div className="lg:col-span-2">

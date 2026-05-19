@@ -27,3 +27,9 @@ export async function compareEtfs(params = {}) {
 
   return response.data;
 }
+
+export async function listEtfsOwnedByUser(portfolioId) {
+  const response = await api.get(`/list-etfs-owned-by-user/${portfolioId}`);
+
+  return response.data;
+}

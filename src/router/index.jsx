@@ -40,6 +40,9 @@ import AddPortfolioTransaction from "../pages/user/dashboard/transactions/AddPor
 import PortfolioTransactions from "../pages/user/dashboard/transactions/PortfolioTransactions";
 import UpdateTransaction from "../pages/user/dashboard/transactions/UpdateTransaction";
 import IncomeProjection from "../pages/user/dashboard/incomeProjection/IncomeProjection";
+import Dividends from "../pages/user/dashboard/dividends/Dividends";
+import DividendCalendar from "../pages/user/dashboard/dividends/DividendCalendar";
+import DividendHistory from "../pages/user/dashboard/dividends/DividendHistory";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -192,9 +195,23 @@ const router = createBrowserRouter([
             element: <UpdateTransaction />,
           },
           {
+            path: "dividends/:portfolioId",
+            element: <Dividends />,
+          },
+          {
             path: "income-projection/:portfolioId",
 
             element: <IncomeProjection />,
+          },
+          {
+            path: "dividends/:portfolioId/calendar",
+
+            element: <DividendCalendar />,
+          },
+          {
+            path: "dividends/:portfolioId/history",
+
+            element: <DividendHistory />,
           },
           {
             path: "support",

@@ -54,3 +54,21 @@ export async function deletePortfolioTransaction(transactionId) {
 
   return response.data;
 }
+
+export async function showPortfolioTransaction(transactionId) {
+  const response = await api.get(
+    `/show-portfolio-transaction/${transactionId}`,
+  );
+
+  return response.data;
+}
+
+export async function updatePortfolioTransaction(transactionId, data) {
+  const response = await api.put(
+    `/update-portfolio-transaction/${transactionId}`,
+
+    data,
+  );
+
+  return response.data;
+}

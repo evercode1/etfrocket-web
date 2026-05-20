@@ -34,6 +34,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -181,6 +182,10 @@ function PortfolioSnapshot({
   const snapshot = missionControl?.portfolio_snapshot || null;
   const flightPath = missionControl?.portfolio_flight_path || [];
   const incomeProjection = buildIncomeProjection(snapshot?.monthly_income);
+
+  const incomeProjectionPreview = incomeProjection.filter(
+    (row) => row.monthNumber % 2 === 0,
+  );
 
   const hasPortfolio = Object.keys(portfolioSelects || {}).length > 0;
 
@@ -337,18 +342,36 @@ function PortfolioSnapshot({
             </div>
 
             <div className="glass-card rounded-3xl p-6 lg:col-span-2">
-              <CardTitle
-                icon={CalendarClock}
-                title="Income Projection"
-                subtitle="Current monthly income projected forward"
-              />
+              <div className="flex items-start justify-between gap-4">
+                <CardTitle
+                  icon={CalendarClock}
+                  title="Income Projection"
+                  subtitle="Base case monthly income path"
+                />
 
-              <div className="mt-6 h-72">
+                <span className="rounded-full border border-brand-primary/40 bg-brand-primary/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-brand-primary">
+                  Base Case
+                </span>
+              </div>
+
+              <div className="mt-6 h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={incomeProjection}>
+                  <BarChart
+                    data={incomeProjectionPreview}
+                    margin={{ top: 10, right: 8, left: 0, bottom: 0 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                    <XAxis dataKey="month" />
-                    <YAxis />
+
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 11 }}
+                      interval={0}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+
+                    <YAxis hide domain={["dataMin - 100", "dataMax + 100"]} />
+
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#ffffff",
@@ -363,28 +386,33 @@ function PortfolioSnapshot({
                         color: "#1e293b",
                         fontWeight: 600,
                       }}
-                      formatter={(value) =>
-                        Number(value).toLocaleString("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        })
-                      }
+                      formatter={(value) => formatCurrency(value)}
                     />
+
+                    <ReferenceLine
+                      y={Number(snapshot?.monthly_income || 0)}
+                      stroke="currentColor"
+                      strokeDasharray="4 4"
+                      opacity={0.35}
+                    />
+
                     <Bar
                       dataKey="income"
                       fill="currentColor"
-                      radius={[8, 8, 0, 0]}
+                      radius={[10, 10, 4, 4]}
+                      opacity={0.75}
+                      barSize={32}
                     />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
-              <button
-                type="button"
-                className="mt-5 w-full rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              <Link
+                to={`/dashboard/income-projection/${missionControl?.selected_portfolio?.id}`}
+                className="mt-5 flex w-full items-center justify-center rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
               >
                 Change Assumptions
-              </button>
+              </Link>
             </div>
           </div>
         </>
@@ -836,31 +864,34 @@ function formatPercent(value) {
 }
 
 function buildIncomeProjection(monthlyIncome = 0) {
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  const startingMonthlyIncome = Number(monthlyIncome || 0);
+  const monthlyContribution = 0;
+  const annualIncomeGrowth = 6;
+  const reinvestPercent = 0;
+  const years = 1;
 
-  const income = Number(monthlyIncome || 0);
+  const totalMonths = years * 12;
+  const monthlyGrowthRate = annualIncomeGrowth / 100 / 12;
+  const contributionIncomeRate = 0.008;
+  const reinvestMonthlyBoost = (reinvestPercent / 100) * 0.01;
 
-  const currentMonth = new Date().getMonth();
+  let projectedMonthlyIncome = startingMonthlyIncome;
+  let cumulativeIncome = 0;
 
-  return Array.from({ length: 6 }, (_, index) => {
-    const monthIndex = (currentMonth + index) % 12;
+  return Array.from({ length: totalMonths }, (_, index) => {
+    const monthNumber = index + 1;
+
+    projectedMonthlyIncome =
+      projectedMonthlyIncome * (1 + monthlyGrowthRate + reinvestMonthlyBoost) +
+      monthlyContribution * contributionIncomeRate;
+
+    cumulativeIncome += projectedMonthlyIncome;
 
     return {
-      month: monthNames[monthIndex],
-      income,
+      monthNumber,
+      month: `Month ${monthNumber}`,
+      income: Number(projectedMonthlyIncome.toFixed(2)),
+      cumulativeIncome: Number(cumulativeIncome.toFixed(2)),
     };
   });
 }

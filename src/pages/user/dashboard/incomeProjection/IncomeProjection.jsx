@@ -121,6 +121,10 @@ export default function IncomeProjection() {
     years,
   ]);
 
+  const chartProjection = useMemo(() => {
+    return projection.filter((row) => row.monthNumber % 3 === 0);
+  }, [projection]);
+
   const finalMonth = projection[projection.length - 1];
 
   if (isLoading) {
@@ -231,13 +235,13 @@ export default function IncomeProjection() {
           <CardTitle
             icon={BarChart3}
             title="Income Projection"
-            subtitle="Projected monthly income by month"
+            subtitle="Quarterly checkpoints from the monthly projection"
           />
 
           <div className="mt-6 h-96">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={projection}
+                data={chartProjection}
                 margin={{ top: 12, right: 8, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
@@ -245,7 +249,7 @@ export default function IncomeProjection() {
                 <XAxis
                   dataKey="label"
                   tick={{ fontSize: 12 }}
-                  interval={Math.max(Math.floor(projection.length / 8), 1)}
+                  interval={Math.max(Math.floor(chartProjection.length / 8), 0)}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -282,7 +286,7 @@ export default function IncomeProjection() {
                   fill="currentColor"
                   radius={[10, 10, 4, 4]}
                   opacity={0.78}
-                  maxBarSize={34}
+                  maxBarSize={42}
                 />
               </BarChart>
             </ResponsiveContainer>

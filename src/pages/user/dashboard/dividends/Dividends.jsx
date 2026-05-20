@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { getDividendIntelligence } from "../../../../api/dividends";
 
@@ -28,7 +28,10 @@ export default function Dividends() {
     });
 
     loadDividendIntelligence();
-  }, []);
+  }, [portfolioId]);
+
+  const navigate = useNavigate();
+  const portfolioSelects = dividendIntelligence?.portfolio_selects || {};
 
   const summary = dividendIntelligence?.summary || {};
 
@@ -105,9 +108,25 @@ export default function Dividends() {
                 Active Portfolio
               </span>
 
-              <span className="text-sm font-semibold text-brand-text">
-                {dividendIntelligence?.portfolio?.name || "Unknown Portfolio"}
-              </span>
+              <select
+                value={String(
+                  dividendIntelligence?.portfolio?.id || portfolioId || "",
+                )}
+                onChange={(event) => {
+                  navigate(`/dashboard/dividends/${event.target.value}`);
+                }}
+                className="bg-transparent text-sm font-semibold text-brand-text outline-none"
+              >
+                {Object.entries(portfolioSelects).map(([id, name]) => (
+                  <option
+                    key={id}
+                    value={id}
+                    className="bg-brand-surface text-brand-text"
+                  >
+                    {name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

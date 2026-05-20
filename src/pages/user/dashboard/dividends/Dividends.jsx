@@ -42,10 +42,28 @@ export default function Dividends() {
 
   const signals = dividendIntelligence?.signals || [];
 
-  const maxTimelineIncome = Math.max(
-    ...dividendTimeline.map((item) => Number(item.income || 0)),
-    1,
+  const timelineIncomeValues = dividendTimeline.map((item) =>
+    Number(item.income || 0),
   );
+
+  const maxTimelineIncome = Math.max(...timelineIncomeValues, 0);
+
+  const minTimelineIncome = Math.min(
+    ...timelineIncomeValues,
+    maxTimelineIncome,
+  );
+
+  function getTimelineBarHeight(income) {
+    if (!maxTimelineIncome || maxTimelineIncome === minTimelineIncome) {
+      return 70;
+    }
+
+    const range = maxTimelineIncome - minTimelineIncome;
+
+    const position = (Number(income || 0) - minTimelineIncome) / range;
+
+    return 55 + position * 45;
+  }
 
   const historyUrl = portfolioId
     ? `/dashboard/dividends/${portfolioId}/history`
@@ -154,29 +172,28 @@ export default function Dividends() {
           </div>
 
           {dividendTimeline.length > 0 ? (
-            <div className="mt-8 flex h-72 items-end justify-between gap-4">
+            <div className="mt-8 grid h-80 grid-cols-5 items-end gap-4">
               {dividendTimeline.map((item) => (
                 <div
                   key={item.month}
                   className="flex flex-1 flex-col items-center"
                 >
-                  <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-t-3xl bg-brand-surfaceHigh">
-                    <div
-                      className="w-full rounded-t-3xl bg-gradient-to-t from-brand-primary/90 to-cyan-300/90 transition-all duration-500"
-                      style={{
-                        height: `${Math.max(
-                          (Number(item.income || 0) / maxTimelineIncome) * 100,
-                          4,
-                        )}%`,
-                      }}
-                    />
-
-                    <div className="absolute top-3 text-sm font-semibold text-white">
+                  <div className="mb-4 text-center">
+                    <div className="whitespace-nowrap text-center text-sm font-bold text-white lg:text-base">
                       {formatCurrency(item.income)}
                     </div>
                   </div>
 
-                  <div className="mt-3 text-sm font-semibold text-brand-muted">
+                  <div className="relative flex h-56 w-full min-w-0 items-end justify-center overflow-hidden rounded-t-3xl bg-brand-surfaceHigh">
+                    <div
+                      className="w-full rounded-t-3xl bg-gradient-to-t from-brand-primary/90 to-cyan-300/90 transition-all duration-500"
+                      style={{
+                        height: `${getTimelineBarHeight(item.income)}%`,
+                      }}
+                    />
+                  </div>
+
+                  <div className="mt-4 text-sm font-semibold text-brand-muted">
                     {item.month}
                   </div>
                 </div>

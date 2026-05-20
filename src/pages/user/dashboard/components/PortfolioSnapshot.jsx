@@ -37,7 +37,7 @@ export default function PortfolioSnapshot({
 }) {
   const snapshot = missionControl?.portfolio_snapshot || null;
   const flightPath = missionControl?.portfolio_flight_path || [];
-  const incomeProjection = buildIncomeProjection(snapshot?.monthly_income);
+  const incomeProjection = snapshot?.income_projection || [];
 
   const incomeProjectionPreview = incomeProjection.filter(
     (row) => row.monthNumber % 2 === 0,

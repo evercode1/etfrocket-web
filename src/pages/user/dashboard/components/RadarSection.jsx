@@ -2,62 +2,68 @@ import { Eye } from "lucide-react";
 
 import RadarCard from "./RadarCard";
 
-const fallbackRadarItems = [
-  {
-    ticker: "NVII",
-    yield: "38.4%",
-    nav: "Improving",
-    momentum: "+8.7%",
-  },
-  {
-    ticker: "CHPY",
-    yield: "41.2%",
-    nav: "Stable",
-    momentum: "+4.1%",
-  },
-  {
-    ticker: "AMDY",
-    yield: "52.8%",
-    nav: "Watch",
-    momentum: "-2.6%",
-  },
-];
-
 export default function RadarSection({
   portfolioId,
   hasPortfolio = true,
   hasHoldings = false,
 }) {
+  console.log("Radar portfolioId", portfolioId);
+  const radarTools = [
+    {
+      title: "Compare My ETFs",
+      description:
+        "Compare ETFs you already own across income, return, NAV stability, and AUM trends.",
+      badge: "Portfolio",
+      stats: [
+        { label: "Source", value: "Current Holdings" },
+        { label: "Best For", value: "Allocation Review" },
+        { label: "Status", value: "Ready Soon" },
+      ],
+      to: portfolioId
+        ? `/dashboard/radar/portfolio-compare/${portfolioId}`
+        : null,
+      disabled: !hasHoldings,
+    },
+    {
+      title: "Compare Symbols",
+      description:
+        "Enter a small group of ETF symbols and compare them side-by-side before adding to a portfolio.",
+      badge: "Custom",
+      stats: [
+        { label: "Input", value: "ETF Symbols" },
+        { label: "Limit", value: "Up to 10" },
+        { label: "Status", value: "Planned" },
+      ],
+      to: "/dashboard/radar/symbol-compare",
+      disabled: false,
+    },
+    {
+      title: "Metric Explorer",
+      description:
+        "Rank ETFs by yield, NAV stability, AUM growth, total return, dividend trends, and risk signals.",
+      badge: "Research",
+      stats: [
+        { label: "Mode", value: "Screener" },
+        { label: "Sort By", value: "ETF Metrics" },
+        { label: "Status", value: "Planned" },
+      ],
+      to: "/dashboard/radar/metric-explorer",
+      disabled: false,
+    },
+  ];
+
   if (!hasPortfolio) {
     return (
       <section className="space-y-5">
         <SectionHeader
           icon={Eye}
-          eyebrow="Watchlist Intelligence"
-          title="Tracked ETF Radar"
-          description="Create a portfolio to unlock ETF radar insights."
+          eyebrow="ETF Radar"
+          title="Research Command Center"
+          description="Create a portfolio to unlock ETF research and comparison tools."
         />
 
         <div className="glass-card rounded-3xl p-8 text-brand-muted">
-          ETF radar cards will appear here once portfolio data is available.
-        </div>
-      </section>
-    );
-  }
-
-  if (!hasHoldings) {
-    return (
-      <section className="space-y-5">
-        <SectionHeader
-          icon={Eye}
-          eyebrow="Watchlist Intelligence"
-          title="Tracked ETF Radar"
-          description="Add ETFs to your portfolio to unlock ETF radar insights."
-        />
-
-        <div className="glass-card rounded-3xl p-8 text-brand-muted">
-          Add ETF transactions to this portfolio to track yield, NAV direction,
-          and momentum signals.
+          ETF research tools will appear here once portfolio data is available.
         </div>
       </section>
     );
@@ -67,20 +73,21 @@ export default function RadarSection({
     <section className="space-y-5">
       <SectionHeader
         icon={Eye}
-        eyebrow="Watchlist Intelligence"
-        title="Tracked ETF Radar"
-        description="A future snapshot of ETFs the user follows, with yield, NAV direction, and momentum signals."
+        eyebrow="ETF Radar"
+        title="Research Command Center"
+        description="Compare your holdings, test ETF ideas, and explore the strongest opportunities by metric."
       />
 
       <div className="grid gap-5 lg:grid-cols-3">
-        {fallbackRadarItems.map((item) => (
+        {radarTools.map((tool) => (
           <RadarCard
-            key={item.ticker}
-            ticker={item.ticker}
-            yieldValue={item.yield}
-            nav={item.nav}
-            momentum={item.momentum}
-            portfolioId={portfolioId}
+            key={tool.title}
+            title={tool.title}
+            description={tool.description}
+            badge={tool.badge}
+            stats={tool.stats}
+            to={tool.to}
+            disabled={tool.disabled}
           />
         ))}
       </div>

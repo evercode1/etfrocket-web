@@ -36,6 +36,7 @@ import Portfolios from "../pages/user/dashboard/portfolios/Portfolios";
 import CreatePortfolio from "../pages/user/dashboard/portfolios/CreatePortfolio";
 import PortfolioDetail from "../pages/user/dashboard/portfolios/PortfolioDetail";
 import UpdatePortfolio from "../pages/user/dashboard/portfolios/UpdatePortfolio";
+import PortfolioHoldings from "../pages/user/dashboard/portfolios/PortfolioHoldings";
 import AddPortfolioTransaction from "../pages/user/dashboard/transactions/AddPortfolioTransaction";
 import PortfolioTransactions from "../pages/user/dashboard/transactions/PortfolioTransactions";
 import UpdateTransaction from "../pages/user/dashboard/transactions/UpdateTransaction";
@@ -184,6 +185,10 @@ const router = createBrowserRouter([
           {
             path: "portfolios/:id/edit",
             element: <UpdatePortfolio />,
+          },
+          {
+            path: "portfolios/:id/holdings",
+            element: <PortfolioHoldings />,
           },
           {
             path: "portfolios/:id/transactions/create",

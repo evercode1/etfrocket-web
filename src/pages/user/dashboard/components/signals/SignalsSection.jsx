@@ -7,10 +7,15 @@ import {
   getPortfolioNavStabilitySignal,
 } from "../../../../../api/portfolioSignals";
 
-import DividendSignalCard from "./DividendSignalCard";
+import SignalCard from "./SignalCard";
 
-export default function DividendSignalsSection({ signals }) {
-  const { portfolioId } = useParams();
+export default function SignalsSection({
+  signals,
+  portfolioId: propPortfolioId,
+}) {
+  const params = useParams();
+
+  const activePortfolioId = propPortfolioId || params.portfolioId;
 
   const [distributionGrowthSignal, setDistributionGrowthSignal] =
     useState(null);
@@ -19,7 +24,7 @@ export default function DividendSignalsSection({ signals }) {
   const [navStabilitySignal, setNavStabilitySignal] = useState(null);
 
   async function loadSignals() {
-    if (!portfolioId) {
+    if (!activePortfolioId) {
       return;
     }
 
@@ -28,9 +33,9 @@ export default function DividendSignalsSection({ signals }) {
       aumGrowthResponse,
       navStabilityResponse,
     ] = await Promise.all([
-      getPortfolioDistributionGrowthSignal(portfolioId),
-      getPortfolioAumGrowthSignal(portfolioId),
-      getPortfolioNavStabilitySignal(portfolioId),
+      getPortfolioDistributionGrowthSignal(activePortfolioId),
+      getPortfolioAumGrowthSignal(activePortfolioId),
+      getPortfolioNavStabilitySignal(activePortfolioId),
     ]);
 
     setDistributionGrowthSignal(distributionGrowthResponse.data || null);
@@ -40,7 +45,7 @@ export default function DividendSignalsSection({ signals }) {
 
   useEffect(() => {
     loadSignals();
-  }, [portfolioId]);
+  }, [activePortfolioId]);
 
   const enhancedSignals = buildSignals(
     signals,
@@ -68,7 +73,7 @@ export default function DividendSignalsSection({ signals }) {
       {enhancedSignals.length > 0 ? (
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
           {enhancedSignals.map((signal) => (
-            <DividendSignalCard
+            <SignalCard
               key={signal.title}
               title={signal.title}
               message={signal.message}

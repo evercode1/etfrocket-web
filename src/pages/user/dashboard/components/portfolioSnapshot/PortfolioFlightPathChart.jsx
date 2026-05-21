@@ -1,4 +1,7 @@
+import { Link } from "react-router-dom";
+
 import { LineChart as LineChartIcon } from "lucide-react";
+
 import {
   Area,
   AreaChart,
@@ -11,9 +14,19 @@ import {
 
 import CardTitle from "./CardTitle";
 
-export default function PortfolioFlightPathChart({ flightPath }) {
+export default function PortfolioFlightPathChart({
+  flightPath,
+  detailPortfolioId,
+}) {
+  const portfolioDetailUrl = detailPortfolioId
+    ? `/dashboard/portfolios/${detailPortfolioId}`
+    : "#";
+
   return (
-    <div className="glass-card rounded-3xl p-6 lg:col-span-3">
+    <Link
+      to={portfolioDetailUrl}
+      className="glass-card block rounded-3xl p-6 transition hover:-translate-y-1 hover:border-brand-primary/50 lg:col-span-3"
+    >
       <CardTitle
         icon={LineChartIcon}
         title="Portfolio Flight Path"
@@ -68,6 +81,6 @@ export default function PortfolioFlightPathChart({ flightPath }) {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </Link>
   );
 }

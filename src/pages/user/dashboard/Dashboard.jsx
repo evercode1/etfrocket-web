@@ -9,7 +9,7 @@ import { Rocket } from "lucide-react";
 
 import PortfolioSnapshot from "./components/portfolioSnapshot/PortfolioSnapshot";
 import RadarSection from "./components/RadarSection";
-import SignalSection from "./components/SignalSection";
+import SignalsSection from "./components/signals/SignalsSection";
 import TelemetrySection from "./components/TelemetrySection";
 
 export default function Dashboard() {
@@ -102,10 +102,11 @@ export default function Dashboard() {
         isLoading={isLoading}
       />
 
-      <SignalSection
-        portfolioId={activePortfolioId}
-        hasPortfolio={hasPortfolio}
-        hasHoldings={hasHoldings}
+      <SignalsSection
+        signals={missionControl?.signals || []}
+        portfolioId={
+          selectedPortfolioId || missionControl?.selected_portfolio?.id
+        }
       />
 
       <RadarSection

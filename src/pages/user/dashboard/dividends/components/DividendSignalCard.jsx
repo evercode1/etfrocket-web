@@ -5,6 +5,7 @@ export default function DividendSignalCard({
   message,
   details,
   topContributors = [],
+  contributorType = "distribution",
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -38,31 +39,11 @@ export default function DividendSignalCard({
 
               <div className="mt-3 space-y-3">
                 {topContributors.map((contributor) => (
-                  <div
+                  <ContributorCard
                     key={contributor.symbol}
-                    className="rounded-2xl border border-brand-outline bg-brand-surface px-4 py-3"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="font-display text-lg font-bold text-brand-primary">
-                        {contributor.symbol}
-                      </span>
-
-                      <span className="text-sm font-semibold text-brand-text">
-                        {formatCurrency(contributor.estimated_income_impact)}
-                      </span>
-                    </div>
-
-                    <p className="mt-2 text-sm text-brand-muted">
-                      30-day avg{" "}
-                      {formatCurrency(contributor.recent_average_dividend)} vs.
-                      90-day avg{" "}
-                      {formatCurrency(contributor.baseline_average_dividend)}
-                    </p>
-
-                    <p className="mt-1 text-sm text-brand-muted">
-                      Growth: {formatPercent(contributor.growth_percentage)}
-                    </p>
-                  </div>
+                    contributor={contributor}
+                    contributorType={contributorType}
+                  />
                 ))}
               </div>
             </div>
@@ -121,10 +102,69 @@ export default function DividendSignalCard({
   );
 }
 
+function ContributorCard({ contributor, contributorType }) {
+  if (contributorType === "aum") {
+    return (
+      <div className="rounded-2xl border border-brand-outline bg-brand-surface px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-display text-lg font-bold text-brand-primary">
+            {contributor.symbol}
+          </span>
+
+          <span className="text-sm font-semibold text-brand-text">
+            {formatPercent(contributor.aum_change_percentage)}
+          </span>
+        </div>
+
+        <p className="mt-2 text-sm text-brand-muted">
+          AUM change: {formatLargeCurrency(contributor.aum_change)}
+        </p>
+
+        <p className="mt-1 text-sm text-brand-muted">
+          {formatLargeCurrency(contributor.start_aum)} to{" "}
+          {formatLargeCurrency(contributor.end_aum)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-brand-outline bg-brand-surface px-4 py-3">
+      <div className="flex items-center justify-between gap-4">
+        <span className="font-display text-lg font-bold text-brand-primary">
+          {contributor.symbol}
+        </span>
+
+        <span className="text-sm font-semibold text-brand-text">
+          {formatCurrency(contributor.estimated_income_impact)}
+        </span>
+      </div>
+
+      <p className="mt-2 text-sm text-brand-muted">
+        30-day avg {formatCurrency(contributor.recent_average_dividend)} vs.
+        90-day avg {formatCurrency(contributor.baseline_average_dividend)}
+      </p>
+
+      <p className="mt-1 text-sm text-brand-muted">
+        Growth: {formatPercent(contributor.growth_percentage)}
+      </p>
+    </div>
+  );
+}
+
 function formatCurrency(value) {
   return Number(value || 0).toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
+  });
+}
+
+function formatLargeCurrency(value) {
+  return Number(value || 0).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 2,
   });
 }
 

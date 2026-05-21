@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { getDividendIntelligence } from "../../../../api/dividends";
+import DividendSignalsSection from "./components/DividendSignalsSection";
 
 export default function Dividends() {
   const { portfolioId } = useParams();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
   const [dividendIntelligence, setDividendIntelligence] = useState(null);
@@ -30,19 +32,13 @@ export default function Dividends() {
     loadDividendIntelligence();
   }, [portfolioId]);
 
-  const navigate = useNavigate();
   const portfolioSelects = dividendIntelligence?.portfolio_selects || {};
-
   const summary = dividendIntelligence?.summary || {};
-
   const upcomingDividends =
     dividendIntelligence?.upcoming_weekly_dividends || [];
-
   const additionalWeeklyEventsCount =
     dividendIntelligence?.additional_weekly_events_count || 0;
-
   const dividendTimeline = dividendIntelligence?.income_timeline || [];
-
   const signals = dividendIntelligence?.signals || [];
 
   const timelineIncomeValues = dividendTimeline.map((item) =>
@@ -62,7 +58,6 @@ export default function Dividends() {
     }
 
     const range = maxTimelineIncome - minTimelineIncome;
-
     const position = (Number(income || 0) - minTimelineIncome) / range;
 
     return 55 + position * 45;
@@ -283,45 +278,7 @@ export default function Dividends() {
         </div>
       </section>
 
-      <section className="glass-card rounded-3xl p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-2xl font-bold">
-              Dividend Signals
-            </h2>
-
-            <p className="mt-1 text-sm text-brand-muted">
-              Rule-based payout observations and trend analysis
-            </p>
-          </div>
-
-          <div className="rounded-full border border-brand-outline bg-brand-surfaceHigh px-4 py-2 text-xs font-mono uppercase tracking-widest text-brand-primary">
-            Experimental
-          </div>
-        </div>
-
-        {signals.length > 0 ? (
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            {signals.map((signal) => (
-              <SignalCard
-                key={signal.title}
-                title={signal.title}
-                message={signal.message}
-                details={{
-                  affectedEtfs: signal.affected_etfs || [],
-                  observation: signal.observation || "",
-                  possibleCauses: signal.possible_causes || [],
-                }}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="mt-6 rounded-2xl border border-brand-outline bg-brand-surfaceHigh p-8 text-center text-brand-muted">
-            Dividend signals will appear once this portfolio has dividend
-            history to analyze.
-          </div>
-        )}
-      </section>
+      <DividendSignalsSection signals={signals} />
     </div>
   );
 }
@@ -385,84 +342,6 @@ function DividendCard({ dividend }) {
       <p className="mt-4 text-sm leading-relaxed text-brand-muted">
         {dividend.note}
       </p>
-    </div>
-  );
-}
-
-function SignalCard({ title, message, details }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="rounded-3xl border border-brand-outline bg-brand-surfaceHigh p-6 transition hover:border-brand-primary/40">
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="font-display text-xl font-bold">{title}</h3>
-
-            <p className="mt-3 leading-relaxed text-brand-muted">{message}</p>
-          </div>
-
-          <span className="rounded-full border border-brand-outline bg-brand-surface px-3 py-1 text-xs font-semibold text-brand-muted">
-            {isOpen ? "Hide" : "Details"}
-          </span>
-        </div>
-      </button>
-
-      {isOpen && (
-        <div className="mt-6 space-y-5 border-t border-brand-outline pt-5">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
-              Affected ETFs
-            </p>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {details.affectedEtfs.length > 0 ? (
-                details.affectedEtfs.map((etf) => (
-                  <span
-                    key={etf}
-                    className="rounded-full border border-brand-outline bg-brand-surface px-3 py-1 text-sm font-semibold text-brand-text"
-                  >
-                    {etf}
-                  </span>
-                ))
-              ) : (
-                <span className="text-sm text-brand-muted">None detected</span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
-              Observation
-            </p>
-
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">
-              {details.observation || "No observation available yet."}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-primary">
-              Possible Causes
-            </p>
-
-            <ul className="mt-3 space-y-2">
-              {details.possibleCauses.map((cause) => (
-                <li
-                  key={cause}
-                  className="rounded-2xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm text-brand-muted"
-                >
-                  {cause}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

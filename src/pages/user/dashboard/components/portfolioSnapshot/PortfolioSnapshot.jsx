@@ -110,7 +110,10 @@ export default function PortfolioSnapshot({
           </div>
 
           <div className="grid gap-5 lg:grid-cols-5">
-            <PortfolioFlightPathChart flightPath={flightPath} />
+            <PortfolioFlightPathChart
+              flightPath={flightPath}
+              detailPortfolioId={detailPortfolioId}
+            />
 
             <IncomeProjectionChart
               incomeProjection={incomeProjection}

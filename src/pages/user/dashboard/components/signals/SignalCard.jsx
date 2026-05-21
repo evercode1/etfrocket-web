@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function DividendSignalCard({
+export default function SignalCard({
   title,
   message,
   details,

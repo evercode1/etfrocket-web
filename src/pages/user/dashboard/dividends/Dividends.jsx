@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { getDividendIntelligence } from "../../../../api/dividends";
-import DividendSignalsSection from "./components/DividendSignalsSection";
+import SignalsSection from "../components/signals/SignalsSection";
 
 export default function Dividends() {
   const { portfolioId } = useParams();
@@ -278,7 +278,7 @@ export default function Dividends() {
         </div>
       </section>
 
-      <DividendSignalsSection signals={signals} />
+      <SignalsSection signals={signals} />
     </div>
   );
 }

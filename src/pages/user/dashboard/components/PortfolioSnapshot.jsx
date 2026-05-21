@@ -40,7 +40,7 @@ export default function PortfolioSnapshot({
   const incomeProjection = snapshot?.income_projection || [];
 
   const incomeProjectionPreview = incomeProjection.filter(
-    (row) => row.monthNumber % 2 === 0,
+    (_, index) => index % 2 === 1,
   );
 
   const hasPortfolio = Object.keys(portfolioSelects || {}).length > 0;
@@ -164,6 +164,19 @@ export default function PortfolioSnapshot({
                     <YAxis />
 
                     <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#131c35",
+                        border: "1px solid rgba(94, 234, 212, 0.2)",
+                        borderRadius: "16px",
+                        color: "#f8fafc",
+                      }}
+                      labelStyle={{
+                        color: "#f8fafc",
+                        fontWeight: 600,
+                      }}
+                      itemStyle={{
+                        color: "#f8fafc",
+                      }}
                       formatter={(value) =>
                         Number(value).toLocaleString("en-US", {
                           style: "currency",
@@ -197,48 +210,75 @@ export default function PortfolioSnapshot({
                 </span>
               </div>
 
-              <div className="mt-6 h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={incomeProjectionPreview}
-                    margin={{ top: 10, right: 8, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+              <div className="mt-6 h-64 min-h-[16rem] min-w-0">
+                {incomeProjectionPreview.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={incomeProjectionPreview}
+                      margin={{ top: 10, right: 8, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
 
-                    <XAxis
-                      dataKey="month"
-                      tick={{ fontSize: 11 }}
-                      interval={0}
-                      axisLine={false}
-                      tickLine={false}
-                    />
+                      <XAxis
+                        dataKey="month"
+                        tick={{ fontSize: 11 }}
+                        interval={0}
+                        axisLine={false}
+                        tickLine={false}
+                      />
 
-                    <YAxis
-                      hide
-                      domain={[
-                        (dataMin) => dataMin * 0.97,
-                        (dataMax) => dataMax * 1.01,
-                      ]}
-                    />
+                      <YAxis
+                        hide
+                        domain={[
+                          (dataMin) => dataMin * 0.97,
+                          (dataMax) => dataMax * 1.01,
+                        ]}
+                      />
 
-                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#131c35",
+                          border: "1px solid rgba(94, 234, 212, 0.2)",
+                          borderRadius: "16px",
+                          color: "#f8fafc",
+                        }}
+                        labelStyle={{
+                          color: "#f8fafc",
+                          fontWeight: 600,
+                        }}
+                        itemStyle={{
+                          color: "#f8fafc",
+                        }}
+                        formatter={(value) =>
+                          Number(value).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          })
+                        }
+                      />
 
-                    <ReferenceLine
-                      y={Number(snapshot?.monthly_income || 0)}
-                      stroke="currentColor"
-                      strokeDasharray="4 4"
-                      opacity={0.35}
-                    />
+                      <ReferenceLine
+                        y={Number(snapshot?.monthly_income || 0)}
+                        stroke="currentColor"
+                        strokeDasharray="4 4"
+                        opacity={0.35}
+                      />
 
-                    <Bar
-                      dataKey="income"
-                      fill="currentColor"
-                      radius={[10, 10, 4, 4]}
-                      opacity={0.75}
-                      barSize={32}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                      <Bar
+                        dataKey="income"
+                        fill="currentColor"
+                        radius={[10, 10, 4, 4]}
+                        opacity={0.75}
+                        barSize={32}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center rounded-2xl border border-brand-outline bg-brand-surfaceHigh text-sm text-brand-muted">
+                    Income projection will appear once dividend history is
+                    available.
+                  </div>
+                )}
               </div>
 
               <Link

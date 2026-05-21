@@ -19,7 +19,6 @@ export default function DividendSignalCard({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="font-display text-xl font-bold">{title}</h3>
-
             <p className="mt-3 leading-relaxed text-brand-muted">{message}</p>
           </div>
 
@@ -123,6 +122,31 @@ function ContributorCard({ contributor, contributorType }) {
         <p className="mt-1 text-sm text-brand-muted">
           {formatLargeCurrency(contributor.start_aum)} to{" "}
           {formatLargeCurrency(contributor.end_aum)}
+        </p>
+      </div>
+    );
+  }
+
+  if (contributorType === "nav") {
+    return (
+      <div className="rounded-2xl border border-brand-outline bg-brand-surface px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-display text-lg font-bold text-brand-primary">
+            {contributor.symbol}
+          </span>
+
+          <span className="text-sm font-semibold text-brand-text">
+            {formatPercent(contributor.nav_erosion_percentage)}
+          </span>
+        </div>
+
+        <p className="mt-2 text-sm text-brand-muted">
+          NAV change: {formatCurrency(contributor.nav_change)}
+        </p>
+
+        <p className="mt-1 text-sm text-brand-muted">
+          {formatCurrency(contributor.start_nav)} to{" "}
+          {formatCurrency(contributor.end_nav)}
         </p>
       </div>
     );

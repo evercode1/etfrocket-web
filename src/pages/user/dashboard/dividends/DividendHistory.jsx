@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getDividendHistory } from "../../../../api/dividends";
@@ -61,13 +61,6 @@ export default function DividendHistory() {
   const dividends = historyResponse?.dividends || null;
   const dividendRows = dividends?.data || [];
 
-  const visibleDistribution = useMemo(() => {
-    return dividendRows.reduce(
-      (total, row) => total + Number(row.dividend_amount || 0),
-      0,
-    );
-  }, [dividendRows]);
-
   if (isLoading) {
     return (
       <div className="glass-card rounded-3xl p-8 text-brand-muted">
@@ -99,7 +92,6 @@ export default function DividendHistory() {
           portfolio.
         </p>
       </section>
-
       <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           label="Paid Records"
@@ -108,21 +100,21 @@ export default function DividendHistory() {
         />
 
         <MetricCard
-          label="Total Distributions"
+          label="Total Paid"
           value={formatCurrency(historyResponse?.total_paid)}
-          detail="Total across all filtered records"
+          detail="Shares owned × distributions"
         />
 
         <MetricCard
-          label="Visible Page Total"
-          value={formatCurrency(visibleDistribution)}
-          detail="Total from current page"
+          label="Month To Date Earnings"
+          value={formatCurrency(historyResponse?.month_to_date_paid)}
+          detail="Paid dividends this month"
         />
 
         <MetricCard
-          label="Current Page"
-          value={dividends?.current_page || 1}
-          detail={`of ${dividends?.last_page || 1}`}
+          label="Last Month Earnings"
+          value={formatCurrency(historyResponse?.last_month_paid)}
+          detail="Paid dividends from prior month"
         />
       </section>
 
@@ -224,6 +216,8 @@ export default function DividendHistory() {
                 <th className="px-4 py-3 font-semibold">Ex-Date</th>
                 <th className="px-4 py-3 font-semibold">Payment Date</th>
                 <th className="px-4 py-3 font-semibold">Distribution</th>
+                <th className="px-4 py-3 font-semibold">Shares</th>
+                <th className="px-4 py-3 font-semibold">Payment Amount</th>
               </tr>
             </thead>
 
@@ -249,6 +243,16 @@ export default function DividendHistory() {
 
                   <td className="px-4 py-4 font-semibold text-brand-text">
                     {formatCurrency(event.dividend_amount)}
+                  </td>
+                  <td className="px-4 py-4 font-semibold text-brand-text">
+                    {Number(event.shares_owned || 0).toLocaleString("en-US", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 4,
+                    })}
+                  </td>
+
+                  <td className="px-4 py-4 font-semibold text-brand-text">
+                    {formatCurrency(event.estimated_payment_amount)}
                   </td>
                 </tr>
               ))}

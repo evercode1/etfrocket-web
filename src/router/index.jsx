@@ -43,6 +43,9 @@ import IncomeProjection from "../pages/user/dashboard/incomeProjection/IncomePro
 import Dividends from "../pages/user/dashboard/dividends/Dividends";
 import DividendCalendar from "../pages/user/dashboard/dividends/DividendCalendar";
 import DividendHistory from "../pages/user/dashboard/dividends/DividendHistory";
+import PortfolioCompare from "../pages/user/dashboard/radar/PortfolioCompare";
+import SymbolCompare from "../pages/user/dashboard/radar/SymbolCompare";
+import MetricExplorer from "../pages/user/dashboard/radar/MetricExplorer";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -212,6 +215,21 @@ const router = createBrowserRouter([
             path: "dividends/:portfolioId/history",
 
             element: <DividendHistory />,
+          },
+          {
+            path: "radar/portfolio-compare/:portfolioId",
+
+            element: <PortfolioCompare />,
+          },
+          {
+            path: "radar/symbol-compare",
+
+            element: <SymbolCompare />,
+          },
+          {
+            path: "radar/metric-explorer",
+
+            element: <MetricExplorer />,
           },
           {
             path: "support",

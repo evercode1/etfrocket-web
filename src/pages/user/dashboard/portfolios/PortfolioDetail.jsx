@@ -325,6 +325,14 @@ export default function PortfolioDetail() {
               subtitle="ETF positions currently tracked in this portfolio"
             />
 
+            <Link
+              to={`/dashboard/portfolios/${portfolio.id}/holdings`}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Analyze Holdings
+            </Link>
+
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 ref={fileInputRef}

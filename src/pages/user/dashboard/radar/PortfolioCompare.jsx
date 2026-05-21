@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
   ArrowLeft,
   BarChart3,
-  CalendarDays,
   ChevronDown,
   ShieldCheck,
   TrendingUp,
@@ -20,83 +19,75 @@ import {
   YAxis,
 } from "recharts";
 
-const mockPortfolioSelects = {
-  1: "Main Portfolio",
-  2: "Income Rocket",
-  3: "Test Portfolio",
-};
+import { getPortfolioCompare } from "../../../../api/comparisons";
 
-const comparisonMetrics = [
-  { label: "Price", value: "price" },
-  { label: "Price Change (%)", value: "priceChange" },
-  { label: "NAV Change (%)", value: "navChange" },
-  { label: "AUM Flow (%)", value: "aumFlow" },
-  { label: "Total Return (%)", value: "totalReturn" },
-];
-
-const ranges = ["1M", "3M", "6M", "1Y", "YTD", "MAX"];
-
-const holdings = [
-  {
-    symbol: "NVII",
-    color: "#4f7cff",
-    income: "$814.22",
-    forwardYield: "41.37%",
-    nav: "Mixed",
-    aum: "+18.4%",
-    totalReturn30: "+5.2%",
-    totalReturn90: "+12.8%",
-  },
-  {
-    symbol: "CHPY",
-    color: "#9357ff",
-    income: "$623.10",
-    forwardYield: "38.92%",
-    nav: "Stable",
-    aum: "+24.6%",
-    totalReturn30: "+8.1%",
-    totalReturn90: "+19.4%",
-  },
-  {
-    symbol: "AMDY",
-    color: "#ff8738",
-    income: "$511.88",
-    forwardYield: "52.14%",
-    nav: "Watch",
-    aum: "-6.2%",
-    totalReturn30: "-1.7%",
-    totalReturn90: "-4.1%",
-  },
-];
-
-const chartData = [
-  { date: "Apr 14", NVII: -1.5, CHPY: -0.5, AMDY: -4.8 },
-  { date: "Apr 21", NVII: 2.2, CHPY: 4.8, AMDY: -8.5 },
-  { date: "Apr 28", NVII: 4.4, CHPY: 9.1, AMDY: -9.8 },
-  { date: "May 05", NVII: 7.6, CHPY: 16.2, AMDY: -7.1 },
-  { date: "May 12", NVII: 6.8, CHPY: 15.5, AMDY: -8.3 },
-  { date: "May 19", NVII: 7.4, CHPY: 17.2, AMDY: -9.6 },
-  { date: "May 26", NVII: 6.1, CHPY: 16.5, AMDY: -6.2 },
-  { date: "Jun 02", NVII: 6.4, CHPY: 18.8, AMDY: -5.5 },
-  { date: "Jun 09", NVII: 7.9, CHPY: 18.2, AMDY: -6.4 },
-  { date: "Jun 16", NVII: 10.1, CHPY: 21.0, AMDY: -5.8 },
-  { date: "Jun 23", NVII: 9.7, CHPY: 20.4, AMDY: -3.2 },
-  { date: "Jun 30", NVII: 10.2, CHPY: 21.2, AMDY: -5.1 },
-  { date: "Jul 07", NVII: 12.8, CHPY: 19.4, AMDY: -4.1 },
+const chartColors = [
+  "#4f7cff",
+  "#9357ff",
+  "#ff8738",
+  "#00d4ff",
+  "#22c55e",
+  "#f43f5e",
 ];
 
 export default function PortfolioCompare() {
   const { portfolioId } = useParams();
   const navigate = useNavigate();
 
-  const [selectedMetric, setSelectedMetric] = useState("totalReturn");
-  const [selectedRange, setSelectedRange] = useState("3M");
+  const [isLoading, setIsLoading] = useState(true);
+  const [comparisonData, setComparisonData] = useState(null);
+  const [selectedMetric, setSelectedMetric] = useState("price");
+  const [selectedRange, setSelectedRange] = useState("1y");
+  const comparisonLimit = comparisonData?.comparison_limit || {};
 
-  const activePortfolioName =
-    mockPortfolioSelects[portfolioId] || "Main Portfolio";
+  async function loadPortfolioCompare() {
+    if (!portfolioId) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await getPortfolioCompare(portfolioId, {
+        metric: selectedMetric,
+        range: selectedRange,
+      });
+
+      setComparisonData(response.data || null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "instant",
+    });
+  }, []);
+
+  useEffect(() => {
+    loadPortfolioCompare();
+  }, [portfolioId, selectedMetric, selectedRange]);
+
+  const portfolio = comparisonData?.portfolio || {};
+  const portfolioSelects = comparisonData?.portfolio_selects || {};
+  const summary = comparisonData?.summary || {};
+  const metricOptions = comparisonData?.options?.metrics || [];
+  const rangeOptions = comparisonData?.options?.ranges || [];
+  const tableRows = comparisonData?.table_rows || [];
+  const chartRows = comparisonData?.chart_rows || [];
 
   function handlePortfolioChange(nextPortfolioId) {
     navigate(`/dashboard/radar/portfolio-compare/${nextPortfolioId}`);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="glass-card rounded-3xl p-8 text-brand-muted">
+        Loading portfolio comparison...
+      </div>
+    );
   }
 
   return (
@@ -119,7 +110,7 @@ export default function PortfolioCompare() {
         </h1>
 
         <p className="mt-4 max-w-3xl text-brand-muted">
-          Compare ETFs currently held in this portfolio across income, yield,
+          Compare ETFs currently held in this portfolio across price, income,
           NAV stability, AUM flow, and total return.
         </p>
       </section>
@@ -128,11 +119,11 @@ export default function PortfolioCompare() {
         <MetricCard
           icon={BarChart3}
           label="Compared ETFs"
-          value={holdings.length}
+          value={summary.compared_etfs_count || 0}
           detail={
             <PortfolioSelector
-              value={String(portfolioId || 1)}
-              portfolios={mockPortfolioSelects}
+              value={String(portfolio.id || portfolioId || "")}
+              portfolios={portfolioSelects}
               onChange={handlePortfolioChange}
             />
           }
@@ -140,16 +131,16 @@ export default function PortfolioCompare() {
 
         <MetricCard
           icon={TrendingUp}
-          label="Highest Yield"
-          value="AMDY"
-          detail="52.14% estimated forward yield"
+          label="Best 90D Return"
+          value={summary.best_total_return_symbol || "—"}
+          detail={formatPercent(summary.best_total_return_percentage)}
         />
 
         <MetricCard
           icon={ShieldCheck}
           label="Strongest NAV"
-          value="CHPY"
-          detail="Best current stability score"
+          value={summary.strongest_nav_symbol || "—"}
+          detail={formatPercent(summary.strongest_nav_change_percentage)}
         />
       </section>
 
@@ -161,23 +152,35 @@ export default function PortfolioCompare() {
             </h2>
 
             <p className="mt-1 text-sm text-brand-muted">
-              See how your ETFs have performed over time for the selected
-              metric.
+              See how your top ETFs compare over time for the selected metric.
             </p>
 
+            {comparisonLimit.total_holdings_count >
+              comparisonLimit.included_holdings_count && (
+              <div className="mt-4 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm text-brand-muted">
+                Showing top {comparisonLimit.included_holdings_count} of{" "}
+                {comparisonLimit.total_holdings_count} ETFs by current market
+                value.
+              </div>
+            )}
+
             <div className="mt-6 flex flex-wrap gap-5">
-              {holdings.map((holding) => (
+              {tableRows.map((row, index) => (
                 <div
-                  key={holding.symbol}
+                  key={row.symbol}
                   className="flex items-center gap-2 text-sm font-semibold text-brand-text"
                 >
                   <span
                     className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: holding.color }}
+                    style={{
+                      backgroundColor: chartColors[index % chartColors.length],
+                    }}
                   />
-                  <span>{holding.symbol}</span>
+
+                  <span>{row.symbol}</span>
+
                   <span className="text-brand-muted">
-                    {holding.totalReturn90}
+                    {formatPercent(row.total_return_percentage_90_day)}
                   </span>
                 </div>
               ))}
@@ -195,7 +198,7 @@ export default function PortfolioCompare() {
                 onChange={(event) => setSelectedMetric(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
               >
-                {comparisonMetrics.map((metric) => (
+                {metricOptions.map((metric) => (
                   <option
                     key={metric.value}
                     value={metric.value}
@@ -213,18 +216,18 @@ export default function PortfolioCompare() {
               </span>
 
               <div className="mt-2 flex overflow-hidden rounded-xl border border-brand-outline bg-brand-surfaceHigh">
-                {ranges.map((range) => (
+                {rangeOptions.map((range) => (
                   <button
-                    key={range}
+                    key={range.value}
                     type="button"
-                    onClick={() => setSelectedRange(range)}
+                    onClick={() => setSelectedRange(range.value)}
                     className={`px-4 py-3 text-xs font-bold transition ${
-                      selectedRange === range
+                      selectedRange === range.value
                         ? "bg-brand-primary/20 text-brand-primary"
                         : "text-brand-muted hover:text-brand-primary"
                     }`}
                   >
-                    {range}
+                    {range.label}
                   </button>
                 ))}
               </div>
@@ -233,47 +236,57 @@ export default function PortfolioCompare() {
         </div>
 
         <div className="mt-8 h-80 min-w-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 10, right: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+          {chartRows.length > 0 && tableRows.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartRows} margin={{ top: 10, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
 
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
 
-              <YAxis
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => `${value}%`}
-              />
-
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#131c35",
-                  border: "1px solid rgba(94, 234, 212, 0.2)",
-                  borderRadius: "16px",
-                  color: "#f8fafc",
-                }}
-                labelStyle={{
-                  color: "#f8fafc",
-                  fontWeight: 600,
-                }}
-                itemStyle={{
-                  color: "#f8fafc",
-                }}
-                formatter={(value) => `${Number(value).toFixed(2)}%`}
-              />
-
-              {holdings.map((holding) => (
-                <Line
-                  key={holding.symbol}
-                  type="monotone"
-                  dataKey={holding.symbol}
-                  stroke={holding.color}
-                  strokeWidth={3}
-                  dot={false}
-                  activeDot={{ r: 6 }}
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) =>
+                    formatChartAxisValue(value, selectedMetric)
+                  }
                 />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#131c35",
+                    border: "1px solid rgba(94, 234, 212, 0.2)",
+                    borderRadius: "16px",
+                    color: "#f8fafc",
+                  }}
+                  labelStyle={{
+                    color: "#f8fafc",
+                    fontWeight: 600,
+                  }}
+                  itemStyle={{
+                    color: "#f8fafc",
+                  }}
+                  formatter={(value) => formatChartTooltipValue(value)}
+                />
+
+                {tableRows.map((row, index) => (
+                  <Line
+                    key={row.symbol}
+                    type="monotone"
+                    dataKey={row.symbol}
+                    stroke={chartColors[index % chartColors.length]}
+                    strokeWidth={3}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-full items-center justify-center rounded-2xl border border-brand-outline bg-brand-surfaceHigh text-sm text-brand-muted">
+              Comparison chart data will appear once metric history is
+              available.
+            </div>
+          )}
         </div>
       </section>
 
@@ -284,8 +297,8 @@ export default function PortfolioCompare() {
           </h2>
 
           <p className="mt-1 text-sm text-brand-muted">
-            Mock layout for portfolio ETF comparison. Data will be wired from
-            Laravel next.
+            Portfolio ETFs compared across current holdings, price, NAV, AUM,
+            and total return metrics.
           </p>
         </div>
 
@@ -294,48 +307,67 @@ export default function PortfolioCompare() {
             <thead className="bg-brand-surfaceHigh text-brand-muted">
               <tr>
                 <th className="px-4 py-3 font-semibold">ETF</th>
+                <th className="px-4 py-3 font-semibold">Shares</th>
+                <th className="px-4 py-3 font-semibold">Price</th>
+                <th className="px-4 py-3 font-semibold">Market Value</th>
                 <th className="px-4 py-3 font-semibold">Monthly Income</th>
-                <th className="px-4 py-3 font-semibold">Forward Yield</th>
                 <th className="px-4 py-3 font-semibold">NAV Stability</th>
-                <th className="px-4 py-3 font-semibold">AUM Flow</th>
-                <th className="px-4 py-3 font-semibold">Total Return 30D</th>
+                <th className="px-4 py-3 font-semibold">AUM Flow 30D</th>
                 <th className="px-4 py-3 font-semibold">Total Return 90D</th>
               </tr>
             </thead>
 
             <tbody>
-              {holdings.map((holding) => (
+              {tableRows.map((row, index) => (
                 <tr
-                  key={holding.symbol}
+                  key={row.etf_id}
                   className="border-t border-brand-outline text-brand-muted"
                 >
                   <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">
                     <span
                       className="mr-2 inline-block h-3 w-3 rounded-full"
-                      style={{ backgroundColor: holding.color }}
+                      style={{
+                        backgroundColor:
+                          chartColors[index % chartColors.length],
+                      }}
                     />
-                    {holding.symbol}
+                    {row.symbol}
                   </td>
+
+                  <td className="px-4 py-4">{formatNumber(row.shares)}</td>
 
                   <td className="px-4 py-4 font-semibold text-brand-text">
-                    {holding.income}
+                    {formatCurrency(row.latest_price)}
                   </td>
 
-                  <td className="px-4 py-4">{holding.forwardYield}</td>
-                  <td className="px-4 py-4">{holding.nav}</td>
-                  <td className="px-4 py-4">{holding.aum}</td>
-                  <td className="px-4 py-4">{holding.totalReturn30}</td>
-                  <td className="px-4 py-4">{holding.totalReturn90}</td>
+                  <td className="px-4 py-4">
+                    {formatCurrency(row.market_value)}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {formatCurrency(row.monthly_income)}
+                  </td>
+
+                  <td className="px-4 py-4">{row.nav_health || "Unknown"}</td>
+
+                  <td className="px-4 py-4">
+                    {formatPercent(row.aum_change_percentage_30_day)}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {formatPercent(row.total_return_percentage_90_day)}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <p className="mt-4 text-xs text-brand-muted">
-          Mock data for UI demonstration. Real comparison data will come from
-          Laravel.
-        </p>
+        {tableRows.length === 0 && (
+          <div className="mt-6 rounded-2xl border border-brand-outline bg-brand-surfaceHigh p-8 text-center text-brand-muted">
+            Add ETF transactions to this portfolio to unlock comparison data.
+          </div>
+        )}
       </section>
     </div>
   );
@@ -363,8 +395,6 @@ function PortfolioSelector({ value, portfolios, onChange }) {
           </option>
         ))}
       </select>
-
-      <ChevronDown className="h-4 w-4 text-brand-muted" />
     </div>
   );
 }
@@ -383,4 +413,55 @@ function MetricCard({ icon: Icon, label, value, detail }) {
       <div className="mt-2 text-sm text-brand-muted">{detail}</div>
     </div>
   );
+}
+
+function formatCurrency(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return Number(value).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+}
+
+function formatNumber(value) {
+  return Number(value || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4,
+  });
+}
+
+function formatPercent(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return `${Number(value).toFixed(2)}%`;
+}
+
+function formatChartAxisValue(value, metric) {
+  if (metric === "price" || metric === "nav" || metric === "dividends") {
+    return `$${Number(value).toFixed(0)}`;
+  }
+
+  if (metric === "aum") {
+    return Number(value).toLocaleString("en-US", {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    });
+  }
+
+  return Number(value).toFixed(0);
+}
+
+function formatChartTooltipValue(value) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  return Number(value).toLocaleString("en-US", {
+    maximumFractionDigits: 4,
+  });
 }

@@ -23,7 +23,15 @@ export default function Portfolios() {
     try {
       const response = await getPortfolioCardSummaries();
 
-      setPortfolios(response.data || []);
+      console.log("Portfolio summaries response:", response);
+
+      const portfolioRows = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+
+      console.log("Portfolio rows:", portfolioRows);
+
+      setPortfolios(portfolioRows);
     } finally {
       setIsLoading(false);
     }
@@ -32,6 +40,14 @@ export default function Portfolios() {
   useEffect(() => {
     loadPortfolios();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="glass-card rounded-3xl p-8 text-brand-muted">
+        Loading portfolios...
+      </div>
+    );
+  }
 
   const hasPortfolios = portfolios.length > 0;
 

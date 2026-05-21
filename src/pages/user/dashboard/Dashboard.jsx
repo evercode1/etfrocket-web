@@ -7,7 +7,7 @@ import {
 
 import { Rocket } from "lucide-react";
 
-import PortfolioSnapshot from "./components/PortfolioSnapshot";
+import PortfolioSnapshot from "./components/portfolioSnapshot/PortfolioSnapshot";
 import RadarSection from "./components/RadarSection";
 import SignalSection from "./components/SignalSection";
 import TelemetrySection from "./components/TelemetrySection";

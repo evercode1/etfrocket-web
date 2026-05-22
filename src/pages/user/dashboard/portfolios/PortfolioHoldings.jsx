@@ -5,7 +5,9 @@ import {
   ArrowLeft,
   BarChart3,
   DollarSign,
+  Eye,
   PieChart as PieChartIcon,
+  Settings,
   Snowflake,
   TrendingUp,
   WalletCards,
@@ -64,53 +66,56 @@ export default function PortfolioHoldings() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <Link
-          to={`/dashboard/portfolios/${id}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Portfolio Detail
-        </Link>
+        <div className="flex flex-col gap-8">
+          <div>
+            <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+              Holdings Analysis
+            </p>
 
-        <p className="mt-8 font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
-          Holdings Analysis
-        </p>
+            <h1 className="mt-3 font-display text-5xl font-bold">
+              {portfolio.name
+                ? `${portfolio.name} Holdings`
+                : "Portfolio Holdings"}
+            </h1>
+          </div>
 
-        <h1 className="mt-3 font-display text-5xl font-bold">
-          {portfolio.name ? `${portfolio.name} Holdings` : "Portfolio Holdings"}
-        </h1>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center"></div>
 
-        <p className="mt-4 max-w-3xl text-brand-muted">
-          Review position-level value, cost basis, gain/loss, income
-          contribution, allocation weight, NAV health, and AUM flow.
-        </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="inline-flex h-14 items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4">
+                <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+                  Active Portfolio
+                </span>
 
-        <div className="mt-5 inline-flex items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3">
-          <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
-            Active Portfolio
-          </span>
+                <select
+                  value={String(portfolio.id || id)}
+                  onChange={(event) => {
+                    const nextPortfolioId = event.target.value;
 
-          <select
-            value={String(portfolio.id || id)}
-            onChange={(event) => {
-              const nextPortfolioId = event.target.value;
+                    setStoredPortfolioId(nextPortfolioId);
 
-              setStoredPortfolioId(nextPortfolioId);
-
-              navigate(`/dashboard/portfolios/${nextPortfolioId}/holdings`);
-            }}
-            className="bg-transparent text-sm font-semibold text-brand-text outline-none"
-          >
-            {Object.entries(portfolioSelects).map(([portfolioId, name]) => (
-              <option
-                key={portfolioId}
-                value={portfolioId}
-                className="bg-brand-surface text-brand-text"
-              >
-                {name}
-              </option>
-            ))}
-          </select>
+                    navigate(
+                      `/dashboard/portfolios/${nextPortfolioId}/holdings`,
+                    );
+                  }}
+                  className="bg-transparent text-sm font-semibold text-brand-text outline-none"
+                >
+                  {Object.entries(portfolioSelects).map(
+                    ([portfolioId, name]) => (
+                      <option
+                        key={portfolioId}
+                        value={portfolioId}
+                        className="bg-brand-surface text-brand-text"
+                      >
+                        {name}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

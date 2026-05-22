@@ -1,20 +1,10 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Search } from "lucide-react";
 
-const symbols = ["NVII", "CHPY", "AMDY", "QDTE"];
-
 export default function SymbolCompare() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <Link
-          to="/dashboard"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
-
         <p className="mt-8 font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
           ETF Radar
         </p>
@@ -74,25 +64,6 @@ export default function SymbolCompare() {
           <SymbolCard key={symbol} symbol={symbol} />
         ))}
       </section>
-    </div>
-  );
-}
-
-function SymbolCard({ symbol }) {
-  return (
-    <div className="glass-card rounded-3xl p-6">
-      <p className="font-display text-3xl font-bold text-brand-primary">
-        {symbol}
-      </p>
-
-      <p className="mt-2 text-sm text-brand-muted">Mock comparison profile</p>
-
-      <div className="mt-6 space-y-3">
-        <MiniStat label="Forward Yield" value="42.8%" />
-        <MiniStat label="NAV Stability" value="Stable" />
-        <MiniStat label="30D AUM Flow" value="+12.4%" />
-        <MiniStat label="Total Return" value="+8.9%" />
-      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import {
   BarChart3,
+  Eye,
   Gauge,
   ShieldCheck,
   Snowflake,
@@ -64,33 +65,27 @@ export default function PortfolioSnapshot({
             Portfolio Snapshot
           </p>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <h2 className="font-display text-5xl font-bold">
-              {missionControl?.selected_portfolio?.portfolio_name ||
-                "Portfolio Snapshot"}
-            </h2>
-
-            {portfolioDetailUrl && (
-              <Link
-                to={portfolioDetailUrl}
-                className="inline-flex items-center gap-1 rounded-full border border-brand-outline bg-brand-surfaceHigh px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-              >
-                Details
-              </Link>
-            )}
-          </div>
-
-          <p className="mt-4 max-w-3xl text-brand-muted">
-            Income-focused ETF portfolio emphasizing yield, NAV durability,
-            monthly cash flow, and allocation strength.
-          </p>
+          <h2 className="mt-3 font-display text-5xl font-bold">
+            {missionControl?.selected_portfolio?.portfolio_name ||
+              "Portfolio Snapshot"}
+          </h2>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          {portfolioDetailUrl && (
+            <Link
+              to={portfolioDetailUrl}
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+            >
+              <Eye className="h-4 w-4" />
+              Details
+            </Link>
+          )}
+
           {portfolioHoldingsUrl && (
             <Link
               to={portfolioHoldingsUrl}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
             >
               <BarChart3 className="h-4 w-4" />
               Holdings

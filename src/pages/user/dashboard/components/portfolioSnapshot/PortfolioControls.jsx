@@ -28,7 +28,7 @@ export default function PortfolioControls({
     return (
       <Link
         to="/dashboard/portfolios/create"
-        className="rocket-button-primary flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
+        className="rocket-button-primary inline-flex h-14 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold"
       >
         <Plus className="h-4 w-4" />
         Create Portfolio
@@ -37,14 +37,27 @@ export default function PortfolioControls({
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <Link
+        to="/dashboard/portfolios"
+        className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+      >
+        <Settings className="h-4 w-4" />
+        Manage All
+      </Link>
+
       <div className="relative">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-3 rounded-xl border border-brand-outline bg-brand-surfaceHigh px-5 py-3 text-sm font-semibold text-brand-text transition hover:border-brand-primary"
+          className="inline-flex h-14 items-center gap-3 rounded-xl border border-brand-outline bg-brand-surfaceHigh px-5 text-sm font-semibold text-brand-text transition hover:border-brand-primary"
         >
+          <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+            Active Portfolio
+          </span>
+
           <span>{selectedPortfolio?.name}</span>
+
           <ChevronDown className="h-4 w-4 text-brand-muted" />
         </button>
 
@@ -79,14 +92,6 @@ export default function PortfolioControls({
           </div>
         )}
       </div>
-
-      <Link
-        to="/dashboard/portfolios"
-        className="flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-      >
-        <Settings className="h-4 w-4" />
-        Manage All
-      </Link>
     </div>
   );
 }

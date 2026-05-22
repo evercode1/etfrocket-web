@@ -161,39 +161,62 @@ export default function PortfolioDetail() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
-                Portfolio Details
-              </p>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+                  Portfolio Details
+                </p>
 
-              {portfolio.is_default && (
-                <span className="rounded-full border border-brand-primary/40 bg-brand-primary/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-brand-primary">
-                  Default
-                </span>
-              )}
-            </div>
+                {portfolio.is_default && (
+                  <span className="rounded-full border border-brand-primary/40 bg-brand-primary/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-brand-primary">
+                    Default
+                  </span>
+                )}
+              </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <h1 className="font-display text-5xl font-bold">
+              <h1 className="mt-3 font-display text-5xl font-bold">
                 {portfolio.portfolio_name}
               </h1>
 
-              <Link
-                to={`/dashboard/portfolios/${portfolio.id}/holdings`}
-                className="inline-flex items-center gap-1 rounded-full border border-brand-outline bg-brand-surfaceHigh px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-              >
-                Holdings
-              </Link>
+              <p className="mt-4 max-w-3xl text-brand-muted">
+                Review allocation, holdings, income strength, NAV health, and
+                transaction activity for this portfolio.
+              </p>
             </div>
 
-            <p className="mt-4 max-w-3xl text-brand-muted">
-              Review allocation, holdings, income strength, NAV health, and
-              transaction activity for this portfolio.
-            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                to={`/dashboard/portfolios/${portfolio.id}/edit`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              >
+                <Edit className="h-4 w-4" />
+                Update
+              </Link>
 
-            <div className="mt-5 inline-flex items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteDialog(true)}
+                disabled={isDeleting}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-danger/50 px-5 py-3 text-sm font-semibold text-brand-danger transition hover:bg-brand-danger/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <Link
+              to={`/dashboard/portfolios/${portfolio.id}/holdings`}
+              className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Holdings
+            </Link>
+
+            <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 lg:self-auto">
               <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
                 Active Portfolio
               </span>
@@ -222,26 +245,6 @@ export default function PortfolioDetail() {
                 )}
               </select>
             </div>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              to={`/dashboard/portfolios/${portfolio.id}/edit`}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-            >
-              <Edit className="h-4 w-4" />
-              Update
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setShowDeleteDialog(true)}
-              disabled={isDeleting}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-danger/50 px-5 py-3 text-sm font-semibold text-brand-danger transition hover:bg-brand-danger/10 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </button>
           </div>
         </div>
       </section>

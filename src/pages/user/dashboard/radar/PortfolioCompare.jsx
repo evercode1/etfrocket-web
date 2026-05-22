@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { ArrowLeft, BarChart3, ShieldCheck, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  Eye,
+  Settings,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
 
 import {
   CartesianGrid,
@@ -94,26 +100,29 @@ export default function PortfolioCompare() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <Link
-          to="/dashboard"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
+        <div className="flex flex-col gap-8">
+          <div>
+            <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+              ETF Radar
+            </p>
 
-        <p className="mt-8 font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
-          ETF Radar
-        </p>
+            <h1 className="mt-3 font-display text-5xl font-bold">
+              Compare My ETFs
+            </h1>
+          </div>
 
-        <h1 className="mt-3 font-display text-5xl font-bold">
-          Compare My ETFs
-        </h1>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center"></div>
 
-        <p className="mt-4 max-w-3xl text-brand-muted">
-          Compare ETFs currently held in this portfolio across price, income,
-          NAV stability, AUM flow, and total return.
-        </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <PortfolioSelector
+                value={String(portfolio.id || portfolioId || "")}
+                portfolios={portfolioSelects}
+                onChange={handlePortfolioChange}
+              />
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-5 md:grid-cols-3">
@@ -121,13 +130,7 @@ export default function PortfolioCompare() {
           icon={BarChart3}
           label="Compared ETFs"
           value={summary.compared_etfs_count || 0}
-          detail={
-            <PortfolioSelector
-              value={String(portfolio.id || portfolioId || "")}
-              portfolios={portfolioSelects}
-              onChange={handlePortfolioChange}
-            />
-          }
+          detail="ETFs included in this comparison"
         />
 
         <MetricCard
@@ -376,9 +379,9 @@ export default function PortfolioCompare() {
 
 function PortfolioSelector({ value, portfolios, onChange }) {
   return (
-    <div className="mt-2 inline-flex items-center gap-2 rounded-xl border border-brand-outline bg-brand-surfaceHigh px-3 py-2">
-      <span className="text-xs font-semibold uppercase tracking-widest text-brand-muted">
-        Portfolio
+    <div className="inline-flex h-14 items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4">
+      <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+        Active Portfolio
       </span>
 
       <select

@@ -156,14 +156,6 @@ export default function PortfolioDetail() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <Link
-          to="/dashboard/portfolios"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Portfolios
-        </Link>
-
         <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-3">
@@ -178,9 +170,18 @@ export default function PortfolioDetail() {
               )}
             </div>
 
-            <h1 className="mt-3 font-display text-5xl font-bold">
-              {portfolio.portfolio_name}
-            </h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <h1 className="font-display text-5xl font-bold">
+                {portfolio.portfolio_name}
+              </h1>
+
+              <Link
+                to={`/dashboard/portfolios/${portfolio.id}/holdings`}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-outline bg-brand-surfaceHigh px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              >
+                Holdings
+              </Link>
+            </div>
 
             <p className="mt-4 max-w-3xl text-brand-muted">
               Review allocation, holdings, income strength, NAV health, and

@@ -72,7 +72,7 @@ export default function PortfolioHoldings() {
         </p>
 
         <h1 className="mt-3 font-display text-5xl font-bold">
-          {portfolio.name || "Portfolio Holdings"}
+          {portfolio.name ? `${portfolio.name} Holdings` : "Portfolio Holdings"}
         </h1>
 
         <p className="mt-4 max-w-3xl text-brand-muted">

@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import {
-  ArrowLeft,
-  BarChart3,
-  ChevronDown,
-  ShieldCheck,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowLeft, BarChart3, ShieldCheck, TrendingUp } from "lucide-react";
 
 import {
   CartesianGrid,
@@ -20,6 +14,7 @@ import {
 } from "recharts";
 
 import { getPortfolioCompare } from "../../../../api/comparisons";
+import { setStoredPortfolioId } from "../../../../utils/portfolioContext";
 
 const chartColors = [
   "#4f7cff",
@@ -67,6 +62,10 @@ export default function PortfolioCompare() {
   }, []);
 
   useEffect(() => {
+    if (portfolioId) {
+      setStoredPortfolioId(portfolioId);
+    }
+
     loadPortfolioCompare();
   }, [portfolioId, selectedMetric, selectedRange]);
 
@@ -79,6 +78,8 @@ export default function PortfolioCompare() {
   const chartRows = comparisonData?.chart_rows || [];
 
   function handlePortfolioChange(nextPortfolioId) {
+    setStoredPortfolioId(nextPortfolioId);
+
     navigate(`/dashboard/radar/portfolio-compare/${nextPortfolioId}`);
   }
 
@@ -427,10 +428,7 @@ function formatCurrency(value) {
 }
 
 function formatNumber(value) {
-  return Number(value || 0).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 4,
-  });
+  return Math.round(Number(value || 0)).toLocaleString("en-US");
 }
 
 function formatPercent(value) {

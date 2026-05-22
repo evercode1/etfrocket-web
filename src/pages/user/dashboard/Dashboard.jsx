@@ -5,17 +5,22 @@ import {
   getPortfolioSelects,
 } from "../../../api/missionControl";
 
-import { Rocket } from "lucide-react";
-
 import PortfolioSnapshot from "./components/portfolioSnapshot/PortfolioSnapshot";
 import RadarSection from "./components/RadarSection";
 import SignalsSection from "./components/signals/SignalsSection";
 import TelemetrySection from "./components/TelemetrySection";
 
+import {
+  getStoredPortfolioId,
+  setStoredPortfolioId,
+} from "../../../utils/portfolioContext";
+
 export default function Dashboard() {
   const [missionControl, setMissionControl] = useState(null);
   const [portfolioSelects, setPortfolioSelects] = useState({});
-  const [selectedPortfolioId, setSelectedPortfolioId] = useState(null);
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState(() => {
+    return getStoredPortfolioId();
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   async function loadDashboard(portfolioId = null) {
@@ -23,19 +28,22 @@ export default function Dashboard() {
 
     try {
       const selectsResponse = await getPortfolioSelects();
-
       const selects = selectsResponse.data || {};
 
       setPortfolioSelects(selects);
 
-      const missionResponse = await getMissionControl(portfolioId);
+      const resolvedPortfolioId = portfolioId || getStoredPortfolioId() || null;
 
+      const missionResponse = await getMissionControl(resolvedPortfolioId);
       const missionData = missionResponse.data || null;
 
       setMissionControl(missionData);
 
-      if (!portfolioId && missionData?.selected_portfolio?.id) {
-        setSelectedPortfolioId(missionData.selected_portfolio.id);
+      if (missionData?.selected_portfolio?.id) {
+        const nextPortfolioId = String(missionData.selected_portfolio.id);
+
+        setStoredPortfolioId(nextPortfolioId);
+        setSelectedPortfolioId(nextPortfolioId);
       }
     } finally {
       setIsLoading(false);

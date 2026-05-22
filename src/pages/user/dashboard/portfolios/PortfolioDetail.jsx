@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
-  ArrowLeft,
   BarChart3,
   Edit,
   Eye,
@@ -27,6 +26,8 @@ import {
   csvUploadPortfolioTransactions,
   listPortfolioTransactions,
 } from "../../../../api/portfolioTransactions";
+
+import { setStoredPortfolioId } from "../../../../utils/portfolioContext";
 
 export default function PortfolioDetail() {
   const { id } = useParams();
@@ -64,6 +65,10 @@ export default function PortfolioDetail() {
   }
 
   useEffect(() => {
+    if (id) {
+      setStoredPortfolioId(id);
+    }
+
     loadPortfolio();
   }, [id]);
 
@@ -196,7 +201,11 @@ export default function PortfolioDetail() {
               <select
                 value={String(portfolio.id)}
                 onChange={(event) => {
-                  navigate(`/dashboard/portfolios/${event.target.value}`);
+                  const nextPortfolioId = event.target.value;
+
+                  setStoredPortfolioId(nextPortfolioId);
+
+                  navigate(`/dashboard/portfolios/${nextPortfolioId}`);
                 }}
                 className="bg-transparent text-sm font-semibold text-brand-text outline-none"
               >

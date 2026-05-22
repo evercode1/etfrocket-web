@@ -1,4 +1,7 @@
+import { Link } from "react-router-dom";
+
 import {
+  BarChart3,
   Gauge,
   ShieldCheck,
   Snowflake,
@@ -32,13 +35,17 @@ export default function PortfolioSnapshot({
     ? `/dashboard/portfolios/${detailPortfolioId}`
     : null;
 
+  const portfolioHoldingsUrl = detailPortfolioId
+    ? `/dashboard/portfolios/${detailPortfolioId}/holdings`
+    : null;
+
   if (isLoading) {
     return (
       <section className="space-y-5">
         <SectionHeader
           icon={Gauge}
           eyebrow="Portfolio Snapshot"
-          title="State of the Mission"
+          title="Portfolio Snapshot"
           description="Loading portfolio telemetry..."
         />
 
@@ -52,19 +59,51 @@ export default function PortfolioSnapshot({
   return (
     <section className="space-y-5">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <SectionHeader
-          icon={Gauge}
-          eyebrow="Portfolio Snapshot"
-          title="State of the Mission"
-          description="A summary of yield, income, return, NAV health, and portfolio stability."
-        />
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-brand-primary">
+            Portfolio Snapshot
+          </p>
 
-        <PortfolioControls
-          portfolioSelects={portfolioSelects}
-          selectedPortfolioId={selectedPortfolioId}
-          setSelectedPortfolioId={setSelectedPortfolioId}
-          hasPortfolio={hasPortfolio}
-        />
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <h2 className="font-display text-5xl font-bold">
+              {missionControl?.selected_portfolio?.portfolio_name ||
+                "Portfolio Snapshot"}
+            </h2>
+
+            {portfolioDetailUrl && (
+              <Link
+                to={portfolioDetailUrl}
+                className="inline-flex items-center gap-1 rounded-full border border-brand-outline bg-brand-surfaceHigh px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+              >
+                Details
+              </Link>
+            )}
+          </div>
+
+          <p className="mt-4 max-w-3xl text-brand-muted">
+            Income-focused ETF portfolio emphasizing yield, NAV durability,
+            monthly cash flow, and allocation strength.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {portfolioHoldingsUrl && (
+            <Link
+              to={portfolioHoldingsUrl}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Holdings
+            </Link>
+          )}
+
+          <PortfolioControls
+            portfolioSelects={portfolioSelects}
+            selectedPortfolioId={selectedPortfolioId}
+            setSelectedPortfolioId={setSelectedPortfolioId}
+            hasPortfolio={hasPortfolio}
+          />
+        </div>
       </div>
 
       {!hasPortfolio ? (

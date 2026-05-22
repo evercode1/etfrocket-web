@@ -45,7 +45,7 @@ import Dividends from "../pages/user/dashboard/dividends/Dividends";
 import DividendCalendar from "../pages/user/dashboard/dividends/DividendCalendar";
 import DividendHistory from "../pages/user/dashboard/dividends/DividendHistory";
 import PortfolioCompare from "../pages/user/dashboard/radar/PortfolioCompare";
-import SymbolCompare from "../pages/user/dashboard/radar/SymbolCompare";
+import CompareSymbols from "../pages/user/dashboard/radar/CompareSymbols";
 import MetricExplorer from "../pages/user/dashboard/radar/MetricExplorer";
 
 import EtfList from "../pages/user/etfs/EtfList";
@@ -227,9 +227,9 @@ const router = createBrowserRouter([
             element: <PortfolioCompare />,
           },
           {
-            path: "radar/symbol-compare",
+            path: "radar/compare-symbols",
 
-            element: <SymbolCompare />,
+            element: <CompareSymbols />,
           },
           {
             path: "radar/metric-explorer",

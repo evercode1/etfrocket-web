@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { Link } from "react-router-dom";
 
 import {
+  AlertTriangle,
   BarChart3,
   Eye,
   EyeOff,
@@ -22,62 +24,24 @@ import {
   YAxis,
 } from "recharts";
 
-const availableEtfs = [
-  {
-    symbol: "CHPY",
-    fund_name: "YieldMax Semiconductor Portfolio Option Income ETF",
-    latest_price: 73.5,
-    monthly_income: 2.855,
-    nav_health: "Stable",
-    aum_flow_percentage: 12.5,
-    total_return_percentage_90_day: 24.82,
-  },
-  {
-    symbol: "AMDY",
-    fund_name: "YieldMax AMD Option Income Strategy ETF",
-    latest_price: 50.43,
-    monthly_income: 3.059,
-    nav_health: "Stable",
-    aum_flow_percentage: 8.3,
-    total_return_percentage_90_day: 18.12,
-  },
-  {
-    symbol: "NVII",
-    fund_name: "REX NVDA Growth & Income ETF",
-    latest_price: 28.58,
-    monthly_income: 1.514,
-    nav_health: "Mixed",
-    aum_flow_percentage: -4.2,
-    total_return_percentage_90_day: -6.35,
-  },
-  {
-    symbol: "QQQI",
-    fund_name: "NEOS Nasdaq-100 High Income ETF",
-    latest_price: 56.14,
-    monthly_income: 0.618,
-    nav_health: "Unknown",
-    aum_flow_percentage: 2.1,
-    total_return_percentage_90_day: 9.44,
-  },
-];
+import { getCompareSymbols } from "../../../../api/comparisons";
 
-const chartRows = [
-  { date: "Jan", CHPY: 48, AMDY: 42, NVII: 35, QQQI: 52 },
-  { date: "Feb", CHPY: 52, AMDY: 45, NVII: 33, QQQI: 53 },
-  { date: "Mar", CHPY: 58, AMDY: 49, NVII: 31, QQQI: 54 },
-  { date: "Apr", CHPY: 64, AMDY: 47, NVII: 29, QQQI: 55 },
-  { date: "May", CHPY: 73.5, AMDY: 50.43, NVII: 28.58, QQQI: 56.14 },
-];
+const chartColors = [
+  "#4f7cff",
 
-const chartColors = {
-  CHPY: "#4f7cff",
-  AMDY: "#9357ff",
-  NVII: "#ff8738",
-  QQQI: "#00d4ff",
-};
+  "#9357ff",
+
+  "#ff8738",
+
+  "#00d4ff",
+
+  "#22c55e",
+
+  "#f43f5e",
+];
 
 export default function CompareSymbols() {
-  const [selectedSymbols, setSelectedSymbols] = useState(["CHPY", "AMDY"]);
+  const [selectedSymbols, setSelectedSymbols] = useState([]);
 
   const [mutedSymbols, setMutedSymbols] = useState([]);
 
@@ -87,35 +51,81 @@ export default function CompareSymbols() {
 
   const [selectedRange, setSelectedRange] = useState("90d");
 
-  const selectedEtfs = useMemo(() => {
-    return availableEtfs.filter((etf) => selectedSymbols.includes(etf.symbol));
-  }, [selectedSymbols]);
+  const [comparisonData, setComparisonData] = useState(null);
 
-  const visibleEtfs = selectedEtfs.filter(
-    (etf) => !mutedSymbols.includes(etf.symbol),
-  );
+  const [isLoading, setIsLoading] = useState(false);
 
-  const bestReturn = [...visibleEtfs].sort(
-    (a, b) =>
-      Number(b.total_return_percentage_90_day || 0) -
-      Number(a.total_return_percentage_90_day || 0),
-  )[0];
+  const [dismissedInvalidSymbols, setDismissedInvalidSymbols] = useState([]);
 
-  const strongestNav =
-    visibleEtfs.find((etf) => etf.nav_health === "Stable") || visibleEtfs[0];
+  async function loadComparisonData() {
+    if (selectedSymbols.length === 0) {
+      setComparisonData(null);
 
-  function handleAddSymbol() {
-    const normalized = symbolInput.trim().toUpperCase();
-
-    if (!normalized || selectedSymbols.includes(normalized)) {
-      setSymbolInput("");
       return;
     }
 
-    const exists = availableEtfs.some((etf) => etf.symbol === normalized);
+    setIsLoading(true);
 
-    if (!exists) {
+    try {
+      const response = await getCompareSymbols(
+        selectedSymbols,
+
+        {
+          metric: selectedMetric,
+
+          range: selectedRange,
+        },
+      );
+
+      const data = response.data || null;
+
+      setComparisonData(data);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadComparisonData();
+  }, [selectedSymbols, selectedMetric, selectedRange]);
+
+  const summary = comparisonData?.summary || {};
+
+  const tableRows = comparisonData?.table_rows || [];
+
+  const chartRows = comparisonData?.chart_rows || [];
+
+  const metricOptions = comparisonData?.options?.metrics || [];
+
+  const rangeOptions = comparisonData?.options?.ranges || [];
+
+  const invalidSymbols = (comparisonData?.invalid_symbols || []).filter(
+    (symbol) => !dismissedInvalidSymbols.includes(symbol),
+  );
+
+  const visibleRows = useMemo(() => {
+    return tableRows.filter((row) => !mutedSymbols.includes(row.symbol));
+  }, [tableRows, mutedSymbols]);
+
+  const bestReturn = [...visibleRows].sort(
+    (a, b) =>
+      Number(b.total_return_percentage || 0) -
+      Number(a.total_return_percentage || 0),
+  )[0];
+
+  const strongestNav =
+    visibleRows.find((row) => row.nav_health === "Stable") || visibleRows[0];
+
+  function handleAddSymbol() {
+    const normalized = symbolInput
+
+      .trim()
+
+      .toUpperCase();
+
+    if (!normalized || selectedSymbols.includes(normalized)) {
       setSymbolInput("");
+
       return;
     }
 
@@ -200,22 +210,59 @@ export default function CompareSymbols() {
         </div>
       </section>
 
+      {invalidSymbols.length > 0 && (
+        <div className="glass-card rounded-3xl border border-amber-400/30 bg-amber-400/10 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-300" />
+
+              <div>
+                <p className="font-semibold text-amber-200">
+                  Some symbols could not be found
+                </p>
+
+                <p className="mt-1 text-sm text-amber-100">
+                  {invalidSymbols.join(", ")}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setDismissedInvalidSymbols([
+                  ...dismissedInvalidSymbols,
+
+                  ...invalidSymbols,
+                ])
+              }
+              className="text-amber-200 transition hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <section className="grid gap-5 md:grid-cols-3">
         <MetricCard
           icon={BarChart3}
           label="Compared Symbols"
-          value={visibleEtfs.length}
+          value={summary.compared_etfs_count || 0}
           detail={
-            visibleEtfs.map((etf) => etf.symbol).join(", ") ||
-            "No visible symbols"
+            visibleRows
+
+              .map((row) => row.symbol)
+
+              .join(", ") || "No visible symbols"
           }
         />
 
         <MetricCard
           icon={TrendingUp}
-          label="Best 90D Return"
+          label="Best Return"
           value={bestReturn?.symbol || "—"}
-          detail={formatPercent(bestReturn?.total_return_percentage_90_day)}
+          detail={formatPercent(bestReturn?.total_return_percentage)}
         />
 
         <MetricCard
@@ -234,15 +281,16 @@ export default function CompareSymbols() {
             </h2>
 
             <p className="mt-1 text-sm text-brand-muted">
-              Mock trend view for validating layout before wiring the API.
+              Compare symbol performance across multiple metrics and time
+              ranges.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              {selectedEtfs.map((etf) => (
+              {tableRows.map((row, index) => (
                 <div
-                  key={etf.symbol}
+                  key={row.symbol}
                   className={`inline-flex items-center gap-3 rounded-full border border-brand-outline bg-brand-surfaceHigh px-4 py-2 text-sm font-semibold transition ${
-                    mutedSymbols.includes(etf.symbol)
+                    mutedSymbols.includes(row.symbol)
                       ? "opacity-40"
                       : "text-brand-text"
                   }`}
@@ -250,18 +298,18 @@ export default function CompareSymbols() {
                   <span
                     className="h-3 w-3 rounded-full"
                     style={{
-                      backgroundColor: chartColors[etf.symbol],
+                      backgroundColor: chartColors[index % chartColors.length],
                     }}
                   />
 
-                  <span>{etf.symbol}</span>
+                  <span>{row.symbol}</span>
 
                   <button
                     type="button"
-                    onClick={() => toggleMuted(etf.symbol)}
+                    onClick={() => toggleMuted(row.symbol)}
                     className="transition hover:text-brand-primary"
                   >
-                    {mutedSymbols.includes(etf.symbol) ? (
+                    {mutedSymbols.includes(row.symbol) ? (
                       <EyeOff className="h-4 w-4" />
                     ) : (
                       <Eye className="h-4 w-4" />
@@ -270,7 +318,7 @@ export default function CompareSymbols() {
 
                   <button
                     type="button"
-                    onClick={() => handleRemoveSymbol(etf.symbol)}
+                    onClick={() => handleRemoveSymbol(row.symbol)}
                     className="transition hover:text-brand-danger"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -291,21 +339,15 @@ export default function CompareSymbols() {
                 onChange={(event) => setSelectedMetric(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
               >
-                <option value="price" className="bg-brand-surface">
-                  Price
-                </option>
-
-                <option value="income" className="bg-brand-surface">
-                  Monthly Income
-                </option>
-
-                <option value="return" className="bg-brand-surface">
-                  Total Return
-                </option>
-
-                <option value="aum" className="bg-brand-surface">
-                  AUM Flow
-                </option>
+                {metricOptions.map((metric) => (
+                  <option
+                    key={metric.value}
+                    value={metric.value}
+                    className="bg-brand-surface text-brand-text"
+                  >
+                    {metric.label}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -315,13 +357,7 @@ export default function CompareSymbols() {
               </span>
 
               <div className="mt-2 flex overflow-hidden rounded-xl border border-brand-outline bg-brand-surfaceHigh">
-                {[
-                  { label: "5D", value: "5d" },
-                  { label: "30D", value: "30d" },
-                  { label: "90D", value: "90d" },
-                  { label: "1Y", value: "1y" },
-                  { label: "MAX", value: "max" },
-                ].map((range) => (
+                {rangeOptions.map((range) => (
                   <button
                     key={range.value}
                     type="button"
@@ -341,44 +377,69 @@ export default function CompareSymbols() {
         </div>
 
         <div className="mt-8 h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartRows} margin={{ top: 10, right: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+          {selectedSymbols.length === 0 ? (
+            <div className="flex h-full items-center justify-center rounded-2xl border border-brand-outline bg-brand-surfaceHigh text-sm text-brand-muted">
+              Add ETF symbols to begin comparison.
+            </div>
+          ) : isLoading ? (
+            <div className="flex h-full items-center justify-center rounded-2xl border border-brand-outline bg-brand-surfaceHigh text-sm text-brand-muted">
+              Loading chart data...
+            </div>
+          ) : chartRows.length === 0 ? (
+            <div className="flex h-full items-center justify-center rounded-2xl border border-brand-outline bg-brand-surfaceHigh text-sm text-brand-muted">
+              Chart history is not available yet.
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={chartRows}
+                margin={{
+                  top: 10,
 
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-
-              <YAxis tick={{ fontSize: 12 }} />
-
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#131c35",
-                  border: "1px solid rgba(94, 234, 212, 0.2)",
-                  borderRadius: "16px",
-                  color: "#f8fafc",
+                  right: 20,
                 }}
-                labelStyle={{
-                  color: "#f8fafc",
-                  fontWeight: 600,
-                }}
-                itemStyle={{
-                  color: "#f8fafc",
-                }}
-              />
+              >
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
 
-              {visibleEtfs.map((etf) => (
-                <Line
-                  key={etf.symbol}
-                  type="monotone"
-                  dataKey={etf.symbol}
-                  stroke={chartColors[etf.symbol]}
-                  strokeWidth={3}
-                  dot={false}
-                  activeDot={{ r: 6 }}
-                  connectNulls
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+
+                <YAxis tick={{ fontSize: 12 }} />
+
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#131c35",
+
+                    border: "1px solid rgba(94, 234, 212, 0.2)",
+
+                    borderRadius: "16px",
+
+                    color: "#f8fafc",
+                  }}
+                  labelStyle={{
+                    color: "#f8fafc",
+
+                    fontWeight: 600,
+                  }}
+                  itemStyle={{
+                    color: "#f8fafc",
+                  }}
                 />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+
+                {visibleRows.map((row, index) => (
+                  <Line
+                    key={row.symbol}
+                    type="monotone"
+                    dataKey={row.symbol}
+                    stroke={chartColors[index % chartColors.length]}
+                    strokeWidth={3}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </section>
 
@@ -389,7 +450,7 @@ export default function CompareSymbols() {
           </h2>
 
           <p className="mt-1 text-sm text-brand-muted">
-            Static comparison rows for UI validation.
+            ETF comparison metrics across selected symbols.
           </p>
         </div>
 
@@ -398,43 +459,53 @@ export default function CompareSymbols() {
             <thead className="bg-brand-surfaceHigh text-brand-muted">
               <tr>
                 <th className="px-4 py-3 font-semibold">ETF</th>
+
                 <th className="px-4 py-3 font-semibold">Fund</th>
+
                 <th className="px-4 py-3 font-semibold">Price</th>
-                <th className="px-4 py-3 font-semibold">Monthly Income</th>
+
                 <th className="px-4 py-3 font-semibold">NAV Health</th>
+
                 <th className="px-4 py-3 font-semibold">AUM Flow</th>
-                <th className="px-4 py-3 font-semibold">90D Return</th>
+
+                <th className="px-4 py-3 font-semibold">Total Return</th>
+
+                <th className="px-4 py-3 font-semibold">Chart Value</th>
               </tr>
             </thead>
 
             <tbody>
-              {visibleEtfs.map((etf) => (
+              {visibleRows.map((row) => (
                 <tr
-                  key={etf.symbol}
+                  key={row.symbol}
                   className="border-t border-brand-outline text-brand-muted"
                 >
                   <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">
-                    {etf.symbol}
+                    {row.symbol}
                   </td>
 
-                  <td className="px-4 py-4">{etf.fund_name}</td>
+                  <td className="px-4 py-4">{row.fund_name}</td>
 
                   <td className="px-4 py-4 font-semibold text-brand-text">
-                    {formatCurrency(etf.latest_price)}
+                    {formatCurrency(row.latest_price)}
+                  </td>
+
+                  <td className="px-4 py-4">{row.nav_health}</td>
+
+                  <td className="px-4 py-4">
+                    {formatPercent(row.aum_change_percentage)}
                   </td>
 
                   <td className="px-4 py-4">
-                    {formatCurrency(etf.monthly_income)}
+                    {formatPercent(row.total_return_percentage)}
                   </td>
 
-                  <td className="px-4 py-4">{etf.nav_health}</td>
+                  <td className="px-4 py-4 font-semibold text-brand-text">
+                    {formatValue(
+                      row.chart_value,
 
-                  <td className="px-4 py-4">
-                    {formatPercent(etf.aum_flow_percentage)}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    {formatPercent(etf.total_return_percentage_90_day)}
+                      selectedMetric,
+                    )}
                   </td>
                 </tr>
               ))}
@@ -446,7 +517,15 @@ export default function CompareSymbols() {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, detail }) {
+function MetricCard({
+  icon: Icon,
+
+  label,
+
+  value,
+
+  detail,
+}) {
   return (
     <div className="glass-card rounded-3xl p-6">
       <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary">
@@ -467,10 +546,15 @@ function formatCurrency(value) {
     return "—";
   }
 
-  return Number(value).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+  return Number(value).toLocaleString(
+    "en-US",
+
+    {
+      style: "currency",
+
+      currency: "USD",
+    },
+  );
 }
 
 function formatPercent(value) {
@@ -479,4 +563,20 @@ function formatPercent(value) {
   }
 
   return `${Number(value).toFixed(2)}%`;
+}
+
+function formatValue(value, metric) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  if (metric === "price") {
+    return formatCurrency(value);
+  }
+
+  if (metric === "aum") {
+    return Number(value).toLocaleString("en-US");
+  }
+
+  return formatPercent(value);
 }

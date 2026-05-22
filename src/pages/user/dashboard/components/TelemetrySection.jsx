@@ -11,6 +11,7 @@ import {
 } from "recharts";
 
 import TelemetryCard from "./TelemetryCard";
+import BackTestingCard from "./BackTestingCard";
 
 const activityData = [
   "Price history imported for NVII",
@@ -97,18 +98,22 @@ export default function TelemetrySection({
           </div>
         </TelemetryCard>
 
-        <TelemetryCard
+        <BackTestingCard
+          to="/dashboard/backtesting"
           icon={TrendingUp}
-          title="Momentum Pulse"
-          subtitle="Placeholder ETF momentum sample"
+          title="Back Testing"
+          subtitle="Run historical ETF strategy simulations"
           className="lg:col-span-2"
         >
           <div className="mt-6 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={momentumPulseData}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+
                 <XAxis dataKey="date" />
+
                 <YAxis />
+
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#ffffff",
@@ -130,6 +135,7 @@ export default function TelemetrySection({
                     })
                   }
                 />
+
                 <Line
                   type="monotone"
                   dataKey="income"
@@ -140,7 +146,23 @@ export default function TelemetrySection({
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </TelemetryCard>
+
+          <div className="mt-6 flex items-center justify-between border-t border-brand-outline pt-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-muted">
+                Strategy Preview
+              </p>
+
+              <p className="mt-1 text-sm text-brand-muted">
+                Compare historical income, growth, and total return performance.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-brand-primary/30 bg-brand-primary/10 px-4 py-2 text-sm font-semibold text-brand-primary">
+              Open Back Tester →
+            </div>
+          </div>
+        </BackTestingCard>
       </div>
     </section>
   );

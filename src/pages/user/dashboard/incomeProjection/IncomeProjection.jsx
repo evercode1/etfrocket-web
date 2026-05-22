@@ -160,10 +160,6 @@ export default function IncomeProjection() {
               Adjust assumptions and project how monthly ETF income could grow
               over time.
             </p>
-
-            <p className="mt-3 font-mono text-xs uppercase tracking-widest text-brand-muted">
-              Portfolio ID: {selectedPortfolioId}
-            </p>
           </div>
 
           <div className="rounded-3xl border border-brand-outline bg-brand-surfaceHigh p-5">

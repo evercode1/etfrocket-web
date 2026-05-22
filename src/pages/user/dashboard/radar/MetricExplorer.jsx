@@ -1,14 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import {
-  ArrowLeft,
-  Filter,
-  Trophy,
-  TrendingUp,
-  ShieldCheck,
-  DollarSign,
-} from "lucide-react";
+import { ArrowLeft, Filter, Trophy } from "lucide-react";
 
 import { getMetricExplorer } from "../../../../api/comparisons";
 
@@ -54,12 +47,8 @@ export default function MetricExplorer() {
   const rangeOptions = data?.options?.ranges || [];
 
   const spotlight = useMemo(() => {
-    if (sortDirection === "asc") {
-      return [...tableRows].slice(-3).reverse();
-    }
-
     return tableRows.slice(0, 3);
-  }, [tableRows, sortDirection]);
+  }, [tableRows]);
 
   return (
     <div className="space-y-8">
@@ -140,7 +129,7 @@ export default function MetricExplorer() {
         <>
           <section className="grid gap-5 lg:grid-cols-3">
             {spotlight.map((etf) => (
-              <RankCard key={etf.symbol} etf={etf} />
+              <RankCard key={etf.symbol} etf={etf} metric={metric} />
             ))}
           </section>
 
@@ -155,24 +144,6 @@ export default function MetricExplorer() {
                   {summary.results_count || 0} ETFs ranked by{" "}
                   {summary.metric?.replaceAll("_", " ") || "metric"}.
                 </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-                >
-                  <ShieldCheck className="h-4 w-4" />
-                  Stable NAV
-                </button>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-                >
-                  <DollarSign className="h-4 w-4" />
-                  High Yield
-                </button>
               </div>
             </div>
 
@@ -221,7 +192,7 @@ export default function MetricExplorer() {
                         <td className="px-4 py-4">{etf.metric_label}</td>
 
                         <td className="px-4 py-4 font-semibold text-brand-text">
-                          {formatValue(etf.metric_value)}
+                          {formatMetricValue(etf.metric_value, metric)}
                         </td>
 
                         <td className="px-4 py-4">{etf.nav_health}</td>
@@ -246,7 +217,7 @@ export default function MetricExplorer() {
   );
 }
 
-function RankCard({ etf }) {
+function RankCard({ etf, metric }) {
   return (
     <div className="glass-card rounded-3xl p-6">
       <div className="flex items-center justify-between">
@@ -266,7 +237,10 @@ function RankCard({ etf }) {
       <div className="mt-6 space-y-3">
         <MiniStat label="Metric" value={etf.metric_label} />
 
-        <MiniStat label="Value" value={formatValue(etf.metric_value)} />
+        <MiniStat
+          label="Value"
+          value={formatMetricValue(etf.metric_value, metric)}
+        />
       </div>
     </div>
   );
@@ -316,9 +290,21 @@ function formatPercent(value) {
   return `${Number(value).toFixed(2)}%`;
 }
 
-function formatValue(value) {
+function formatMetricValue(value, metric) {
   if (value === null || value === undefined) {
     return "—";
+  }
+
+  if (
+    [
+      "price_growth",
+      "total_return",
+      "nav_stability",
+      "aum_growth",
+      "forward_yield",
+    ].includes(metric)
+  ) {
+    return `${Number(value).toFixed(2)}%`;
   }
 
   return Number(value).toLocaleString("en-US", {

@@ -17,7 +17,6 @@ export default function RadarSection({
       stats: [
         { label: "Source", value: "Current Holdings" },
         { label: "Best For", value: "Allocation Review" },
-        { label: "Status", value: "Ready Soon" },
       ],
       to: portfolioId
         ? `/dashboard/radar/portfolio-compare/${portfolioId}`
@@ -32,20 +31,18 @@ export default function RadarSection({
       stats: [
         { label: "Input", value: "ETF Symbols" },
         { label: "Limit", value: "Up to 10" },
-        { label: "Status", value: "Planned" },
       ],
       to: "/dashboard/radar/compare-symbols",
       disabled: false,
     },
     {
-      title: "Metric Explorer",
+      title: "ETF Rankings",
       description:
         "Rank ETFs by yield, NAV stability, AUM growth, total return, dividend trends, and risk signals.",
       badge: "Research",
       stats: [
         { label: "Mode", value: "Screener" },
         { label: "Sort By", value: "ETF Metrics" },
-        { label: "Status", value: "Planned" },
       ],
       to: "/dashboard/radar/metric-explorer",
       disabled: false,

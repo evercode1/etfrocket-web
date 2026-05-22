@@ -8,6 +8,7 @@ import {
   Edit,
   Plus,
   Rocket,
+  Settings,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -15,6 +16,7 @@ import {
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 
 import { listEtfsOwnedByUser } from "../../../../api/etfs";
+import { viewPortfolio } from "../../../../api/portfolios";
 
 import {
   csvUploadPortfolioTransactions,
@@ -22,10 +24,15 @@ import {
   listPortfolioTransactions,
 } from "../../../../api/portfolioTransactions";
 
+import { setStoredPortfolioId } from "../../../../utils/portfolioContext";
+
 export default function PortfolioTransactions() {
   const { id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+
+  const [portfolio, setPortfolio] = useState(null);
+  const [portfolioSelects, setPortfolioSelects] = useState({});
 
   const [transactions, setTransactions] = useState([]);
   const [etfs, setEtfs] = useState([]);
@@ -48,6 +55,14 @@ export default function PortfolioTransactions() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  async function loadPortfolio() {
+    const response = await viewPortfolio(id);
+    const data = response.data || null;
+
+    setPortfolio(data);
+    setPortfolioSelects(data?.portfolio_selects || {});
+  }
+
   async function loadEtfs() {
     const response = await listEtfsOwnedByUser(id);
 
@@ -59,31 +74,49 @@ export default function PortfolioTransactions() {
     sorting = sortConfig,
     etfId = selectedEtfId,
   ) {
-    setIsLoading(true);
+    const response = await listPortfolioTransactions(id, {
+      page,
+      per_page: 25,
+      sortBy: sorting.sortBy,
+      sortOrder: sorting.sortOrder,
+      etf_id: etfId || undefined,
+    });
 
-    try {
-      const response = await listPortfolioTransactions(id, {
-        page,
-        per_page: 25,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder,
-        etf_id: etfId || undefined,
-      });
+    const paginatedData = response.data || {};
 
-      const paginatedData = response.data || {};
-
-      setTransactions(paginatedData.data || []);
-      setPagination(paginatedData);
-      setCurrentPage(paginatedData.current_page || page);
-    } finally {
-      setIsLoading(false);
-    }
+    setTransactions(paginatedData.data || []);
+    setPagination(paginatedData);
+    setCurrentPage(paginatedData.current_page || page);
   }
 
   useEffect(() => {
-    loadEtfs();
-    loadTransactions(1);
+    async function loadPage() {
+      setIsLoading(true);
+
+      try {
+        if (id) {
+          setStoredPortfolioId(id);
+        }
+
+        setSelectedEtfId("");
+        setCurrentPage(1);
+
+        await Promise.all([loadPortfolio(), loadEtfs(), loadTransactions(1)]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadPage();
   }, [id]);
+
+  function handlePortfolioChange(event) {
+    const nextPortfolioId = event.target.value;
+
+    setStoredPortfolioId(nextPortfolioId);
+
+    navigate(`/dashboard/portfolios/${nextPortfolioId}/transactions`);
+  }
 
   function handleSort(sortBy) {
     const nextSort = {
@@ -176,60 +209,82 @@ export default function PortfolioTransactions() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <Link
-          to={`/dashboard/portfolios/${id}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Portfolio
-        </Link>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <Link
+                to={`/dashboard/portfolios/${id}`}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Portfolio
+              </Link>
 
-        <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
-              Transaction Ledger
-            </p>
+              <p className="mt-8 font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+                Transaction Ledger
+              </p>
 
-            <h1 className="mt-3 font-display text-5xl font-bold">
-              Portfolio Transactions
-            </h1>
+              <h1 className="mt-3 font-display text-5xl font-bold">
+                Portfolio Transactions
+              </h1>
 
-            <p className="mt-4 max-w-3xl text-brand-muted">
-              Review, sort, import, edit, delete, and filter buy/sell records
-              for this portfolio.
-            </p>
+              <p className="mt-4 max-w-3xl text-brand-muted">
+                Review, sort, import, edit, delete, and filter buy/sell records
+                for the selected portfolio. Defaults to All.
+              </p>
+            </div>
 
-            <p className="mt-3 font-mono text-xs uppercase tracking-widest text-brand-muted">
-              Portfolio ID: {id}
-            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,text/csv"
+                onChange={handleImportCsv}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isImporting}
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Upload className="h-4 w-4" />
+                {isImporting ? "Importing..." : "Import CSV"}
+              </button>
+
+              <Link
+                to={`/dashboard/portfolios/${id}/transactions/create`}
+                className="rocket-button-primary inline-flex h-14 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold"
+              >
+                <Plus className="h-4 w-4" />
+                Add Transaction
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,text/csv"
-              onChange={handleImportCsv}
-              className="hidden"
-            />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <div className="inline-flex h-14 items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4">
+              <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+                Active Portfolio
+              </span>
 
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isImporting}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Upload className="h-4 w-4" />
-              {isImporting ? "Importing..." : "Import CSV"}
-            </button>
-
-            <Link
-              to={`/dashboard/portfolios/${id}/transactions/create`}
-              className="rocket-button-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
-            >
-              <Plus className="h-4 w-4" />
-              Add Transaction
-            </Link>
+              <select
+                value={String(portfolio?.id || id)}
+                onChange={handlePortfolioChange}
+                className="bg-transparent text-sm font-semibold text-brand-text outline-none"
+              >
+                {Object.entries(portfolioSelects).map(([portfolioId, name]) => (
+                  <option
+                    key={portfolioId}
+                    value={portfolioId}
+                    className="bg-brand-surface text-brand-text"
+                  >
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </section>

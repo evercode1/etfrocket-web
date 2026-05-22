@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, Plus, Settings } from "lucide-react";
 
+import { setStoredPortfolioId } from "../../../../../utils/portfolioContext";
+
 export default function PortfolioControls({
   portfolioSelects,
   selectedPortfolioId,
@@ -56,6 +58,7 @@ export default function PortfolioControls({
                 key={portfolio.id}
                 type="button"
                 onClick={() => {
+                  setStoredPortfolioId(portfolio.id);
                   setSelectedPortfolioId(portfolio.id);
                   setIsOpen(false);
                 }}

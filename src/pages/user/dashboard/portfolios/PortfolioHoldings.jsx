@@ -12,14 +12,15 @@ import {
 } from "lucide-react";
 
 import { getPortfolioHoldings } from "../../../../api/holdings";
+import { setStoredPortfolioId } from "../../../../utils/portfolioContext";
 
 export default function PortfolioHoldings() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
   const [holdingsData, setHoldingsData] = useState(null);
   const [selectedView, setSelectedView] = useState("performance");
-  const navigate = useNavigate();
 
   async function loadHoldings() {
     setIsLoading(true);
@@ -38,6 +39,10 @@ export default function PortfolioHoldings() {
       top: 0,
       behavior: "instant",
     });
+
+    if (id) {
+      setStoredPortfolioId(id);
+    }
 
     loadHoldings();
   }, [id]);
@@ -79,6 +84,7 @@ export default function PortfolioHoldings() {
           Review position-level value, cost basis, gain/loss, income
           contribution, allocation weight, NAV health, and AUM flow.
         </p>
+
         <div className="mt-5 inline-flex items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3">
           <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
             Active Portfolio
@@ -87,7 +93,11 @@ export default function PortfolioHoldings() {
           <select
             value={String(portfolio.id || id)}
             onChange={(event) => {
-              navigate(`/dashboard/portfolios/${event.target.value}/holdings`);
+              const nextPortfolioId = event.target.value;
+
+              setStoredPortfolioId(nextPortfolioId);
+
+              navigate(`/dashboard/portfolios/${nextPortfolioId}/holdings`);
             }}
             className="bg-transparent text-sm font-semibold text-brand-text outline-none"
           >
@@ -243,35 +253,22 @@ export default function PortfolioHoldings() {
                 {selectedView === "performance" ? (
                   <tr>
                     <th className="px-4 py-3 font-semibold">ETF</th>
-
                     <th className="px-4 py-3 font-semibold">Shares</th>
-
                     <th className="px-4 py-3 font-semibold">Avg Cost</th>
-
                     <th className="px-4 py-3 font-semibold">Price</th>
-
                     <th className="px-4 py-3 font-semibold">Market Value</th>
-
                     <th className="px-4 py-3 font-semibold">Cost Basis</th>
-
                     <th className="px-4 py-3 font-semibold">Gain/Loss</th>
-
                     <th className="px-4 py-3 font-semibold">Gain/Loss %</th>
                   </tr>
                 ) : (
                   <tr>
                     <th className="px-4 py-3 font-semibold">ETF</th>
-
                     <th className="px-4 py-3 font-semibold">Monthly Income</th>
-
                     <th className="px-4 py-3 font-semibold">Yield on Cost</th>
-
                     <th className="px-4 py-3 font-semibold">Allocation</th>
-
                     <th className="px-4 py-3 font-semibold">Income Weight</th>
-
                     <th className="px-4 py-3 font-semibold">NAV Health</th>
-
                     <th className="px-4 py-3 font-semibold">AUM Flow</th>
                   </tr>
                 )}

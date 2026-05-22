@@ -1,0 +1,382 @@
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  CalendarRange,
+  DollarSign,
+  LineChart,
+  Play,
+  RefreshCcw,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
+
+import {
+  CartesianGrid,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Area,
+  ComposedChart,
+} from "recharts";
+
+const supportedEtfs = [
+  "CHPY",
+  "QDTE",
+  "AMDY",
+  "QQQI",
+  "NVII",
+  "SPYI",
+  "JEPI",
+  "JEPQ",
+  "SVOL",
+  "FEPI",
+];
+
+const mockResults = {
+  finalValue: 148522,
+  totalReturn: 48.52,
+  totalIncome: 42110,
+  maxDrawdown: -12.4,
+  sharpeRatio: 1.48,
+  cagr: 18.2,
+};
+
+const chartData = [
+  { year: "2021", portfolio: 10000, income: 0 },
+  { year: "2022", portfolio: 14250, income: 1200 },
+  { year: "2023", portfolio: 22600, income: 4200 },
+  { year: "2024", portfolio: 48800, income: 12400 },
+  { year: "2025", portfolio: 98200, income: 26500 },
+  { year: "2026", portfolio: 148522, income: 42110 },
+];
+
+export default function BackTesting() {
+  const [symbol, setSymbol] = useState("CHPY");
+
+  const [timeframe, setTimeframe] = useState("5y");
+
+  const [initialInvestment, setInitialInvestment] = useState("10000");
+
+  const [monthlyContribution, setMonthlyContribution] = useState("500");
+
+  const [dripPercentage, setDripPercentage] = useState("100");
+
+  const [unsupportedSymbol, setUnsupportedSymbol] = useState(false);
+
+  const projectedMonthlyIncome = useMemo(() => {
+    return Math.round(mockResults.totalIncome / 12);
+  }, []);
+
+  function handleRunBacktest() {
+    const normalized = symbol.trim().toUpperCase();
+
+    if (!supportedEtfs.includes(normalized)) {
+      setUnsupportedSymbol(true);
+
+      return;
+    }
+
+    setUnsupportedSymbol(false);
+
+    setSymbol(normalized);
+  }
+
+  return (
+    <div className="space-y-8">
+      <section className="glass-card rounded-3xl p-8">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Link>
+
+        <div className="mt-8 flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+              ETF Strategy Lab
+            </p>
+
+            <h1 className="mt-3 font-display text-5xl font-bold">
+              Back Testing
+            </h1>
+
+            <p className="mt-4 max-w-3xl text-brand-muted">
+              Simulate historical ETF performance using reinvestment, recurring
+              contributions, and income strategies to evaluate long-term
+              portfolio outcomes.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-brand-outline bg-brand-surfaceHigh px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-muted">
+              Current Strategy
+            </p>
+
+            <p className="mt-2 font-display text-3xl font-bold text-brand-primary">
+              {symbol}
+            </p>
+
+            <p className="mt-2 text-sm text-brand-muted">
+              Historical DRIP simulation with recurring contributions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[420px_1fr]">
+        <div className="glass-card rounded-3xl p-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary">
+              <LineChart className="h-5 w-5" />
+            </div>
+
+            <div>
+              <h2 className="font-display text-2xl font-bold">
+                Strategy Inputs
+              </h2>
+
+              <p className="text-sm text-brand-muted">
+                Configure your historical simulation.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-5">
+            <InputGroup label="ETF Symbol" icon={TrendingUp}>
+              <input
+                value={symbol}
+                onChange={(event) => setSymbol(event.target.value)}
+                placeholder="Enter ETF symbol"
+                className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
+              />
+            </InputGroup>
+
+            {unsupportedSymbol && (
+              <div className="rounded-2xl border border-brand-danger/40 bg-brand-danger/10 px-4 py-3 text-sm font-semibold text-brand-danger">
+                ETF not currently supported for historical back testing.
+              </div>
+            )}
+
+            <InputGroup label="Timeframe" icon={CalendarRange}>
+              <select
+                value={timeframe}
+                onChange={(event) => setTimeframe(event.target.value)}
+                className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
+              >
+                <option value="1y">1 Year</option>
+                <option value="3y">3 Years</option>
+                <option value="5y">5 Years</option>
+                <option value="10y">10 Years</option>
+                <option value="max">Max Available</option>
+              </select>
+            </InputGroup>
+
+            <InputGroup label="Initial Investment" icon={DollarSign}>
+              <input
+                value={initialInvestment}
+                onChange={(event) => setInitialInvestment(event.target.value)}
+                type="number"
+                min="0"
+                className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
+              />
+            </InputGroup>
+
+            <InputGroup label="Monthly Contribution" icon={RefreshCcw}>
+              <input
+                value={monthlyContribution}
+                onChange={(event) => setMonthlyContribution(event.target.value)}
+                type="number"
+                min="0"
+                className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
+              />
+            </InputGroup>
+
+            <InputGroup label="DRIP Percentage" icon={ShieldCheck}>
+              <div>
+                <input
+                  value={dripPercentage}
+                  onChange={(event) => setDripPercentage(event.target.value)}
+                  type="range"
+                  min="0"
+                  max="100"
+                  className="w-full"
+                />
+
+                <div className="mt-2 flex items-center justify-between text-xs font-semibold text-brand-muted">
+                  <span>0%</span>
+                  <span>{dripPercentage}% Reinvested</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            </InputGroup>
+
+            <button
+              type="button"
+              onClick={handleRunBacktest}
+              className="rocket-button-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-bold"
+            >
+              <Play className="h-4 w-4" />
+              Run Back Test
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              label="Final Portfolio Value"
+              value={formatCurrency(mockResults.finalValue)}
+            />
+
+            <StatCard
+              label="Total Return"
+              value={`${mockResults.totalReturn}%`}
+            />
+
+            <StatCard
+              label="Projected Monthly Income"
+              value={formatCurrency(projectedMonthlyIncome)}
+            />
+
+            <StatCard
+              label="Max Drawdown"
+              value={`${mockResults.maxDrawdown}%`}
+              danger
+            />
+          </section>
+
+          <section className="glass-card rounded-3xl p-6">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h2 className="font-display text-2xl font-bold">
+                  Portfolio Growth Simulation
+                </h2>
+
+                <p className="mt-1 text-sm text-brand-muted">
+                  Historical compounding with reinvestment and recurring
+                  contributions.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Pill label={`CAGR ${mockResults.cagr}%`} />
+                <Pill label={`Sharpe ${mockResults.sharpeRatio}`} />
+              </div>
+            </div>
+
+            <div className="mt-8 h-96">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+
+                  <XAxis dataKey="year" />
+
+                  <YAxis />
+
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderColor: "#94a3b8",
+                      color: "#0f172a",
+                    }}
+                    labelStyle={{
+                      color: "#0f172a",
+                      fontWeight: 700,
+                    }}
+                    itemStyle={{
+                      color: "#1e293b",
+                      fontWeight: 600,
+                    }}
+                    formatter={(value) =>
+                      Number(value).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })
+                    }
+                  />
+
+                  <Area
+                    type="monotone"
+                    dataKey="portfolio"
+                    fill="currentColor"
+                    fillOpacity={0.08}
+                    stroke="none"
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="portfolio"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    dot={false}
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function InputGroup({ label, icon: Icon, children }) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center gap-2">
+        <Icon className="h-4 w-4 text-brand-primary" />
+
+        <span className="text-xs font-semibold uppercase tracking-widest text-brand-muted">
+          {label}
+        </span>
+      </div>
+
+      {children}
+    </div>
+  );
+}
+
+function StatCard({ label, value, danger = false }) {
+  return (
+    <div className="glass-card rounded-3xl p-5">
+      <p className="text-sm text-brand-muted">{label}</p>
+
+      <p
+        className={`mt-3 font-display text-3xl font-bold ${
+          danger ? "text-brand-danger" : "text-brand-primary"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function Pill({ label }) {
+  return (
+    <div className="rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-2 text-sm font-semibold text-brand-muted">
+      {label}
+    </div>
+  );
+}
+
+function formatCurrency(value) {
+  return Number(value).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}

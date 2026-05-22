@@ -47,6 +47,7 @@ import DividendHistory from "../pages/user/dashboard/dividends/DividendHistory";
 import PortfolioCompare from "../pages/user/dashboard/radar/PortfolioCompare";
 import CompareSymbols from "../pages/user/dashboard/radar/CompareSymbols";
 import MetricExplorer from "../pages/user/dashboard/radar/MetricExplorer";
+import BackTesting from "../pages/user/dashboard/backtesting/BackTesting";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -235,6 +236,10 @@ const router = createBrowserRouter([
             path: "radar/metric-explorer",
 
             element: <MetricExplorer />,
+          },
+          {
+            path: "backtesting",
+            element: <BackTesting />,
           },
           {
             path: "support",

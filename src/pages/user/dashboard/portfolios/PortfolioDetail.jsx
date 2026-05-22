@@ -146,6 +146,7 @@ export default function PortfolioDetail() {
   }
 
   const holdings = portfolio.holdings || [];
+  const topHoldings = holdings.slice(0, 6);
 
   const allocationData = holdings.map((holding) => ({
     name: holding.symbol,
@@ -186,9 +187,31 @@ export default function PortfolioDetail() {
               transaction activity for this portfolio.
             </p>
 
-            <p className="mt-3 font-mono text-xs uppercase tracking-widest text-brand-muted">
-              Portfolio ID: {portfolio.id}
-            </p>
+            <div className="mt-5 inline-flex items-center gap-3 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3">
+              <span className="font-mono text-xs uppercase tracking-widest text-brand-primary">
+                Active Portfolio
+              </span>
+
+              <select
+                value={String(portfolio.id)}
+                onChange={(event) => {
+                  navigate(`/dashboard/portfolios/${event.target.value}`);
+                }}
+                className="bg-transparent text-sm font-semibold text-brand-text outline-none"
+              >
+                {Object.entries(portfolio.portfolio_selects || {}).map(
+                  ([portfolioSelectId, name]) => (
+                    <option
+                      key={portfolioSelectId}
+                      value={portfolioSelectId}
+                      className="bg-brand-surface text-brand-text"
+                    >
+                      {name}
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -321,17 +344,9 @@ export default function PortfolioDetail() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <CardTitle
               icon={Rocket}
-              title="Holdings"
-              subtitle="ETF positions currently tracked in this portfolio"
+              title="Top Holdings"
+              subtitle="Largest ETF positions by current market value"
             />
-
-            <Link
-              to={`/dashboard/portfolios/${portfolio.id}/holdings`}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Analyze Holdings
-            </Link>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
@@ -377,55 +392,69 @@ export default function PortfolioDetail() {
           {holdings.length === 0 ? (
             <EmptyPanel message="No holdings yet. Add a transaction or import a CSV to start tracking this portfolio." />
           ) : (
-            <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-brand-surfaceHigh text-brand-muted">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold">ETF</th>
-                    <th className="px-4 py-3 font-semibold">Shares</th>
-                    <th className="px-4 py-3 font-semibold">Value</th>
-                    <th className="px-4 py-3 font-semibold">Income</th>
-                    <th className="px-4 py-3 font-semibold">Allocation</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {holdings.map((holding) => (
-                    <tr
-                      key={holding.etf_id}
-                      className="border-t border-brand-outline text-brand-muted"
-                    >
-                      <td className="px-4 py-4">
-                        <div>
-                          <p className="font-semibold text-brand-text">
-                            {holding.symbol}
-                          </p>
-                          <p className="text-xs text-brand-muted">
-                            {holding.fund_name}
-                          </p>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-4">
-                        {Number(holding.shares || 0).toLocaleString()}
-                      </td>
-
-                      <td className="px-4 py-4">
-                        {formatCurrency(holding.market_value)}
-                      </td>
-
-                      <td className="px-4 py-4">
-                        {formatCurrency(holding.estimated_monthly_income)}
-                      </td>
-
-                      <td className="px-4 py-4">
-                        {formatPercent(holding.allocation_percentage)}
-                      </td>
+            <>
+              <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-brand-surfaceHigh text-brand-muted">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">ETF</th>
+                      <th className="px-4 py-3 font-semibold">Shares</th>
+                      <th className="px-4 py-3 font-semibold">Value</th>
+                      <th className="px-4 py-3 font-semibold">Income</th>
+                      <th className="px-4 py-3 font-semibold">Allocation</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+
+                  <tbody>
+                    {topHoldings.map((holding) => (
+                      <tr
+                        key={holding.etf_id}
+                        className="border-t border-brand-outline text-brand-muted"
+                      >
+                        <td className="px-4 py-4">
+                          <div>
+                            <p className="font-semibold text-brand-text">
+                              {holding.symbol}
+                            </p>
+                            <p className="text-xs text-brand-muted">
+                              {holding.fund_name}
+                            </p>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-4">
+                          {Math.round(
+                            Number(holding.shares || 0),
+                          ).toLocaleString()}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          {formatCurrency(holding.market_value)}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          {formatCurrency(holding.estimated_monthly_income)}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          {formatPercent(holding.allocation_percentage)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-6 flex justify-center">
+                <Link
+                  to={`/dashboard/portfolios/${portfolio.id}/holdings`}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  View All Holdings
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>
@@ -496,7 +525,9 @@ export default function PortfolioDetail() {
                     </td>
 
                     <td className="px-4 py-4">
-                      {Number(transaction.shares || 0).toLocaleString()}
+                      {Math.round(
+                        Number(transaction.shares || 0),
+                      ).toLocaleString()}
                     </td>
 
                     <td className="px-4 py-4">

@@ -34,7 +34,7 @@ export default function RadarSection({
         { label: "Limit", value: "Up to 10" },
         { label: "Status", value: "Planned" },
       ],
-      to: "/dashboard/radar/symbol-compare",
+      to: "/dashboard/radar/compare-symbols",
       disabled: false,
     },
     {

@@ -29,3 +29,15 @@ export async function getCompareSymbols(
 
   return response.data;
 }
+
+export async function getMetricExplorer(params = {}) {
+  const response = await api.get(
+    "/metric-explorer",
+
+    {
+      params,
+    },
+  );
+
+  return response.data;
+}

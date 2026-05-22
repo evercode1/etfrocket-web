@@ -57,6 +57,10 @@ export default function CompareSymbols() {
 
   const [dismissedInvalidSymbols, setDismissedInvalidSymbols] = useState([]);
 
+  const [maxSymbolsWarning, setMaxSymbolsWarning] = useState(false);
+
+  const MAX_SYMBOLS = 10;
+
   async function loadComparisonData() {
     if (selectedSymbols.length === 0) {
       setComparisonData(null);
@@ -128,6 +132,14 @@ export default function CompareSymbols() {
 
       return;
     }
+
+    if (selectedSymbols.length >= MAX_SYMBOLS) {
+      setMaxSymbolsWarning(true);
+
+      return;
+    }
+
+    setMaxSymbolsWarning(false);
 
     setSelectedSymbols([...selectedSymbols, normalized]);
 
@@ -237,6 +249,30 @@ export default function CompareSymbols() {
                 ])
               }
               className="text-amber-200 transition hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {maxSymbolsWarning && (
+        <div className="glass-card rounded-3xl border border-brand-danger/30 bg-brand-danger/10 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-semibold text-brand-danger">
+                Maximum symbol limit reached
+              </p>
+
+              <p className="mt-1 text-sm text-brand-muted">
+                You can compare up to {MAX_SYMBOLS} symbols at a time.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMaxSymbolsWarning(false)}
+              className="text-brand-danger transition hover:text-white"
             >
               <X className="h-4 w-4" />
             </button>

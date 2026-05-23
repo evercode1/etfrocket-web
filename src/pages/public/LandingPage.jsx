@@ -73,23 +73,19 @@ export default function LandingPage() {
           </div>
 
           <div className="relative">
-            <p className="font-mono text-sm uppercase tracking-[0.5em] text-cyan-300">
-              ETF Rocket
-            </p>
-
             <h1 className="mt-8 font-display text-7xl font-black tracking-[0.08em] text-white md:text-[10rem]">
               RIDE
             </h1>
 
             <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
-              THE ROCKET
+              THE
+            </h1>
+
+            <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
+              ROCKET
             </h1>
 
             <div className="mx-auto mt-10 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-
-            <p className="mt-10 font-mono text-sm uppercase tracking-[0.45em] text-slate-300 md:text-base">
-              MOMENTUM • INCOME • INTELLIGENCE
-            </p>
           </div>
         </div>
       </div>
@@ -109,27 +105,15 @@ export default function LandingPage() {
           </div>
 
           <div className="relative">
-            <p className="font-mono text-sm uppercase tracking-[0.5em] text-cyan-300">
-              ETF Rocket
-            </p>
-
             <h1 className="mt-10 font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
-              Manage Weekly
+              WEEKLY
             </h1>
 
-            <h1 className="font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
-              Paying
-            </h1>
-
-            <h1 className="rocket-gradient-text font-display text-6xl font-black leading-[1.02] tracking-[0.04em] md:text-[7rem]">
-              Dividend Funds
+            <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
+              INCOME
             </h1>
 
             <div className="mx-auto mt-12 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-
-            <p className="mt-12 font-mono text-sm uppercase tracking-[0.45em] text-slate-300 md:text-base">
-              AI DRIVEN MARKET INTELLIGENCE
-            </p>
           </div>
         </div>
       </div>
@@ -142,38 +126,35 @@ export default function LandingPage() {
         }`}
       >
         <div className="max-w-5xl text-center">
-          <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-5 py-2 backdrop-blur-xl">
-            <Radar className="h-4 w-4 text-cyan-300" />
-
-            <span className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-200">
-              Mission Control
-            </span>
-          </div>
-
           <h1 className="mt-10 font-display text-6xl font-black leading-[0.95] text-white md:text-8xl">
-            Build Smarter{" "}
-            <span className="rocket-gradient-text">Income Strategies</span>
+            Maximize Your{" "}
+            <div>
+              <span className="rocket-gradient-text">ETF Cash Flow</span>
+            </div>
           </h1>
 
           <p className="mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-slate-300 md:text-xl">
-            Monitor momentum, track dividend income, run historical backtests,
-            and explore AI-driven market intelligence from one powerful ETF
-            command center.
+            Track total return, dividend income, monitor NAV health, run
+            historical backtests. Explore AI-driven market intelligence from one
+            powerful ETF command center.
           </p>
 
           <div className="mt-14 flex flex-col items-center justify-center gap-5 sm:flex-row">
             <Link
-              to="/login"
+              to="/auth/login"
               className="rocket-button-primary inline-flex items-center gap-3"
             >
               Launch Dashboard
               <ArrowRight className="h-4 w-4" />
             </Link>
 
-            <button className="rocket-button-secondary inline-flex items-center gap-3">
+            <Link
+              to="/auth/login"
+              className="rocket-button-secondary inline-flex items-center gap-3"
+            >
               <TrendingUp className="h-4 w-4" />
               Explore ETFs
-            </button>
+            </Link>
           </div>
 
           {/* Telemetry Pills */}

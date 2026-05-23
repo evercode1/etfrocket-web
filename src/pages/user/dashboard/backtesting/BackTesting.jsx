@@ -29,7 +29,7 @@ import { runBackTest, getEtfSelects } from "../../../../api/comparisons";
 export default function BackTesting() {
   const [symbol, setSymbol] = useState("CHPY");
 
-  const [timeframe, setTimeframe] = useState("5y");
+  const [timeframe, setTimeframe] = useState("1y");
 
   const [initialInvestment, setInitialInvestment] = useState("10000");
 
@@ -301,14 +301,13 @@ export default function BackTesting() {
             />
 
             <StatCard
-              label="Projected Monthly Income"
+              label="Proj Monthly Income"
               value={formatCurrency(projectedMonthlyIncome)}
             />
 
             <StatCard
               label="Max Drawdown"
               value={`${Number(analytics.max_drawdown || 0).toFixed(2)}%`}
-              danger
             />
           </section>
 

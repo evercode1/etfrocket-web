@@ -1,95 +1,257 @@
+import { useEffect, useState } from "react";
+
+import { Link } from "react-router-dom";
+
+import { ArrowRight, Radar, TrendingUp } from "lucide-react";
+
+import heroVideo from "../../assets/vid.mp4";
+
 export default function LandingPage() {
+  const [stage, setStage] = useState(1);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => {
+        setStage(2);
+      }, 1800),
+
+      setTimeout(() => {
+        setStage(3);
+      }, 4200),
+    ];
+
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
-    <main className="relative overflow-hidden">
-      {/* Background Effects */}
+    <main className="relative min-h-screen overflow-hidden bg-[#020817] text-white">
+      {/* Background Glow */}
 
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute left-[-200px] top-[-200px] h-[500px] w-[500px] rounded-full bg-brand-primaryStrong/10 blur-[120px]" />
+      <div className="absolute inset-0 -z-30">
+        <div className="absolute left-[-300px] top-[-300px] h-[700px] w-[700px] rounded-full bg-cyan-500/10 blur-[180px]" />
 
-        <div className="absolute bottom-[-200px] right-[-200px] h-[500px] w-[500px] rounded-full bg-brand-secondary/10 blur-[120px]" />
+        <div className="absolute bottom-[-300px] right-[-300px] h-[700px] w-[700px] rounded-full bg-blue-500/10 blur-[180px]" />
       </div>
 
-      {/* Hero */}
+      {/* Video Layer */}
 
-      <section className="mx-auto flex max-w-7xl flex-col items-center px-6 py-32 text-center">
-        <div className="glass-card max-w-5xl rounded-[32px] p-12 shadow-glow">
-          <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
-            Mission Control
-          </p>
+      <div
+        className={`absolute inset-0 transition-all duration-[3000ms] ${
+          stage === 3 ? "scale-110 opacity-20 blur-sm" : "scale-100 opacity-100"
+        }`}
+      >
+        <video
+          autoPlay
+          muted
+          playsInline
+          className="h-full w-full object-cover"
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
 
-          <h1 className="mt-8 font-display text-6xl font-extrabold leading-tight md:text-7xl">
-            Track Your ETF{" "}
-            <span className="rocket-gradient-text">Momentum</span>
+        {/* Cinematic Overlay */}
+
+        <div className="absolute inset-0 bg-gradient-to-b from-[#020817]/10 via-[#020817]/30 to-[#020817]" />
+
+        {/* Glow */}
+
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.12),transparent_60%)]" />
+      </div>
+
+      {/* Stage 1 */}
+
+      <div
+        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1200ms] md:pt-52 ${
+          stage === 1 ? "translate-y-0 opacity-100" : "-translate-y-8 opacity-0"
+        }`}
+      >
+        <div className="relative">
+          {/* Glow */}
+
+          <div className="absolute inset-0 blur-[140px]">
+            <div className="h-full w-full rounded-full bg-cyan-400/20" />
+          </div>
+
+          <div className="relative">
+            <p className="font-mono text-sm uppercase tracking-[0.5em] text-cyan-300">
+              ETF Rocket
+            </p>
+
+            <h1 className="mt-8 font-display text-7xl font-black tracking-[0.08em] text-white md:text-[10rem]">
+              RIDE
+            </h1>
+
+            <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
+              THE ROCKET
+            </h1>
+
+            <div className="mx-auto mt-10 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
+
+            <p className="mt-10 font-mono text-sm uppercase tracking-[0.45em] text-slate-300 md:text-base">
+              MOMENTUM • INCOME • INTELLIGENCE
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stage 2 */}
+
+      <div
+        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1500ms] md:pt-52 ${
+          stage === 2 ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+        }`}
+      >
+        <div className="relative max-w-6xl">
+          {/* Glow */}
+
+          <div className="absolute inset-0 blur-[120px]">
+            <div className="h-full w-full rounded-full bg-cyan-400/20" />
+          </div>
+
+          <div className="relative">
+            <p className="font-mono text-sm uppercase tracking-[0.5em] text-cyan-300">
+              ETF Rocket
+            </p>
+
+            <h1 className="mt-10 font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
+              Manage Weekly
+            </h1>
+
+            <h1 className="font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
+              Paying
+            </h1>
+
+            <h1 className="rocket-gradient-text font-display text-6xl font-black leading-[1.02] tracking-[0.04em] md:text-[7rem]">
+              Dividend Funds
+            </h1>
+
+            <div className="mx-auto mt-12 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
+
+            <p className="mt-12 font-mono text-sm uppercase tracking-[0.45em] text-slate-300 md:text-base">
+              AI DRIVEN MARKET INTELLIGENCE
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stage 3 Hero */}
+
+      <section
+        className={`relative z-30 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-start px-6 pt-40 transition-all duration-[1800ms] md:pt-52 ${
+          stage === 3 ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+        }`}
+      >
+        <div className="max-w-5xl text-center">
+          <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-5 py-2 backdrop-blur-xl">
+            <Radar className="h-4 w-4 text-cyan-300" />
+
+            <span className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-200">
+              Mission Control
+            </span>
+          </div>
+
+          <h1 className="mt-10 font-display text-6xl font-black leading-[0.95] text-white md:text-8xl">
+            Build Smarter{" "}
+            <span className="rocket-gradient-text">Income Strategies</span>
           </h1>
 
-          <p className="mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-brand-muted">
-            ETF Rocket helps investors monitor momentum, dividends, and
-            portfolio telemetry through a precision-engineered financial command
-            center.
+          <p className="mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-slate-300 md:text-xl">
+            Monitor momentum, track dividend income, run historical backtests,
+            and explore AI-driven market intelligence from one powerful ETF
+            command center.
           </p>
 
-          <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button className="rocket-button-primary">Launch Dashboard</button>
+          <div className="mt-14 flex flex-col items-center justify-center gap-5 sm:flex-row">
+            <Link
+              to="/login"
+              className="rocket-button-primary inline-flex items-center gap-3"
+            >
+              Launch Dashboard
+              <ArrowRight className="h-4 w-4" />
+            </Link>
 
-            <button className="rocket-button-secondary">Explore ETFs</button>
+            <button className="rocket-button-secondary inline-flex items-center gap-3">
+              <TrendingUp className="h-4 w-4" />
+              Explore ETFs
+            </button>
+          </div>
+
+          {/* Telemetry Pills */}
+
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-4">
+            <TelemetryPill label="AI Market Signals" />
+
+            <TelemetryPill label="Historical Backtesting" />
+
+            <TelemetryPill label="Portfolio Telemetry" />
+
+            <TelemetryPill label="Momentum Analytics" />
           </div>
         </div>
       </section>
 
-      {/* Feature Grid */}
+      {/* Footer */}
 
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 pb-32 md:grid-cols-3">
-        {/* Momentum */}
+      <footer className="relative z-30 mx-auto max-w-7xl px-6 pb-12">
+        <div className="glass-card rounded-3xl border border-white/10 bg-[#071225]/60 p-10 backdrop-blur-xl">
+          <div className="grid gap-10 md:grid-cols-3">
+            <div>
+              <h3 className="font-display text-4xl font-bold text-cyan-100">
+                ETF Rocket
+              </h3>
 
-        <div className="glass-card rounded-3xl p-8">
-          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primaryStrong/10">
-            <span className="text-2xl text-brand-primary">🚀</span>
+              <p className="mt-6 max-w-sm leading-relaxed text-slate-300">
+                Mission control for ETF investors. Analyze yield sustainability,
+                compare funds, and explore ETF analytics with clarity.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-300">
+                Resources
+              </p>
+
+              <div className="mt-6 flex flex-col gap-4 text-slate-300">
+                <a href="#">Help Center</a>
+
+                <a href="#">Support</a>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-300">
+                Legal
+              </p>
+
+              <div className="mt-6 flex flex-col gap-4 text-slate-300">
+                <a href="#">Privacy Policy</a>
+
+                <a href="#">Terms of Service</a>
+              </div>
+            </div>
           </div>
-
-          <h2 className="font-display text-3xl font-bold text-brand-primary">
-            Momentum Engine
-          </h2>
-
-          <p className="mt-4 leading-relaxed text-brand-muted">
-            Identify high-momentum ETFs using advanced telemetry and historical
-            trend analysis.
-          </p>
         </div>
 
-        {/* Dividends */}
+        {/* Copyright */}
 
-        <div className="glass-card rounded-3xl p-8">
-          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-secondary/10">
-            <span className="text-2xl text-brand-secondary">❄️</span>
-          </div>
+        <div className="mt-8 text-center">
+          <p className="text-sm text-slate-400">
+            © 2026 ETF Rocket. All rights reserved.
+          </p>
 
-          <h2 className="font-display text-3xl font-bold text-brand-secondary">
-            Dividend Snowball
-          </h2>
-
-          <p className="mt-4 leading-relaxed text-brand-muted">
-            Monitor yield generation, distributions, and compounding income
-            growth over time.
+          <p className="mt-2 font-mono text-xs uppercase tracking-[0.35em] text-slate-500">
+            ETF Mission Control
           </p>
         </div>
-
-        {/* Portfolio */}
-
-        <div className="glass-card rounded-3xl p-8">
-          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary/10">
-            <span className="text-2xl text-brand-primary">📡</span>
-          </div>
-
-          <h2 className="font-display text-3xl font-bold text-brand-primary">
-            Mission Control
-          </h2>
-
-          <p className="mt-4 leading-relaxed text-brand-muted">
-            Centralized portfolio analytics, comparisons, and transaction
-            tracking in one dashboard.
-          </p>
-        </div>
-      </section>
+      </footer>
     </main>
+  );
+}
+
+function TelemetryPill({ label }) {
+  return (
+    <div className="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 backdrop-blur-xl">
+      {label}
+    </div>
   );
 }

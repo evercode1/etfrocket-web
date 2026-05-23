@@ -41,3 +41,19 @@ export async function getMetricExplorer(params = {}) {
 
   return response.data;
 }
+
+export async function runBackTest(payload) {
+  const response = await api.post(
+    "/back-testing",
+
+    payload,
+  );
+
+  return response.data;
+}
+
+export async function getEtfSelects() {
+  const response = await api.get("/get-etf-selects");
+
+  return response.data;
+}

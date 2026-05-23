@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
-import { ArrowRight, Radar, TrendingUp } from "lucide-react";
+import { ArrowRight, TrendingUp } from "lucide-react";
 
 import heroVideo from "../../assets/vid.mp4";
 
@@ -13,10 +13,6 @@ export default function LandingPage() {
     const timers = [
       setTimeout(() => {
         setStage(2);
-      }, 1800),
-
-      setTimeout(() => {
-        setStage(3);
       }, 4200),
     ];
 
@@ -37,7 +33,7 @@ export default function LandingPage() {
 
       <div
         className={`absolute inset-0 transition-all duration-[3000ms] ${
-          stage === 3 ? "scale-110 opacity-20 blur-sm" : "scale-100 opacity-100"
+          stage === 2 ? "opacity-20" : "scale-100 opacity-100"
         }`}
       >
         <video
@@ -61,7 +57,7 @@ export default function LandingPage() {
       {/* Stage 1 */}
 
       <div
-        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1200ms] md:pt-52 ${
+        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1800ms] md:pt-52 ${
           stage === 1 ? "translate-y-0 opacity-100" : "-translate-y-8 opacity-0"
         }`}
       >
@@ -84,50 +80,20 @@ export default function LandingPage() {
             <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
               ROCKET
             </h1>
-
-            <div className="mx-auto mt-10 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
           </div>
         </div>
       </div>
 
-      {/* Stage 2 */}
-
-      <div
-        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1500ms] md:pt-52 ${
-          stage === 2 ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-        }`}
-      >
-        <div className="relative max-w-6xl">
-          {/* Glow */}
-
-          <div className="absolute inset-0 blur-[120px]">
-            <div className="h-full w-full rounded-full bg-cyan-400/20" />
-          </div>
-
-          <div className="relative">
-            <h1 className="mt-10 font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
-              WEEKLY
-            </h1>
-
-            <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
-              INCOME
-            </h1>
-
-            <div className="mx-auto mt-12 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-          </div>
-        </div>
-      </div>
-
-      {/* Stage 3 Hero */}
+      {/* Stage 2 Hero */}
 
       <section
-        className={`relative z-30 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-start px-6 pt-40 transition-all duration-[1800ms] md:pt-52 ${
-          stage === 3 ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+        className={`relative z-30 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-start px-6 pt-40 transition-all duration-[1600ms] md:pt-52 ${
+          stage === 2 ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
         }`}
       >
         <div className="max-w-5xl text-center">
           <h1 className="mt-10 font-display text-6xl font-black leading-[0.95] text-white md:text-8xl">
-            Maximize Your{" "}
+            Maximize Your
             <div>
               <span className="rocket-gradient-text">ETF Cash Flow</span>
             </div>

@@ -55,8 +55,8 @@ export default function TelemetrySection({
       <section className="space-y-5">
         <SectionHeader
           icon={RadioTower}
-          eyebrow="Market & System Activity"
-          title="Latest Telemetry"
+          eyebrow="Market Telemetry"
+          title="AI Market Signals"
           description="Add ETFs to your portfolio to unlock market and system telemetry."
         />
 
@@ -72,9 +72,9 @@ export default function TelemetrySection({
     <section className="space-y-5">
       <SectionHeader
         icon={RadioTower}
-        eyebrow="Market & System Activity"
-        title="Latest Telemetry"
-        description="A future stream of imports, dividend updates, extraction events, and ETF data refreshes."
+        eyebrow="Market Telemetry"
+        title="AI Market Signals"
+        description="A Stream of AI-driven market insights and signals."
       />
 
       <div className="grid gap-5 lg:grid-cols-5">

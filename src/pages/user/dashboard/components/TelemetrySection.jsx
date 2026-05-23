@@ -65,7 +65,7 @@ export default function TelemetrySection({
         >
           <div className="mt-6 space-y-3">
             <Link
-              to="/dashboard/market-snapshot"
+              to="/dashboard/signals/market-snapshot"
               className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
             >
               <div>
@@ -83,7 +83,7 @@ export default function TelemetrySection({
             </Link>
 
             <Link
-              to="/dashboard/market-conditions"
+              to="/dashboard/signals/market-conditions"
               className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
             >
               <div>
@@ -101,7 +101,7 @@ export default function TelemetrySection({
             </Link>
 
             <Link
-              to="/dashboard/market-events"
+              to="/dashboard/signals/market-events"
               className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
             >
               <div>

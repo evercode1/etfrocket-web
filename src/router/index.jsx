@@ -48,6 +48,9 @@ import PortfolioCompare from "../pages/user/dashboard/radar/PortfolioCompare";
 import CompareSymbols from "../pages/user/dashboard/radar/CompareSymbols";
 import MetricExplorer from "../pages/user/dashboard/radar/MetricExplorer";
 import BackTesting from "../pages/user/dashboard/backtesting/BackTesting";
+import MarketSnapshot from "../pages/user/dashboard/aiSignals/MarketSnapshot";
+import MarketConditions from "../pages/user/dashboard/aiSignals/MarketConditions";
+import MarketEvents from "../pages/user/dashboard/aiSignals/MarketEvents";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";
@@ -240,6 +243,20 @@ const router = createBrowserRouter([
           {
             path: "backtesting",
             element: <BackTesting />,
+          },
+          {
+            path: "signals/market-snapshot",
+            element: <MarketSnapshot />,
+          },
+
+          {
+            path: "signals/market-conditions",
+            element: <MarketConditions />,
+          },
+
+          {
+            path: "signals/market-events",
+            element: <MarketEvents />,
           },
           {
             path: "support",

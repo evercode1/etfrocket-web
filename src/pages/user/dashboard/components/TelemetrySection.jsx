@@ -1,4 +1,6 @@
-import { RadioTower, TrendingUp } from "lucide-react";
+import { RadioTower, ArrowRight, TrendingUp } from "lucide-react";
+
+import { Link } from "react-router-dom";
 
 import {
   CartesianGrid,
@@ -12,13 +14,6 @@ import {
 
 import TelemetryCard from "./TelemetryCard";
 import BackTestingCard from "./BackTestingCard";
-
-const activityData = [
-  "Price history imported for NVII",
-  "Dividend history updated for AMDY",
-  "ETF metrics recalculated",
-  "AI extraction queued for covered-call universe",
-];
 
 const momentumPulseData = [
   { date: "Jan", income: 220 },
@@ -38,31 +33,14 @@ export default function TelemetrySection({
       <section className="space-y-5">
         <SectionHeader
           icon={RadioTower}
-          eyebrow="Market & System Activity"
-          title="Latest Telemetry"
-          description="Create a portfolio to unlock activity and system telemetry."
+          eyebrow="AI Market Signals"
+          title="Latest AI Market Signals"
+          description="Create a portfolio to unlock AI-driven market insights and signals."
         />
 
         <div className="glass-card rounded-3xl p-8 text-brand-muted">
-          Telemetry will appear here once ETF and portfolio activity begins.
-        </div>
-      </section>
-    );
-  }
-
-  if (!hasHoldings) {
-    return (
-      <section className="space-y-5">
-        <SectionHeader
-          icon={RadioTower}
-          eyebrow="Market Telemetry"
-          title="AI Market Signals"
-          description="Add ETFs to your portfolio to unlock market and system telemetry."
-        />
-
-        <div className="glass-card rounded-3xl p-8 text-brand-muted">
-          Add ETF transactions to this portfolio to track imports, dividend
-          updates, metric recalculations, and momentum activity.
+          AI Market Signals will appear here once ETF and portfolio activity
+          begins.
         </div>
       </section>
     );
@@ -72,31 +50,77 @@ export default function TelemetrySection({
     <section className="space-y-5">
       <SectionHeader
         icon={RadioTower}
-        eyebrow="Market Telemetry"
+        eyebrow="AI Market Signals"
         title="AI Market Signals"
-        description="A Stream of AI-driven market insights and signals."
+        description="A stream of AI-driven market insights and signals."
       />
 
       <div className="grid gap-5 lg:grid-cols-5">
+        {/* AI Signals */}
+
         <TelemetryCard
-          icon={RadioTower}
-          title="Activity Feed"
-          subtitle="Placeholder operational timeline"
+          title="Market Updates"
+          subtitle="Daily AI generated market intelligence"
           className="lg:col-span-3"
         >
-          <div className="mt-6 space-y-4">
-            {activityData.map((item) => (
-              <div
-                key={item}
-                className="flex items-center gap-4 rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3"
-              >
-                <div className="h-2.5 w-2.5 rounded-full bg-brand-primary shadow-glow" />
+          <div className="mt-6 space-y-3">
+            <Link
+              to="/dashboard/market-snapshot"
+              className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
+            >
+              <div>
+                <p className="font-semibold text-brand-text transition group-hover:text-brand-primary">
+                  AI Market Snapshot
+                </p>
 
-                <p className="text-sm text-brand-muted">{item}</p>
+                <p className="mt-1 text-sm text-brand-muted">
+                  Daily overview of market sentiment, flows, and macro
+                  positioning.
+                </p>
               </div>
-            ))}
+
+              <ArrowRight className="h-5 w-5 text-brand-muted transition group-hover:text-brand-primary" />
+            </Link>
+
+            <Link
+              to="/dashboard/market-conditions"
+              className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
+            >
+              <div>
+                <p className="font-semibold text-brand-text transition group-hover:text-brand-primary">
+                  AI Market Conditions
+                </p>
+
+                <p className="mt-1 text-sm text-brand-muted">
+                  AI interpretation of volatility, momentum, and risk-on versus
+                  risk-off conditions.
+                </p>
+              </div>
+
+              <ArrowRight className="h-5 w-5 text-brand-muted transition group-hover:text-brand-primary" />
+            </Link>
+
+            <Link
+              to="/dashboard/market-events"
+              className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
+            >
+              <div>
+                <p className="font-semibold text-brand-text transition group-hover:text-brand-primary">
+                  AI Market Events
+                </p>
+
+                <p className="mt-1 text-sm text-brand-muted">
+                  Upcoming economic events, earnings, Fed activity, and
+                  catalysts impacting markets.
+                </p>
+              </div>
+
+              <ArrowRight className="h-5 w-5 text-brand-muted transition group-hover:text-brand-primary" />
+            </Link>
           </div>
         </TelemetryCard>
+
+        {/* Back Testing */}
 
         <BackTestingCard
           to="/dashboard/backtesting"

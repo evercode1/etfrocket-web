@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
-import { ArrowRight, Radar, TrendingUp } from "lucide-react";
+import { ArrowRight, TrendingUp } from "lucide-react";
 
 import heroVideo from "../../assets/vid.mp4";
 
@@ -13,10 +13,6 @@ export default function LandingPage() {
     const timers = [
       setTimeout(() => {
         setStage(2);
-      }, 1800),
-
-      setTimeout(() => {
-        setStage(3);
       }, 4200),
     ];
 
@@ -37,7 +33,7 @@ export default function LandingPage() {
 
       <div
         className={`absolute inset-0 transition-all duration-[3000ms] ${
-          stage === 3 ? "scale-110 opacity-20 blur-sm" : "scale-100 opacity-100"
+          stage === 2 ? "opacity-20" : "scale-100 opacity-100"
         }`}
       >
         <video
@@ -61,7 +57,7 @@ export default function LandingPage() {
       {/* Stage 1 */}
 
       <div
-        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1200ms] md:pt-52 ${
+        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1800ms] md:pt-52 ${
           stage === 1 ? "translate-y-0 opacity-100" : "-translate-y-8 opacity-0"
         }`}
       >
@@ -73,107 +69,58 @@ export default function LandingPage() {
           </div>
 
           <div className="relative">
-            <p className="font-mono text-sm uppercase tracking-[0.5em] text-cyan-300">
-              ETF Rocket
-            </p>
-
             <h1 className="mt-8 font-display text-7xl font-black tracking-[0.08em] text-white md:text-[10rem]">
               RIDE
             </h1>
 
             <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
-              THE ROCKET
+              THE
             </h1>
 
-            <div className="mx-auto mt-10 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-
-            <p className="mt-10 font-mono text-sm uppercase tracking-[0.45em] text-slate-300 md:text-base">
-              MOMENTUM • INCOME • INTELLIGENCE
-            </p>
+            <h1 className="rocket-gradient-text font-display text-7xl font-black tracking-[0.08em] md:text-[10rem]">
+              ROCKET
+            </h1>
           </div>
         </div>
       </div>
 
-      {/* Stage 2 */}
-
-      <div
-        className={`absolute inset-0 z-20 flex items-start justify-center px-6 pt-40 text-center transition-all duration-[1500ms] md:pt-52 ${
-          stage === 2 ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-        }`}
-      >
-        <div className="relative max-w-6xl">
-          {/* Glow */}
-
-          <div className="absolute inset-0 blur-[120px]">
-            <div className="h-full w-full rounded-full bg-cyan-400/20" />
-          </div>
-
-          <div className="relative">
-            <p className="font-mono text-sm uppercase tracking-[0.5em] text-cyan-300">
-              ETF Rocket
-            </p>
-
-            <h1 className="mt-10 font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
-              Manage Weekly
-            </h1>
-
-            <h1 className="font-display text-6xl font-black leading-[1.02] tracking-[0.04em] text-white md:text-[7rem]">
-              Paying
-            </h1>
-
-            <h1 className="rocket-gradient-text font-display text-6xl font-black leading-[1.02] tracking-[0.04em] md:text-[7rem]">
-              Dividend Funds
-            </h1>
-
-            <div className="mx-auto mt-12 h-px w-72 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-
-            <p className="mt-12 font-mono text-sm uppercase tracking-[0.45em] text-slate-300 md:text-base">
-              AI DRIVEN MARKET INTELLIGENCE
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Stage 3 Hero */}
+      {/* Stage 2 Hero */}
 
       <section
-        className={`relative z-30 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-start px-6 pt-40 transition-all duration-[1800ms] md:pt-52 ${
-          stage === 3 ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+        className={`relative z-30 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-start px-6 pt-40 transition-all duration-[1600ms] md:pt-52 ${
+          stage === 2 ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
         }`}
       >
         <div className="max-w-5xl text-center">
-          <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-5 py-2 backdrop-blur-xl">
-            <Radar className="h-4 w-4 text-cyan-300" />
-
-            <span className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-200">
-              Mission Control
-            </span>
-          </div>
-
           <h1 className="mt-10 font-display text-6xl font-black leading-[0.95] text-white md:text-8xl">
-            Build Smarter{" "}
-            <span className="rocket-gradient-text">Income Strategies</span>
+            Maximize Your
+            <div>
+              <span className="rocket-gradient-text">ETF Cash Flow</span>
+            </div>
           </h1>
 
           <p className="mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-slate-300 md:text-xl">
-            Monitor momentum, track dividend income, run historical backtests,
-            and explore AI-driven market intelligence from one powerful ETF
-            command center.
+            Track total return, dividend income, monitor NAV health, run
+            historical backtests. Explore AI-driven market intelligence from one
+            powerful ETF command center.
           </p>
 
           <div className="mt-14 flex flex-col items-center justify-center gap-5 sm:flex-row">
             <Link
-              to="/login"
+              to="/auth/login"
               className="rocket-button-primary inline-flex items-center gap-3"
             >
               Launch Dashboard
               <ArrowRight className="h-4 w-4" />
             </Link>
 
-            <button className="rocket-button-secondary inline-flex items-center gap-3">
+            <Link
+              to="/auth/login"
+              className="rocket-button-secondary inline-flex items-center gap-3"
+            >
               <TrendingUp className="h-4 w-4" />
               Explore ETFs
-            </button>
+            </Link>
           </div>
 
           {/* Telemetry Pills */}

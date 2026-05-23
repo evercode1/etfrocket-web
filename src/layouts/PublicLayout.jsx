@@ -10,8 +10,8 @@ export default function PublicLayout() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-brand-background text-brand-text">
-      <header className="border-b border-brand-outline bg-brand-surface/80 backdrop-blur-xl">
+    <div className="relative min-h-screen overflow-hidden bg-brand-background text-brand-text">
+      <header className="relative z-40 border-b border-brand-outline bg-brand-surface/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <Link
             to="/"
@@ -60,10 +60,14 @@ export default function PublicLayout() {
         </div>
       </header>
 
-      <div className="flex min-h-[calc(100vh-88px)] flex-col">
+      <div className="relative z-30 flex min-h-[calc(100vh-88px)] flex-col">
         <main className="flex-1">
           <Outlet />
         </main>
+
+        {/* Footer floats over landing page video/background */}
+
+        <div className="relative z-30"></div>
       </div>
     </div>
   );

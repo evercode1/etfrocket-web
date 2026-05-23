@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { Link } from "react-router-dom";
+
 import {
   ArrowLeft,
   CalendarRange,
@@ -22,36 +24,7 @@ import {
   ComposedChart,
 } from "recharts";
 
-const supportedEtfs = [
-  "CHPY",
-  "QDTE",
-  "AMDY",
-  "QQQI",
-  "NVII",
-  "SPYI",
-  "JEPI",
-  "JEPQ",
-  "SVOL",
-  "FEPI",
-];
-
-const mockResults = {
-  finalValue: 148522,
-  totalReturn: 48.52,
-  totalIncome: 42110,
-  maxDrawdown: -12.4,
-  sharpeRatio: 1.48,
-  cagr: 18.2,
-};
-
-const chartData = [
-  { year: "2021", portfolio: 10000, income: 0 },
-  { year: "2022", portfolio: 14250, income: 1200 },
-  { year: "2023", portfolio: 22600, income: 4200 },
-  { year: "2024", portfolio: 48800, income: 12400 },
-  { year: "2025", portfolio: 98200, income: 26500 },
-  { year: "2026", portfolio: 148522, income: 42110 },
-];
+import { runBackTest, getEtfSelects } from "../../../../api/comparisons";
 
 export default function BackTesting() {
   const [symbol, setSymbol] = useState("CHPY");
@@ -60,20 +33,56 @@ export default function BackTesting() {
 
   const [initialInvestment, setInitialInvestment] = useState("10000");
 
-  const [monthlyContribution, setMonthlyContribution] = useState("500");
+  const [monthlyContribution, setMonthlyContribution] = useState("0");
 
   const [dripPercentage, setDripPercentage] = useState("100");
 
   const [unsupportedSymbol, setUnsupportedSymbol] = useState(false);
 
-  const projectedMonthlyIncome = useMemo(() => {
-    return Math.round(mockResults.totalIncome / 12);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [isLoadingEtfs, setIsLoadingEtfs] = useState(true);
+
+  const [backTestData, setBackTestData] = useState(null);
+
+  const [etfOptions, setEtfOptions] = useState([]);
+
+  useEffect(() => {
+    async function loadEtfOptions() {
+      try {
+        const response = await getEtfSelects();
+
+        setEtfOptions(
+          Object.entries(response.data || {}).map(([id, symbol]) => ({
+            id: Number(id),
+
+            symbol,
+          })),
+        );
+      } finally {
+        setIsLoadingEtfs(false);
+      }
+    }
+
+    loadEtfOptions();
   }, []);
 
-  function handleRunBacktest() {
+  const projectedMonthlyIncome = useMemo(() => {
+    if (!backTestData?.summary?.total_dividends) {
+      return 0;
+    }
+
+    return Math.round(backTestData.summary.total_dividends / 12);
+  }, [backTestData]);
+
+  async function handleRunBacktest() {
     const normalized = symbol.trim().toUpperCase();
 
-    if (!supportedEtfs.includes(normalized)) {
+    const selectedEtf = etfOptions.find(
+      (etf) => etf.symbol?.toUpperCase() === normalized,
+    );
+
+    if (!selectedEtf) {
       setUnsupportedSymbol(true);
 
       return;
@@ -81,8 +90,40 @@ export default function BackTesting() {
 
     setUnsupportedSymbol(false);
 
-    setSymbol(normalized);
+    setIsLoading(true);
+
+    try {
+      const endDate = new Date();
+
+      const startDate = calculateStartDate(timeframe);
+
+      const response = await runBackTest({
+        etf_id: selectedEtf.id,
+
+        start_date: startDate,
+
+        end_date: endDate.toISOString().split("T")[0],
+
+        initial_investment: Number(initialInvestment),
+
+        monthly_contribution: Number(monthlyContribution),
+
+        drip_percentage: Number(dripPercentage),
+      });
+
+      setBackTestData(response.data || null);
+
+      setSymbol(normalized);
+    } finally {
+      setIsLoading(false);
+    }
   }
+
+  const chartRows = backTestData?.chart_rows || [];
+
+  const analytics = backTestData?.analytics || {};
+
+  const summary = backTestData?.summary || {};
 
   return (
     <div className="space-y-8">
@@ -149,11 +190,20 @@ export default function BackTesting() {
           <div className="mt-6 space-y-5">
             <InputGroup label="ETF Symbol" icon={TrendingUp}>
               <input
+                list="etf-options"
                 value={symbol}
                 onChange={(event) => setSymbol(event.target.value)}
                 placeholder="Enter ETF symbol"
-                className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
+                className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold uppercase text-brand-text outline-none transition focus:border-brand-primary"
               />
+
+              <datalist id="etf-options">
+                {etfOptions.map((etf) => (
+                  <option key={etf.id} value={etf.symbol}>
+                    {etf.symbol}
+                  </option>
+                ))}
+              </datalist>
             </InputGroup>
 
             {unsupportedSymbol && (
@@ -169,10 +219,12 @@ export default function BackTesting() {
                 className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary"
               >
                 <option value="1y">1 Year</option>
+
                 <option value="3y">3 Years</option>
+
                 <option value="5y">5 Years</option>
+
                 <option value="10y">10 Years</option>
-                <option value="max">Max Available</option>
               </select>
             </InputGroup>
 
@@ -209,19 +261,27 @@ export default function BackTesting() {
 
                 <div className="mt-2 flex items-center justify-between text-xs font-semibold text-brand-muted">
                   <span>0%</span>
+
                   <span>{dripPercentage}% Reinvested</span>
+
                   <span>100%</span>
                 </div>
+
+                <p className="mt-3 text-xs text-brand-muted">
+                  Rerun the back test after adjusting DRIP allocation.
+                </p>
               </div>
             </InputGroup>
 
             <button
               type="button"
               onClick={handleRunBacktest}
-              className="rocket-button-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-bold"
+              disabled={isLoading || isLoadingEtfs}
+              className="rocket-button-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-bold disabled:opacity-60"
             >
               <Play className="h-4 w-4" />
-              Run Back Test
+
+              {isLoading ? "Running..." : "Run Back Test"}
             </button>
           </div>
         </div>
@@ -230,12 +290,14 @@ export default function BackTesting() {
           <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             <StatCard
               label="Final Portfolio Value"
-              value={formatCurrency(mockResults.finalValue)}
+              value={formatCurrency(summary.final_value || 0)}
             />
 
             <StatCard
               label="Total Return"
-              value={`${mockResults.totalReturn}%`}
+              value={`${Number(analytics.total_return_percentage || 0).toFixed(
+                2,
+              )}%`}
             />
 
             <StatCard
@@ -245,7 +307,7 @@ export default function BackTesting() {
 
             <StatCard
               label="Max Drawdown"
-              value={`${mockResults.maxDrawdown}%`}
+              value={`${Number(analytics.max_drawdown || 0).toFixed(2)}%`}
               danger
             />
           </section>
@@ -264,17 +326,18 @@ export default function BackTesting() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Pill label={`CAGR ${mockResults.cagr}%`} />
-                <Pill label={`Sharpe ${mockResults.sharpeRatio}`} />
+                <Pill
+                  label={`CAGR ${Number(analytics.cagr || 0).toFixed(2)}%`}
+                />
               </div>
             </div>
 
             <div className="mt-8 h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={chartData}>
+                <ComposedChart data={chartRows}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
 
-                  <XAxis dataKey="year" />
+                  <XAxis dataKey="date" />
 
                   <YAxis />
 
@@ -302,15 +365,16 @@ export default function BackTesting() {
 
                   <Area
                     type="monotone"
-                    dataKey="portfolio"
+                    dataKey="portfolio_value"
                     fill="currentColor"
                     fillOpacity={0.08}
                     stroke="none"
+                    tooltipType="none"
                   />
 
                   <Line
                     type="monotone"
-                    dataKey="portfolio"
+                    dataKey="portfolio_value"
                     stroke="currentColor"
                     strokeWidth={3}
                     dot={false}
@@ -374,9 +438,36 @@ function Pill({ label }) {
 }
 
 function formatCurrency(value) {
-  return Number(value).toLocaleString("en-US", {
+  return Number(value || 0).toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
   });
+}
+
+function calculateStartDate(timeframe) {
+  const now = new Date();
+
+  switch (timeframe) {
+    case "1y":
+      now.setFullYear(now.getFullYear() - 1);
+      break;
+
+    case "3y":
+      now.setFullYear(now.getFullYear() - 3);
+      break;
+
+    case "5y":
+      now.setFullYear(now.getFullYear() - 5);
+      break;
+
+    case "10y":
+      now.setFullYear(now.getFullYear() - 10);
+      break;
+
+    default:
+      now.setFullYear(now.getFullYear() - 5);
+  }
+
+  return now.toISOString().split("T")[0];
 }

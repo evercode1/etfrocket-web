@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import PasswordInput from "../../components/forms/PasswordInput";
 import SubmitButton from "../../components/forms/SubmitButton";
@@ -8,6 +8,8 @@ import { getPasswordResetForm, resetPassword } from "../../api/auth";
 
 export default function ResetPassword() {
   const { token } = useParams();
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
 
   const [userId, setUserId] = useState(null);
   const [formToken, setFormToken] = useState(token);
@@ -52,14 +54,19 @@ export default function ResetPassword() {
     event.preventDefault();
 
     setLoadingSubmit(true);
+
     setError(null);
+
     setSuccessMessage(null);
 
     try {
       const response = await resetPassword({
-        user_id: userId,
-        token: formToken,
+        email,
+
+        token,
+
         password: form.password,
+
         password_confirmation: form.password_confirmation,
       });
 
@@ -67,6 +74,7 @@ export default function ResetPassword() {
 
       setForm({
         password: "",
+
         password_confirmation: "",
       });
     } catch (err) {

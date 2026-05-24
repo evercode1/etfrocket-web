@@ -9,6 +9,7 @@ import {
   LogOut,
   Rocket,
   Compass,
+  Activity,
 } from "lucide-react";
 
 import AdminSupportBell from "../components/support/AdminSupportBell";
@@ -59,6 +60,14 @@ export default function AdminLayout() {
               >
                 <Compass className="h-4 w-4" />
                 User Dashboard
+              </Link>
+
+              <Link
+                to="/admin/system-monitoring"
+                className="flex items-center gap-2 transition hover:text-brand-primary"
+              >
+                <Activity className="h-4 w-4" />
+                System Monitoring
               </Link>
             </nav>
           </div>

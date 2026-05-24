@@ -1,113 +1,65 @@
+import { useEffect, useState } from "react";
+
 import { Link } from "react-router-dom";
 
 import { ArrowLeft, Brain, Clock3, ShieldCheck, Sparkles } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
 
-const mockSignals = {
-  snapshot: {
-    title: "AI Market Snapshot",
+import { getAiSignals } from "../../../../api/aiSignals";
 
-    subtitle:
-      "Daily AI-generated overview of market sentiment and macro positioning.",
+const signalTypeMap = {
+  snapshot: 1,
 
-    mood: "Risk-On",
+  conditions: 2,
 
-    confidence: 82,
-
-    updated_at: "Updated 12 minutes ago",
-
-    markdown: `
-# Market Snapshot
-
-Markets continued higher today as treasury yields stabilized and volatility remained muted.
-
-## Key Signals
-
-- Nasdaq leadership remains strong
-- Bitcoin momentum continues above breakout levels
-- Treasury yields softened slightly
-- Small caps showed improving participation
-
-## AI Interpretation
-
-Current market conditions favor:
-- momentum continuation
-- growth exposure
-- income strategy participation
-
-The AI system currently identifies improving breadth and elevated speculative appetite while defensive positioning continues to weaken.
-`,
-  },
-
-  conditions: {
-    title: "AI Market Conditions",
-
-    subtitle: "AI interpretation of volatility, momentum, and market behavior.",
-
-    mood: "Neutral",
-
-    confidence: 74,
-
-    updated_at: "Updated 18 minutes ago",
-
-    markdown: `
-# Current Conditions
-
-The market remains in a transitional phase between defensive positioning and renewed risk appetite.
-
-## Current Readings
-
-- Volatility declining
-- Bond market stabilizing
-- Momentum breadth improving
-- Defensive sectors weakening
-
-## AI Interpretation
-
-Current conditions suggest:
-- selective bullish continuation
-- moderate risk appetite
-- improving momentum participation
-`,
-  },
-
-  events: {
-    title: "AI Market Events",
-
-    subtitle:
-      "Upcoming catalysts and macro events impacting financial markets.",
-
-    mood: "Event Driven",
-
-    confidence: 91,
-
-    updated_at: "Updated 6 minutes ago",
-
-    markdown: `
-# Upcoming Events
-
-Several major macro catalysts are approaching.
-
-## This Week
-
-- Federal Reserve commentary
-- Treasury auctions
-- Large-cap earnings
-- Employment data release
-
-## AI Interpretation
-
-The AI system expects elevated market sensitivity surrounding:
-- interest rates
-- growth expectations
-- liquidity conditions
-`,
-  },
+  events: 3,
 };
 
 export default function AiSignalsPage({ type = "snapshot" }) {
-  const signal = mockSignals[type] || mockSignals.snapshot;
+  const [loading, setLoading] = useState(true);
+
+  const [signal, setSignal] = useState(null);
+
+  const [market, setMarket] = useState(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await getAiSignals();
+
+        setMarket(response.market);
+
+        const matchedSignal = response.data.find(
+          (item) => item.signal_type_id === signalTypeMap[type],
+        );
+
+        setSignal(matchedSignal || null);
+      } catch (error) {
+        console.error("Failed to load AI signals", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [type]);
+
+  if (loading) {
+    return (
+      <div className="glass-card rounded-3xl p-10 text-center text-brand-muted">
+        Loading AI signals...
+      </div>
+    );
+  }
+
+  if (!signal) {
+    return (
+      <div className="glass-card rounded-3xl p-10 text-center text-brand-muted">
+        No AI signal available.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -151,7 +103,7 @@ export default function AiSignalsPage({ type = "snapshot" }) {
                 </p>
 
                 <p className="mt-1 font-display text-2xl font-bold text-brand-primary">
-                  {signal.mood}
+                  {signal.market_mood}
                 </p>
               </div>
             </div>
@@ -160,13 +112,13 @@ export default function AiSignalsPage({ type = "snapshot" }) {
               <TelemetryRow
                 icon={ShieldCheck}
                 label="AI Confidence"
-                value={`${signal.confidence}%`}
+                value={`${signal.confidence_score}%`}
               />
 
               <TelemetryRow
                 icon={Clock3}
-                label="Last Updated"
-                value={signal.updated_at}
+                label="Market Status"
+                value={market?.status || "UNKNOWN"}
               />
 
               <TelemetryRow
@@ -182,11 +134,11 @@ export default function AiSignalsPage({ type = "snapshot" }) {
       {/* Main Content */}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_340px]">
-        {/* Markdown Content */}
+        {/* Markdown */}
 
         <div className="glass-card rounded-3xl p-8">
           <div className="prose prose-invert max-w-none prose-headings:font-display prose-headings:text-white prose-p:text-brand-muted prose-strong:text-brand-primary prose-li:text-brand-muted">
-            <ReactMarkdown>{signal.markdown}</ReactMarkdown>
+            <ReactMarkdown>{signal.markdown_content}</ReactMarkdown>
           </div>
         </div>
 
@@ -195,20 +147,20 @@ export default function AiSignalsPage({ type = "snapshot" }) {
         <div className="space-y-6">
           <SignalCard
             title="AI Signal Status"
-            value="ONLINE"
-            subtitle="Telemetry feed active"
+            value={market?.status || "UNKNOWN"}
+            subtitle="Market telemetry feed"
           />
 
           <SignalCard
-            title="Macro Bias"
-            value="Moderately Bullish"
-            subtitle="Momentum participation improving"
+            title="Model"
+            value={signal.ai_model}
+            subtitle="Active AI generation model"
           />
 
           <SignalCard
-            title="Risk Environment"
-            value="Elevated"
-            subtitle="Event volatility expected"
+            title="Signal Type"
+            value={signal.signal_type?.signal_type_name || "Unknown"}
+            subtitle="Current intelligence category"
           />
         </div>
       </section>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Link } from "react-router-dom";
 
@@ -9,15 +9,27 @@ import heroVideo from "../../assets/vid.mp4";
 export default function LandingPage() {
   const [stage, setStage] = useState(1);
 
+  const [videoReady, setVideoReady] = useState(false);
+
+  const transitionStarted = useRef(false);
+
   useEffect(() => {
+    if (!videoReady || transitionStarted.current) {
+      return;
+    }
+
+    transitionStarted.current = true;
+
     const timers = [
+      // Let title settle before ignition
+
       setTimeout(() => {
         setStage(2);
-      }, 4200),
+      }, 5200),
     ];
 
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [videoReady]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#020817] text-white">
@@ -40,7 +52,10 @@ export default function LandingPage() {
           autoPlay
           muted
           playsInline
-          className="h-full w-full object-cover"
+          onCanPlayThrough={() => setVideoReady(true)}
+          className={`h-full w-full object-cover transition-opacity duration-[1800ms] ${
+            videoReady ? "opacity-100" : "opacity-0"
+          }`}
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
@@ -159,9 +174,16 @@ export default function LandingPage() {
               </p>
 
               <div className="mt-6 flex flex-col gap-4 text-slate-300">
-                <a href="#">Help Center</a>
+                <Link to="/help" className="transition hover:text-cyan-300">
+                  Help Center
+                </Link>
 
-                <a href="#">Support</a>
+                <Link
+                  to="/dashboard/support"
+                  className="transition hover:text-cyan-300"
+                >
+                  Support
+                </Link>
               </div>
             </div>
 
@@ -171,9 +193,19 @@ export default function LandingPage() {
               </p>
 
               <div className="mt-6 flex flex-col gap-4 text-slate-300">
-                <a href="#">Privacy Policy</a>
+                <Link
+                  to="/privacy-policy"
+                  className="transition hover:text-cyan-300"
+                >
+                  Privacy Policy
+                </Link>
 
-                <a href="#">Terms of Service</a>
+                <Link
+                  to="/terms-of-service"
+                  className="transition hover:text-cyan-300"
+                >
+                  Terms of Service
+                </Link>
               </div>
             </div>
           </div>

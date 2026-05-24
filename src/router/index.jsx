@@ -20,9 +20,9 @@ import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
 import AdminDashboard from "../pages/admin/Dashboard";
-import ListUsers from "../pages/admin/users/ListUsers";
-import ViewUser from "../pages/admin/users/ViewUser";
-import EditUser from "../pages/admin/users/EditUser";
+import ListUsers from "../pages/admin/users/ListUsers.jsx";
+import ViewUser from "../pages/admin/users/ViewUser.jsx";
+import EditUser from "../pages/admin/users/EditUser.jsx";
 import ListTickets from "../pages/admin/support/ListTickets";
 import ViewTicket from "../pages/admin/support/ViewTicket";
 import DataManagement from "../pages/admin/data/DataManagement";

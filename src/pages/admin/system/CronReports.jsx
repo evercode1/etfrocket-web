@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   Activity,
   AlertTriangle,
@@ -7,57 +9,49 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const mockCronData = [
-  {
-    id: 1,
-
-    cron_name: "ai:generate-signals",
-
-    status: "COMPLETED",
-
-    runtime: "4s",
-
-    interval: "Hourly",
-
-    started_at: "2026-05-24 10:00 AM",
-
-    notification_status: "Nothing To Send",
-  },
-
-  {
-    id: 2,
-
-    cron_name: "etfs:calculate-metrics",
-
-    status: "COMPLETED",
-
-    runtime: "19s",
-
-    interval: "Daily",
-
-    started_at: "2026-05-24 09:00 AM",
-
-    notification_status: "Nothing To Send",
-  },
-
-  {
-    id: 3,
-
-    cron_name: "app:trim-cron-logs",
-
-    status: "COMPLETED",
-
-    runtime: "1s",
-
-    interval: "Weekly",
-
-    started_at: "2026-05-24 04:00 AM",
-
-    notification_status: "Nothing To Send",
-  },
-];
+import { getCronReports } from "../../../api/monitoring";
 
 export default function CronReports() {
+  const [loading, setLoading] = useState(true);
+
+  const [summary, setSummary] = useState({
+    successful_runs: 0,
+
+    failed_runs: 0,
+
+    average_runtime: 0,
+
+    active_crons: 0,
+  });
+
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    async function loadCronReports() {
+      try {
+        const response = await getCronReports();
+
+        setSummary(response.data.summary);
+
+        setLogs(response.data.logs.data);
+      } catch (error) {
+        console.error("Failed to load cron reports", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadCronReports();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="glass-card rounded-3xl p-10 text-center text-slate-300">
+        Loading cron reports...
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -91,28 +85,28 @@ export default function CronReports() {
         <TelemetryCard
           icon={ShieldCheck}
           label="Successful Runs"
-          value="148"
+          value={summary.successful_runs}
           color="text-emerald-300"
         />
 
         <TelemetryCard
           icon={AlertTriangle}
           label="Failed Runs"
-          value="0"
+          value={summary.failed_runs}
           color="text-amber-300"
         />
 
         <TelemetryCard
           icon={Clock3}
           label="Average Runtime"
-          value="6s"
+          value={`${summary.average_runtime}s`}
           color="text-cyan-300"
         />
 
         <TelemetryCard
           icon={RefreshCcw}
           label="Active Crons"
-          value="3"
+          value={summary.active_crons}
           color="text-violet-300"
         />
       </section>
@@ -149,7 +143,7 @@ export default function CronReports() {
             </thead>
 
             <tbody>
-              {mockCronData.map((cron) => (
+              {logs.map((cron) => (
                 <tr
                   key={cron.id}
                   className="border-b border-white/5 transition hover:bg-white/[0.02]"
@@ -159,16 +153,16 @@ export default function CronReports() {
                   </TableCell>
 
                   <TableCell>
-                    <StatusBadge status={cron.status} />
+                    <StatusBadge status={cron.status_name} />
                   </TableCell>
 
-                  <TableCell>{cron.runtime}</TableCell>
+                  <TableCell>{cron.run_time}s</TableCell>
 
-                  <TableCell>{cron.interval}</TableCell>
+                  <TableCell>{cron.interval_name}</TableCell>
 
-                  <TableCell>{cron.started_at}</TableCell>
+                  <TableCell>{formatDate(cron.start_time)}</TableCell>
 
-                  <TableCell>{cron.notification_status}</TableCell>
+                  <TableCell>{cron.notification_status_name}</TableCell>
                 </tr>
               ))}
             </tbody>
@@ -220,9 +214,21 @@ function TableCell({ children, className = "" }) {
 }
 
 function StatusBadge({ status }) {
+  const isCompleted = status?.toLowerCase() === "completed";
+
   return (
-    <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
+    <span
+      className={`rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+        isCompleted
+          ? "border border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+          : "border border-amber-400/20 bg-amber-400/10 text-amber-300"
+      }`}
+    >
       {status}
     </span>
   );
+}
+
+function formatDate(value) {
+  return new Date(value).toLocaleString();
 }

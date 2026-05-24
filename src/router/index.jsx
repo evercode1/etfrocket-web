@@ -26,6 +26,8 @@ import EditUser from "../pages/admin/users/EditUser";
 import ListTickets from "../pages/admin/support/ListTickets";
 import ViewTicket from "../pages/admin/support/ViewTicket";
 import DataManagement from "../pages/admin/data/DataManagement";
+import SystemMonitoring from "../pages/admin/system/SystemMonitoring";
+import CronReports from "../pages/admin/system/CronReports";
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
@@ -145,6 +147,14 @@ const router = createBrowserRouter([
           {
             path: "data",
             element: <DataManagement />,
+          },
+          {
+            path: "system-monitoring",
+            element: <SystemMonitoring />,
+          },
+          {
+            path: "cron-reports",
+            element: <CronReports />,
           },
         ],
       },

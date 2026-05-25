@@ -42,12 +42,11 @@ export default function SystemMonitoring() {
         />
 
         <MonitoringCard
-          to="#"
+          to="/admin/import-list"
           icon={Database}
           title="Import Activity"
           description="Monitor ETF imports, NAV synchronization, AUM ingestion, and data pipeline activity."
-          status="COMING SOON"
-          disabled
+          status="ACTIVE"
         />
 
         <MonitoringCard

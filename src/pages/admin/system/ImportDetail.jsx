@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+
+import { useParams } from "react-router-dom";
+
 import ReactMarkdown from "react-markdown";
 
 import {
@@ -9,30 +13,49 @@ import {
   Server,
 } from "lucide-react";
 
-const generatedMarkdown = `
-# AI Market Snapshot
-
-Markets continued higher today as treasury yields stabilized and volatility remained muted.
-
-## Key Signals
-
-- Nasdaq leadership remains strong
-- Bitcoin momentum continues above breakout levels
-- Treasury yields softened slightly
-- Small caps showed improving participation
-
-## AI Interpretation
-
-Current market conditions favor:
-
-- momentum continuation
-- growth exposure
-- income strategy participation
-
-The AI system currently identifies improving breadth and elevated speculative appetite while defensive positioning continues to weaken.
-`;
+import { getImportLog } from "../../../api/monitoring";
 
 export default function ImportDetail() {
+  const { id } = useParams();
+
+  const [log, setLog] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadImportLog() {
+      try {
+        const response = await getImportLog(id);
+
+        setLog(response.log);
+      } catch (err) {
+        setError("Failed to load import log.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadImportLog();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="glass-card rounded-3xl p-10 text-slate-300">
+        Loading import log...
+      </div>
+    );
+  }
+
+  if (error || !log) {
+    return (
+      <div className="glass-card rounded-3xl p-10 text-red-400">
+        {error || "Import log not found."}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -49,7 +72,7 @@ export default function ImportDetail() {
             </p>
 
             <h1 className="mt-2 font-display text-5xl font-black text-white">
-              ETF Price Import
+              {log.import_type_name}
             </h1>
           </div>
         </div>
@@ -66,28 +89,32 @@ export default function ImportDetail() {
         <DetailCard
           icon={CheckCircle2}
           label="Status"
-          value="COMPLETED"
-          color="text-emerald-300"
+          value={log.status_name}
+          color={
+            log.status_name === "COMPLETED"
+              ? "text-emerald-300"
+              : "text-amber-300"
+          }
         />
 
         <DetailCard
           icon={Clock3}
           label="Runtime"
-          value="12s"
+          value={`${log.run_time}s`}
           color="text-cyan-300"
         />
 
         <DetailCard
           icon={Database}
           label="Rows Processed"
-          value="1,900"
+          value={log.rows_processed.toLocaleString()}
           color="text-violet-300"
         />
 
         <DetailCard
           icon={Server}
           label="Provider"
-          value="Manual Seed"
+          value={log.data_source_name || "Unknown"}
           color="text-amber-300"
         />
       </section>
@@ -104,20 +131,29 @@ export default function ImportDetail() {
             </h2>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
-              <SummaryItem label="Import Started" value="2026-05-24 08:00:01" />
+              <SummaryItem
+                label="Import Started"
+                value={formatDate(log.started_at)}
+              />
 
               <SummaryItem
                 label="Import Completed"
-                value="2026-05-24 08:00:13"
+                value={formatDate(log.completed_at)}
               />
 
-              <SummaryItem label="Records Created" value="1,480" />
+              <SummaryItem
+                label="Records Created"
+                value={log.records_created}
+              />
 
-              <SummaryItem label="Records Updated" value="420" />
+              <SummaryItem
+                label="Records Updated"
+                value={log.records_updated}
+              />
 
-              <SummaryItem label="Import Type" value="ETF Price Import" />
+              <SummaryItem label="Import Type" value={log.import_type_name} />
 
-              <SummaryItem label="Status" value="Completed" />
+              <SummaryItem label="Status" value={log.status_name} />
             </div>
           </div>
 
@@ -131,39 +167,34 @@ export default function ImportDetail() {
             </div>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-[#0a1424] p-6 font-mono text-sm leading-relaxed text-slate-300">
-              Import completed successfully.
-              <br />
-              <br />
-              No duplicate records detected.
-              <br />
-              <br />
-              Historical ETF price synchronization completed without provider
-              interruption.
+              {log.processing_notes || "No processing notes available."}
             </div>
           </div>
 
           {/* Generated Content */}
 
-          <div className="glass-card rounded-3xl p-8">
-            <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-cyan-300" />
+          {log.generated_markdown && (
+            <div className="glass-card rounded-3xl p-8">
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5 text-cyan-300" />
 
-              <h2 className="font-display text-2xl font-bold text-white">
-                Generated Content
-              </h2>
-            </div>
+                <h2 className="font-display text-2xl font-bold text-white">
+                  Generated Content
+                </h2>
+              </div>
 
-            <p className="mt-4 text-sm leading-relaxed text-slate-400">
-              Markdown content generated during import processing and AI
-              telemetry execution.
-            </p>
+              <p className="mt-4 text-sm leading-relaxed text-slate-400">
+                Markdown content generated during import processing and AI
+                telemetry execution.
+              </p>
 
-            <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-[#0a1424] p-8">
-              <div className="prose prose-invert max-w-none prose-headings:font-display prose-headings:text-white prose-p:text-slate-300 prose-strong:text-cyan-300 prose-li:text-slate-300">
-                <ReactMarkdown>{generatedMarkdown}</ReactMarkdown>
+              <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-[#0a1424] p-8">
+                <div className="prose prose-invert max-w-none prose-headings:font-display prose-headings:text-white prose-p:text-slate-300 prose-strong:text-cyan-300 prose-li:text-slate-300">
+                  <ReactMarkdown>{log.generated_markdown}</ReactMarkdown>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right */}
@@ -171,20 +202,20 @@ export default function ImportDetail() {
         <div className="space-y-6">
           <SidebarCard
             label="Failure Count"
-            value="0"
-            subtitle="No processing failures detected"
+            value={log.failure_count}
+            subtitle="Import execution failure telemetry."
           />
 
           <SidebarCard
             label="Duplicate Rows"
-            value="0"
-            subtitle="No duplicate entries detected"
+            value={log.duplicate_rows}
+            subtitle="Potential duplicate record detection."
           />
 
           <SidebarCard
             label="Data Integrity"
-            value="PASSED"
-            subtitle="Validation checks completed successfully"
+            value={log.passed_data_integrity_check ? "PASSED" : "FAILED"}
+            subtitle="Validation and integrity verification status."
           />
         </div>
       </section>
@@ -192,7 +223,15 @@ export default function ImportDetail() {
   );
 }
 
-function DetailCard({ icon: Icon, label, value, color }) {
+function DetailCard({
+  icon: Icon,
+
+  label,
+
+  value,
+
+  color,
+}) {
   return (
     <div className="glass-card rounded-3xl p-6">
       <div className="flex items-center justify-between">
@@ -214,7 +253,11 @@ function DetailCard({ icon: Icon, label, value, color }) {
   );
 }
 
-function SummaryItem({ label, value }) {
+function SummaryItem({
+  label,
+
+  value,
+}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#0a1424] p-5">
       <p className="font-mono text-xs uppercase tracking-[0.25em] text-slate-400">
@@ -226,7 +269,13 @@ function SummaryItem({ label, value }) {
   );
 }
 
-function SidebarCard({ label, value, subtitle }) {
+function SidebarCard({
+  label,
+
+  value,
+
+  subtitle,
+}) {
   return (
     <div className="glass-card rounded-3xl p-6">
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-400">
@@ -240,4 +289,8 @@ function SidebarCard({ label, value, subtitle }) {
       <p className="mt-3 text-sm leading-relaxed text-slate-300">{subtitle}</p>
     </div>
   );
+}
+
+function formatDate(value) {
+  return new Date(value).toLocaleString();
 }

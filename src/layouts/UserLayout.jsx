@@ -11,6 +11,7 @@ import {
   LogOut,
   Settings,
   Rocket,
+  BrainCircuit,
 } from "lucide-react";
 
 import SupportBell from "../components/support/SupportBell";
@@ -53,6 +54,13 @@ export default function UserLayout() {
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
+              </Link>
+              <Link
+                to="/dashboard/ai-insights"
+                className="flex items-center gap-2 transition hover:text-brand-primary"
+              >
+                <BrainCircuit className="h-4 w-4" />
+                AI Insights
               </Link>
             </nav>
           </div>

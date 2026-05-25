@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from "react";
+
 import { Link } from "react-router-dom";
 
 import {
@@ -10,57 +12,67 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const mockImports = [
-  {
-    id: 1,
-
-    import_type: "ETF Price Import",
-
-    status: "COMPLETED",
-
-    runtime: "12s",
-
-    records_created: 1480,
-
-    records_updated: 420,
-
-    started_at: "2026-05-24 08:00 AM",
-  },
-
-  {
-    id: 2,
-
-    import_type: "Dividend Import",
-
-    status: "FAILED",
-
-    runtime: "4s",
-
-    records_created: 0,
-
-    records_updated: 0,
-
-    started_at: "2026-05-24 07:00 AM",
-  },
-
-  {
-    id: 3,
-
-    import_type: "NAV Import",
-
-    status: "COMPLETED",
-
-    runtime: "8s",
-
-    records_created: 210,
-
-    records_updated: 980,
-
-    started_at: "2026-05-24 06:00 AM",
-  },
-];
+import { getImportLogs } from "../../../api/monitoring";
 
 export default function ImportList() {
+  const [imports, setImports] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function loadImports() {
+      try {
+        const response = await getImportLogs();
+
+        setImports(response.logs.data);
+      } catch (err) {
+        setError("Failed to load import activity.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadImports();
+  }, []);
+
+  const telemetry = useMemo(() => {
+    const successfulImports = imports.filter(
+      (item) => item.status_name === "COMPLETED",
+    ).length;
+
+    const failedImports = imports.filter(
+      (item) => item.status_name === "FAILED",
+    ).length;
+
+    const totalProcessed = imports.reduce(
+      (total, item) => total + item.rows_processed,
+
+      0,
+    );
+
+    const averageRuntime = imports.length
+      ? Math.round(
+          imports.reduce(
+            (total, item) => total + item.run_time,
+
+            0,
+          ) / imports.length,
+        )
+      : 0;
+
+    return {
+      successfulImports,
+
+      failedImports,
+
+      totalProcessed,
+
+      averageRuntime,
+    };
+  }, [imports]);
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -94,33 +106,33 @@ export default function ImportList() {
         <TelemetryCard
           icon={ShieldCheck}
           label="Successful Imports"
-          value="284"
+          value={telemetry.successfulImports}
           color="text-emerald-300"
         />
 
         <TelemetryCard
           icon={AlertTriangle}
           label="Failed Imports"
-          value="3"
+          value={telemetry.failedImports}
           color="text-amber-300"
         />
 
         <TelemetryCard
           icon={Database}
           label="Records Processed"
-          value="2.1M"
+          value={telemetry.totalProcessed.toLocaleString()}
           color="text-cyan-300"
         />
 
         <TelemetryCard
           icon={Clock3}
           label="Average Runtime"
-          value="9s"
+          value={`${telemetry.averageRuntime}s`}
           color="text-violet-300"
         />
       </section>
 
-      {/* Import Table */}
+      {/* Table */}
 
       <section className="glass-card overflow-hidden rounded-3xl">
         <div className="border-b border-white/10 px-8 py-6">
@@ -133,68 +145,82 @@ export default function ImportList() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="border-b border-white/10 bg-[#0a1424]">
-              <tr className="text-left">
-                <TableHeading>Import Type</TableHeading>
+        {loading ? (
+          <div className="p-8 text-slate-300">Loading import activity...</div>
+        ) : error ? (
+          <div className="p-8 text-red-400">{error}</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="border-b border-white/10 bg-[#0a1424]">
+                <tr className="text-left">
+                  <TableHeading>Import Type</TableHeading>
 
-                <TableHeading>Status</TableHeading>
+                  <TableHeading>Status</TableHeading>
 
-                <TableHeading>Runtime</TableHeading>
+                  <TableHeading>Runtime</TableHeading>
 
-                <TableHeading>Created</TableHeading>
+                  <TableHeading>Created</TableHeading>
 
-                <TableHeading>Updated</TableHeading>
+                  <TableHeading>Updated</TableHeading>
 
-                <TableHeading>Started</TableHeading>
+                  <TableHeading>Started</TableHeading>
 
-                <TableHeading>Details</TableHeading>
-              </tr>
-            </thead>
-
-            <tbody>
-              {mockImports.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b border-white/5 transition hover:bg-white/[0.02]"
-                >
-                  <TableCell className="font-mono text-cyan-300">
-                    {item.import_type}
-                  </TableCell>
-
-                  <TableCell>
-                    <StatusBadge status={item.status} />
-                  </TableCell>
-
-                  <TableCell>{item.runtime}</TableCell>
-
-                  <TableCell>{item.records_created}</TableCell>
-
-                  <TableCell>{item.records_updated}</TableCell>
-
-                  <TableCell>{item.started_at}</TableCell>
-
-                  <TableCell>
-                    <Link
-                      to={`/admin/import-detail/${item.id}`}
-                      className="flex items-center gap-2 text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
-                    >
-                      View
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </TableCell>
+                  <TableHeading>Details</TableHeading>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+
+              <tbody>
+                {imports.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b border-white/5 transition hover:bg-white/[0.02]"
+                  >
+                    <TableCell className="font-mono text-cyan-300">
+                      {item.import_type_name}
+                    </TableCell>
+
+                    <TableCell>
+                      <StatusBadge status={item.status_name} />
+                    </TableCell>
+
+                    <TableCell>{item.run_time}s</TableCell>
+
+                    <TableCell>{item.records_created}</TableCell>
+
+                    <TableCell>{item.records_updated}</TableCell>
+
+                    <TableCell>{formatDate(item.started_at)}</TableCell>
+
+                    <TableCell>
+                      <Link
+                        to={`/admin/import-detail/${item.id}`}
+                        className="flex items-center gap-2 text-sm font-semibold text-cyan-300 transition hover:text-cyan-200"
+                      >
+                        View
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </TableCell>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );
 }
 
-function TelemetryCard({ icon: Icon, label, value, color }) {
+function TelemetryCard({
+  icon: Icon,
+
+  label,
+
+  value,
+
+  color,
+}) {
   return (
     <div className="glass-card rounded-3xl p-6">
       <div className="flex items-center justify-between">
@@ -224,7 +250,11 @@ function TableHeading({ children }) {
   );
 }
 
-function TableCell({ children, className = "" }) {
+function TableCell({
+  children,
+
+  className = "",
+}) {
   return (
     <td
       className={`whitespace-nowrap px-8 py-5 text-sm text-slate-300 ${className}`}
@@ -248,4 +278,8 @@ function StatusBadge({ status }) {
       {status}
     </span>
   );
+}
+
+function formatDate(value) {
+  return new Date(value).toLocaleString();
 }

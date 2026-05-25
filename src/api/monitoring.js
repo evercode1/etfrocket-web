@@ -5,3 +5,21 @@ export async function getCronReports() {
 
   return response.data;
 }
+
+export async function getImportLogs(params = {}) {
+  const response = await api.get(
+    "/import-logs",
+
+    {
+      params,
+    },
+  );
+
+  return response.data;
+}
+
+export async function getImportLog(id) {
+  const response = await api.get(`/import-log/${id}`);
+
+  return response.data;
+}

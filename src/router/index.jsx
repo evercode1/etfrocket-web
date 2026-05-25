@@ -28,6 +28,8 @@ import ViewTicket from "../pages/admin/support/ViewTicket";
 import DataManagement from "../pages/admin/data/DataManagement";
 import SystemMonitoring from "../pages/admin/system/SystemMonitoring";
 import CronReports from "../pages/admin/system/CronReports";
+import ImportList from "../pages/admin/system/ImportList";
+import ImportDetail from "../pages/admin/system/ImportDetail";
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
@@ -155,6 +157,14 @@ const router = createBrowserRouter([
           {
             path: "cron-reports",
             element: <CronReports />,
+          },
+          {
+            path: "import-list",
+            element: <ImportList />,
+          },
+          {
+            path: "import-detail/:id",
+            element: <ImportDetail />,
           },
         ],
       },

@@ -37,8 +37,7 @@ export default function Register() {
       const response = await register(form);
 
       setSuccessMessage(
-        response.message ||
-          "Account created. Please check your email to verify your account before logging in.",
+        "Account created successfully. Please check your inbox and spam folder for your verification email.",
       );
 
       setForm({

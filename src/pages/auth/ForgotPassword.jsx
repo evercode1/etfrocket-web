@@ -25,8 +25,7 @@ export default function ForgotPassword() {
       });
 
       setSuccessMessage(
-        response.message ||
-          "If your email exists in our system, a password reset link has been sent.",
+        "Password reset email sent successfully. Please check your inbox and spam folder if it does not arrive within a few minutes.",
       );
 
       setEmail("");

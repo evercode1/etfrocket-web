@@ -55,7 +55,7 @@ import BackTesting from "../pages/user/dashboard/backtesting/BackTesting";
 import MarketSnapshot from "../pages/user/dashboard/aiSignals/MarketSnapshot";
 import MarketConditions from "../pages/user/dashboard/aiSignals/MarketConditions";
 import MarketEvents from "../pages/user/dashboard/aiSignals/MarketEvents";
-import AiInsights from "../pages/user/dashboard/AiInsights";
+import AiInsights from "../pages/user/dashboard/aiInsights";
 
 import EtfList from "../pages/user/etfs/EtfList";
 import EtfCompare from "../pages/user/etfs/EtfCompare";

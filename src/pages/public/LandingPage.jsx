@@ -115,9 +115,9 @@ export default function LandingPage() {
           </h1>
 
           <p className="mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-slate-300 md:text-xl">
-            Track total return, dividend income, monitor NAV health, run
-            historical backtests. Explore AI-driven market intelligence from one
-            powerful ETF command center.
+            AI insights track total return, dividend income, monitor NAV health,
+            run historical backtests. Explore AI-driven market intelligence from
+            one powerful ETF command center.
           </p>
 
           <div className="mt-14 flex flex-col items-center justify-center gap-5 sm:flex-row">

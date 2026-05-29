@@ -129,7 +129,7 @@ export default function PortfolioCompare() {
         <MetricCard
           icon={BarChart3}
           label="Compared ETFs"
-          value={summary.compared_etfs_count || 0}
+          value={summary.compared_securities_count || 0}
           detail="ETFs included in this comparison"
         />
 
@@ -324,7 +324,7 @@ export default function PortfolioCompare() {
             <tbody>
               {tableRows.map((row, index) => (
                 <tr
-                  key={row.etf_id}
+                  key={row.security_id}
                   className="border-t border-brand-outline text-brand-muted"
                 >
                   <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">

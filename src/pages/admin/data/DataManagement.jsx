@@ -10,7 +10,7 @@ import {
 
 import {
   backfillPriceHistory,
-  calculateEtfMetrics,
+  calculateSecurityMetrics,
   runAiDataExtractions,
   truncateTables,
 } from "../../../api/adminData";
@@ -94,7 +94,7 @@ export default function DataManagement() {
         <CommandCard
           icon={FileSpreadsheet}
           title="Backfill Price History"
-          description="Import price history and dividend history from the ETF text file in app/Imports/PriceData."
+          description="Import price history and dividend history from the ETF text files in app/Imports/PriceData."
           warning="This replaces existing price and dividend history for the selected ETF."
           loading={loadingKey === "priceHistory"}
           output={outputs.priceHistory}
@@ -142,7 +142,7 @@ export default function DataManagement() {
               confirmLabel: "Calculate Metrics",
               onConfirm: () =>
                 runCommand("metrics", () =>
-                  calculateEtfMetrics({
+                  calculateSecurityMetrics({
                     symbol: metricsSymbol || undefined,
                   }),
                 ),
@@ -389,7 +389,11 @@ function ConfirmationModal({ action, onCancel }) {
 
           <button
             type="button"
-            onClick={action.onConfirm}
+            onClick={() => {
+              onCancel();
+
+              action.onConfirm();
+            }}
             className={`rounded-xl px-5 py-3 text-sm font-bold transition ${
               action.danger
                 ? "bg-brand-danger text-white hover:opacity-90"

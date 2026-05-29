@@ -284,7 +284,7 @@ export default function CompareSymbols() {
         <MetricCard
           icon={BarChart3}
           label="Compared Symbols"
-          value={summary.compared_etfs_count || 0}
+          value={summary.compared_securities_count || 0}
           detail={
             visibleRows
 
@@ -520,7 +520,7 @@ export default function CompareSymbols() {
                     {row.symbol}
                   </td>
 
-                  <td className="px-4 py-4">{row.fund_name}</td>
+                  <td className="px-4 py-4">{row.security_name}</td>
 
                   <td className="px-4 py-4 font-semibold text-brand-text">
                     {formatCurrency(row.latest_price)}

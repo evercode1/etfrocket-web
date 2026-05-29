@@ -5,8 +5,8 @@ export async function backfillPriceHistory(payload) {
   return response.data;
 }
 
-export async function calculateEtfMetrics(payload) {
-  const response = await api.post("/data/calculate-etf-metrics", payload);
+export async function calculateSecurityMetrics(payload) {
+  const response = await api.post("/data/calculate-security-metrics", payload);
   return response.data;
 }
 

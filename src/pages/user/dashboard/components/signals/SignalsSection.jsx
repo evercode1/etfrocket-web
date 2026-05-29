@@ -80,7 +80,7 @@ export default function SignalsSection({
               topContributors={signal.topContributors || []}
               contributorType={signal.contributorType || "distribution"}
               details={{
-                affectedEtfs: signal.affected_etfs || [],
+                affectedSecurities: signal.affected_securities || [],
                 observation: signal.observation || "",
                 possibleCauses: signal.possible_causes || [],
               }}
@@ -138,7 +138,7 @@ function buildDistributionGrowthCard(signalData) {
       title: "Distribution Growth",
       message:
         "No current holdings were detected for distribution growth analysis.",
-      affected_etfs: [],
+      affected_securities: [],
       observation:
         "Distribution growth is evaluated using current portfolio holdings.",
       possible_causes: [
@@ -156,7 +156,7 @@ function buildDistributionGrowthCard(signalData) {
       title: "Distribution Growth",
       message:
         "No positive distribution growth was detected across current holdings.",
-      affected_etfs: [],
+      affected_securities: [],
       observation:
         "30-day average distributions are flat or lower than 90-day averages.",
       possible_causes: [
@@ -169,14 +169,14 @@ function buildDistributionGrowthCard(signalData) {
     };
   }
 
-  const topSymbols = signalData.affected_etfs.slice(0, 3).join(", ");
+  const topSymbols = signalData.affected_securities.slice(0, 3).join(", ");
 
   return {
     title: "Distribution Growth",
     message: `${signalData.growth_count} holding${
       signalData.growth_count === 1 ? "" : "s"
     } showed positive distribution growth.`,
-    affected_etfs: signalData.affected_etfs || [],
+    affected_securities: signalData.affected_securities || [],
     observation: `${topSymbols} contributed the strongest distribution growth, with an estimated portfolio income impact of ${formatCurrency(
       signalData.portfolio_income_impact,
     )}.`,
@@ -195,7 +195,7 @@ function buildAumGrowthCard(signalData) {
     return {
       title: "AUM Growth",
       message: "No current holdings were detected for AUM flow analysis.",
-      affected_etfs: [],
+      affected_securities: [],
       observation: "AUM growth is evaluated using current portfolio holdings.",
       possible_causes: [
         "Portfolio may not have any active positions",
@@ -211,7 +211,7 @@ function buildAumGrowthCard(signalData) {
     return {
       title: "AUM Growth",
       message: "No recent AUM flow data was detected across current holdings.",
-      affected_etfs: [],
+      affected_securities: [],
       observation:
         "30-day AUM change metrics are unavailable or incomplete for current holdings.",
       possible_causes: [
@@ -241,7 +241,7 @@ function buildAumGrowthCard(signalData) {
       message: `${inflowCount} holding${
         inflowCount === 1 ? "" : "s"
       } showed positive 30-day AUM growth.`,
-      affected_etfs: signalData.affected_etfs || [],
+      affected_securities: signalData.affected_securities || [],
       observation: `${topSymbols} had the strongest recent asset inflows, suggesting increased investor demand.`,
       possible_causes: [
         "Investor demand may be increasing",
@@ -261,7 +261,7 @@ function buildAumGrowthCard(signalData) {
             outflowCount === 1 ? "" : "s"
           } showed negative 30-day AUM flow.`
         : "Current holdings showed flat 30-day AUM flow.",
-    affected_etfs: signalData.affected_etfs || [],
+    affected_securities: signalData.affected_securities || [],
     observation:
       outflowCount > 0
         ? "Recent AUM contraction may indicate lower investor demand or fund-level pressure."
@@ -288,7 +288,7 @@ function buildNavStabilityCard(signalData) {
     return {
       title: "NAV Stability",
       message: "No current holdings were detected for NAV stability analysis.",
-      affected_etfs: [],
+      affected_securities: [],
       observation:
         "NAV stability is evaluated using current portfolio holdings.",
       possible_causes: [
@@ -306,7 +306,7 @@ function buildNavStabilityCard(signalData) {
       title: "NAV Stability",
       message:
         "No NAV stability metrics were detected across current holdings.",
-      affected_etfs: [],
+      affected_securities: [],
       observation:
         "NAV erosion metrics are unavailable or incomplete for current holdings.",
       possible_causes: [
@@ -330,7 +330,7 @@ function buildNavStabilityCard(signalData) {
       message: `${watchCount} holding${
         watchCount === 1 ? "" : "s"
       } showed elevated NAV erosion risk.`,
-      affected_etfs: signalData.affected_etfs || [],
+      affected_securities: signalData.affected_securities || [],
       observation: `Worst NAV erosion was ${formatPercent(
         signalData.worst_nav_erosion_percentage,
       )}. Review holdings with erosion worse than -10%.`,
@@ -350,7 +350,7 @@ function buildNavStabilityCard(signalData) {
       message: `${mixedCount} holding${
         mixedCount === 1 ? "" : "s"
       } showed moderate NAV erosion.`,
-      affected_etfs: signalData.affected_etfs || [],
+      affected_securities: signalData.affected_securities || [],
       observation: `Worst NAV erosion was ${formatPercent(
         signalData.worst_nav_erosion_percentage,
       )}. Several holdings remain stable, but some deserve monitoring.`,
@@ -369,7 +369,7 @@ function buildNavStabilityCard(signalData) {
     message: `${stableCount} holding${
       stableCount === 1 ? "" : "s"
     } maintained stable NAV trends.`,
-    affected_etfs: signalData.affected_etfs || [],
+    affected_securities: signalData.affected_securities || [],
     observation: `Worst NAV erosion was ${formatPercent(
       signalData.worst_nav_erosion_percentage,
     )}, which remains within the stable range.`,

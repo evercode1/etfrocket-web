@@ -94,7 +94,7 @@ function DividendCalendarCard({ event }) {
             {event.symbol}
           </p>
 
-          <p className="mt-1 text-sm text-brand-muted">{event.fund_name}</p>
+          <p className="mt-1 text-sm text-brand-muted">{event.security_name}</p>
         </div>
 
         <span

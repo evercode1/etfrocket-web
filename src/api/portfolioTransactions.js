@@ -10,8 +10,8 @@ export async function createPortfolioTransaction(portfolioId, data) {
   return response.data;
 }
 
-export async function getEtfFilters() {
-  const response = await api.get("/get-etf-filters");
+export async function getSecurityFilters() {
+  const response = await api.get("/get-security-filters");
 
   return response.data;
 }

@@ -11,7 +11,7 @@ import {
   Rocket,
 } from "lucide-react";
 
-import { getEtfSelects } from "../../../../api/etfs";
+import { getSecuritySelects } from "../../../../api/securities";
 
 import { createPortfolioTransaction } from "../../../../api/portfolioTransactions";
 
@@ -26,36 +26,36 @@ export default function AddPortfolioTransaction() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [etfs, setEtfs] = useState({});
-  const [isLoadingEtfs, setIsLoadingEtfs] = useState(true);
+  const [securities, setSecurities] = useState({});
+  const [isLoadingSecurities, setIsLoadingSecurities] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const [form, setForm] = useState({
-    etf_id: "",
+    security_id: "",
     transaction_type_id: 1,
     shares: "",
     price_per_share: "",
     transaction_date: new Date().toISOString().slice(0, 10),
   });
 
-  async function loadEtfs() {
-    setIsLoadingEtfs(true);
+  async function loadSecurities() {
+    setIsLoadingSecurities(true);
 
     try {
-      const response = await getEtfSelects();
+      const response = await getSecuritySelects();
 
-      setEtfs(response.data || {});
+      setSecurities(response.data || {});
     } catch (error) {
-      setError("Unable to load ETF options.");
+      setError("Unable to load security options.");
     } finally {
-      setIsLoadingEtfs(false);
+      setIsLoadingSecurities(false);
     }
   }
 
   useEffect(() => {
-    loadEtfs();
+    loadSecurities();
   }, []);
 
   function handleChange(event) {
@@ -82,7 +82,7 @@ export default function AddPortfolioTransaction() {
 
     try {
       await createPortfolioTransaction(id, {
-        etf_id: Number(form.etf_id),
+        security_id: Number(form.security_id),
 
         transaction_type_id: Number(form.transaction_type_id),
 
@@ -109,7 +109,7 @@ export default function AddPortfolioTransaction() {
   const estimatedValue =
     Number(form.shares || 0) * Number(form.price_per_share || 0);
 
-  const selectedSymbol = etfs[form.etf_id] || "selected ETF";
+  const selectedSymbol = securities[form.security_id] || "selected security";
 
   const selectedTransactionType =
     transactionTypes.find(
@@ -173,27 +173,29 @@ export default function AddPortfolioTransaction() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
               <label
-                htmlFor="etf_id"
+                htmlFor="security_id"
                 className="block text-sm font-semibold text-brand-muted"
               >
-                ETF
+                Security
               </label>
 
               <select
-                id="etf_id"
-                name="etf_id"
-                value={form.etf_id}
+                id="security_id"
+                name="security_id"
+                value={form.security_id}
                 onChange={handleChange}
                 required
-                disabled={isLoadingEtfs}
+                disabled={isLoadingSecurities}
                 className="mt-2 w-full rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 font-semibold text-brand-text outline-none transition focus:border-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <option value="">
-                  {isLoadingEtfs ? "Loading ETFs..." : "Select an ETF"}
+                  {isLoadingSecurities
+                    ? "Loading securities..."
+                    : "Select a security"}
                 </option>
 
-                {Object.entries(etfs).map(([etfId, symbol]) => (
-                  <option key={etfId} value={etfId}>
+                {Object.entries(securities).map(([securityId, symbol]) => (
+                  <option key={securityId} value={securityId}>
                     {symbol}
                   </option>
                 ))}

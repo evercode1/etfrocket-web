@@ -15,7 +15,7 @@ import {
 
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 
-import { listEtfsOwnedByUser } from "../../../../api/etfs";
+import { listSecuritiesOwnedByUser } from "../../../../api/securities";
 import { viewPortfolio } from "../../../../api/portfolios";
 
 import {
@@ -35,8 +35,8 @@ export default function PortfolioTransactions() {
   const [portfolioSelects, setPortfolioSelects] = useState({});
 
   const [transactions, setTransactions] = useState([]);
-  const [etfs, setEtfs] = useState([]);
-  const [selectedEtfId, setSelectedEtfId] = useState("");
+  const [securities, setSecurities] = useState([]);
+  const [selectedSecurityId, setSelectedSecurityId] = useState("");
 
   const [pagination, setPagination] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,23 +63,23 @@ export default function PortfolioTransactions() {
     setPortfolioSelects(data?.portfolio_selects || {});
   }
 
-  async function loadEtfs() {
-    const response = await listEtfsOwnedByUser(id);
+  async function loadSecurities() {
+    const response = await listSecuritiesOwnedByUser(id);
 
-    setEtfs(response.data || []);
+    setSecurities(response.data || []);
   }
 
   async function loadTransactions(
     page = currentPage,
     sorting = sortConfig,
-    etfId = selectedEtfId,
+    securityId = selectedSecurityId,
   ) {
     const response = await listPortfolioTransactions(id, {
       page,
       per_page: 25,
       sortBy: sorting.sortBy,
       sortOrder: sorting.sortOrder,
-      etf_id: etfId || undefined,
+      security_id: securityId || undefined,
     });
 
     const paginatedData = response.data || {};
@@ -98,10 +98,14 @@ export default function PortfolioTransactions() {
           setStoredPortfolioId(id);
         }
 
-        setSelectedEtfId("");
+        setSelectedSecurityId("");
         setCurrentPage(1);
 
-        await Promise.all([loadPortfolio(), loadEtfs(), loadTransactions(1)]);
+        await Promise.all([
+          loadPortfolio(),
+          loadSecurities(),
+          loadTransactions(1),
+        ]);
       } finally {
         setIsLoading(false);
       }
@@ -128,14 +132,14 @@ export default function PortfolioTransactions() {
     };
 
     setSortConfig(nextSort);
-    loadTransactions(1, nextSort, selectedEtfId);
+    loadTransactions(1, nextSort, selectedSecurityId);
   }
 
-  function handleEtfFilterChange(event) {
-    const etfId = event.target.value;
+  function handleSecurityFilterChange(event) {
+    const securityId = event.target.value;
 
-    setSelectedEtfId(etfId);
-    loadTransactions(1, sortConfig, etfId);
+    setSelectedSecurityId(securityId);
+    loadTransactions(1, sortConfig, securityId);
   }
 
   async function handleImportCsv(event) {
@@ -158,8 +162,8 @@ export default function PortfolioTransactions() {
         `Import complete. Imported: ${data.imported_rows}, Duplicates: ${data.duplicate_rows}, Failed: ${data.failed_rows}.`,
       );
 
-      await loadEtfs();
-      await loadTransactions(currentPage, sortConfig, selectedEtfId);
+      await loadSecurities();
+      await loadTransactions(currentPage, sortConfig, selectedSecurityId);
     } catch (error) {
       setImportError(
         error.response?.data?.message ||
@@ -184,8 +188,8 @@ export default function PortfolioTransactions() {
 
       setTransactionToDelete(null);
 
-      await loadEtfs();
-      await loadTransactions(currentPage, sortConfig, selectedEtfId);
+      await loadSecurities();
+      await loadTransactions(currentPage, sortConfig, selectedSecurityId);
     } catch (error) {
       setDeleteError(
         error.response?.data?.message ||
@@ -331,23 +335,23 @@ export default function PortfolioTransactions() {
 
           <div>
             <label
-              htmlFor="etf_filter"
+              htmlFor="security_filter"
               className="mb-2 block text-sm font-semibold text-brand-muted"
             >
-              Filter by ETF
+              Filter by Security
             </label>
 
             <select
-              id="etf_filter"
-              value={selectedEtfId}
-              onChange={handleEtfFilterChange}
+              id="security_filter"
+              value={selectedSecurityId}
+              onChange={handleSecurityFilterChange}
               className="w-full rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm font-semibold text-brand-text outline-none transition focus:border-brand-primary lg:w-64"
             >
-              <option value="">All ETFs</option>
+              <option value="">All Securities</option>
 
-              {etfs.map((etf) => (
-                <option key={etf.id} value={etf.id}>
-                  {etf.symbol}
+              {securities.map((security) => (
+                <option key={security.id} value={security.id}>
+                  {security.symbol}
                 </option>
               ))}
             </select>

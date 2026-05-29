@@ -336,7 +336,7 @@ export default function PortfolioDetail() {
               <div className="mt-5 grid gap-3">
                 {holdings.map((holding) => (
                   <div
-                    key={holding.etf_id}
+                    key={holding.security_id}
                     className="flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3"
                   >
                     <span className="font-semibold text-brand-text">
@@ -421,7 +421,7 @@ export default function PortfolioDetail() {
                   <tbody>
                     {topHoldings.map((holding) => (
                       <tr
-                        key={holding.etf_id}
+                        key={holding.security_id}
                         className="border-t border-brand-outline text-brand-muted"
                       >
                         <td className="px-4 py-4">
@@ -430,7 +430,7 @@ export default function PortfolioDetail() {
                               {holding.symbol}
                             </p>
                             <p className="text-xs text-brand-muted">
-                              {holding.fund_name}
+                              {holding.security_name}
                             </p>
                           </div>
                         </td>
@@ -517,7 +517,9 @@ export default function PortfolioDetail() {
 
                     <td className="px-4 py-4">
                       <p className="font-semibold text-brand-text">
-                        {transaction.etf?.symbol || transaction.symbol || "—"}
+                        {transaction.security?.symbol ||
+                          transaction.symbol ||
+                          "—"}
                       </p>
                     </td>
 

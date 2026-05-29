@@ -283,7 +283,7 @@ export default function PortfolioHoldings() {
                 {holdings.map((holding) =>
                   selectedView === "performance" ? (
                     <tr
-                      key={holding.etf_id}
+                      key={holding.security_id}
                       className="border-t border-brand-outline text-brand-muted"
                     >
                       <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">
@@ -333,7 +333,7 @@ export default function PortfolioHoldings() {
                     </tr>
                   ) : (
                     <tr
-                      key={holding.etf_id}
+                      key={holding.security_id}
                       className="border-t border-brand-outline text-brand-muted"
                     >
                       <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">

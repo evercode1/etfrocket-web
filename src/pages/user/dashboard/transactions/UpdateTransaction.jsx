@@ -13,7 +13,7 @@ import {
 
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 
-import { listEtfsOwnedByUser } from "../../../../api/etfs";
+import { listSecuritiesOwnedByUser } from "../../../../api/securities";
 
 import {
   showPortfolioTransaction,
@@ -29,14 +29,14 @@ export default function UpdateTransaction() {
   const { id, transactionId } = useParams();
   const navigate = useNavigate();
 
-  const [etfs, setEtfs] = useState([]);
+  const [securities, setSecurities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const [form, setForm] = useState({
-    etf_id: "",
+    security_id: "",
     transaction_type_id: 1,
     shares: "",
     price_per_share: "",
@@ -47,17 +47,17 @@ export default function UpdateTransaction() {
     setIsLoading(true);
 
     try {
-      const [etfsResponse, transactionResponse] = await Promise.all([
-        listEtfsOwnedByUser(id),
+      const [securitiesResponse, transactionResponse] = await Promise.all([
+        listSecuritiesOwnedByUser(id),
         showPortfolioTransaction(transactionId),
       ]);
 
-      setEtfs(etfsResponse.data || []);
+      setSecurities(securitiesResponse.data || []);
 
       const transaction = transactionResponse.data;
 
       setForm({
-        etf_id: transaction.etf_id || "",
+        security_id: transaction.security_id || "",
         transaction_type_id: transaction.transaction_type_id || 1,
         shares: transaction.shares || "",
         price_per_share: transaction.price_per_share || "",
@@ -96,7 +96,7 @@ export default function UpdateTransaction() {
 
     try {
       await updatePortfolioTransaction(transactionId, {
-        etf_id: Number(form.etf_id),
+        security_id: Number(form.security_id),
         transaction_type_id: Number(form.transaction_type_id),
         shares: form.shares,
         price_per_share: form.price_per_share,
@@ -115,11 +115,11 @@ export default function UpdateTransaction() {
     }
   }
 
-  const selectedEtf = etfs.find(
-    (etf) => Number(etf.id) === Number(form.etf_id),
+  const selectedSecurity = securities.find(
+    (security) => Number(security.id) === Number(form.security_id),
   );
 
-  const selectedSymbol = selectedEtf?.symbol || "selected ETF";
+  const selectedSymbol = selectedSecurity?.symbol || "selected security";
 
   const selectedTransactionType =
     transactionTypes.find(
@@ -194,25 +194,25 @@ export default function UpdateTransaction() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
               <label
-                htmlFor="etf_id"
+                htmlFor="security_id"
                 className="block text-sm font-semibold text-brand-muted"
               >
-                ETF
+                Security
               </label>
 
               <select
-                id="etf_id"
-                name="etf_id"
-                value={form.etf_id}
+                id="security_id"
+                name="security_id"
+                value={form.security_id}
                 onChange={handleChange}
                 required
                 className="mt-2 w-full rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 font-semibold text-brand-text outline-none transition focus:border-brand-primary"
               >
-                <option value="">Select an ETF</option>
+                <option value="">Select a Security</option>
 
-                {etfs.map((etf) => (
-                  <option key={etf.id} value={etf.id}>
-                    {etf.symbol}
+                {securities.map((security) => (
+                  <option key={security.id} value={security.id}>
+                    {security.symbol}
                   </option>
                 ))}
               </select>

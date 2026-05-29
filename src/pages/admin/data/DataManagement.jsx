@@ -10,7 +10,7 @@ import {
 
 import {
   backfillPriceHistory,
-  calculateEtfMetrics,
+  calculateSecurityMetrics,
   runAiDataExtractions,
   truncateTables,
 } from "../../../api/adminData";
@@ -142,7 +142,7 @@ export default function DataManagement() {
               confirmLabel: "Calculate Metrics",
               onConfirm: () =>
                 runCommand("metrics", () =>
-                  calculateEtfMetrics({
+                  calculateSecurityMetrics({
                     symbol: metricsSymbol || undefined,
                   }),
                 ),

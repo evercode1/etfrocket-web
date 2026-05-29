@@ -24,7 +24,7 @@ import {
   ComposedChart,
 } from "recharts";
 
-import { runBackTest, getEtfSelects } from "../../../../api/comparisons";
+import { runBackTest, getSecuritySelects } from "../../../../api/comparisons";
 
 export default function BackTesting() {
   const [symbol, setSymbol] = useState("CHPY");
@@ -41,18 +41,18 @@ export default function BackTesting() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isLoadingEtfs, setIsLoadingEtfs] = useState(true);
+  const [isLoadingSecurities, setIsLoadingSecurities] = useState(true);
 
   const [backTestData, setBackTestData] = useState(null);
 
-  const [etfOptions, setEtfOptions] = useState([]);
+  const [securityOptions, setSecurityOptions] = useState([]);
 
   useEffect(() => {
-    async function loadEtfOptions() {
+    async function loadSecurityOptions() {
       try {
-        const response = await getEtfSelects();
+        const response = await getSecuritySelects();
 
-        setEtfOptions(
+        setSecurityOptions(
           Object.entries(response.data || {}).map(([id, symbol]) => ({
             id: Number(id),
 
@@ -60,11 +60,11 @@ export default function BackTesting() {
           })),
         );
       } finally {
-        setIsLoadingEtfs(false);
+        setIsLoadingSecurities(false);
       }
     }
 
-    loadEtfOptions();
+    loadSecurityOptions();
   }, []);
 
   const projectedMonthlyIncome = useMemo(() => {
@@ -78,11 +78,11 @@ export default function BackTesting() {
   async function handleRunBacktest() {
     const normalized = symbol.trim().toUpperCase();
 
-    const selectedEtf = etfOptions.find(
-      (etf) => etf.symbol?.toUpperCase() === normalized,
+    const selectedSecurity = securityOptions.find(
+      (security) => security.symbol?.toUpperCase() === normalized,
     );
 
-    if (!selectedEtf) {
+    if (!selectedSecurity) {
       setUnsupportedSymbol(true);
 
       return;
@@ -98,7 +98,7 @@ export default function BackTesting() {
       const startDate = calculateStartDate(timeframe);
 
       const response = await runBackTest({
-        etf_id: selectedEtf.id,
+        security_id: selectedSecurity.id,
 
         start_date: startDate,
 

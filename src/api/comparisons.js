@@ -52,8 +52,8 @@ export async function runBackTest(payload) {
   return response.data;
 }
 
-export async function getEtfSelects() {
-  const response = await api.get("/get-etf-selects");
+export async function getSecuritySelects() {
+  const response = await api.get("/get-security-selects");
 
   return response.data;
 }

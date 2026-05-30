@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
+
 import {
   ArrowLeft,
   ArrowUpDown,

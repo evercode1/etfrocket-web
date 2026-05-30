@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
 
 import {
   ArrowLeft,
@@ -155,7 +156,13 @@ export default function PortfolioHoldings() {
       <section className="grid gap-6 xl:grid-cols-3">
         <CalloutCard
           title="Largest Position"
-          value={insights.largest_position?.symbol || "—"}
+          value={
+            insights.largest_position?.symbol ? (
+              <SecuritySymbol symbol={insights.largest_position.symbol} />
+            ) : (
+              "—"
+            )
+          }
           detail={`${formatPercent(
             insights.largest_position?.value,
           )} of portfolio market value`}
@@ -163,7 +170,13 @@ export default function PortfolioHoldings() {
 
         <CalloutCard
           title="Top Income Driver"
-          value={insights.top_income_driver?.symbol || "—"}
+          value={
+            insights.top_income_driver?.symbol ? (
+              <SecuritySymbol symbol={insights.top_income_driver.symbol} />
+            ) : (
+              "—"
+            )
+          }
           detail={`${formatPercent(
             insights.top_income_driver?.value,
           )} of projected monthly income`}
@@ -171,8 +184,16 @@ export default function PortfolioHoldings() {
 
         <CalloutCard
           title="Highest Gain"
-          value={insights.highest_gain?.symbol || "—"}
-          detail={`${formatCurrency(insights.highest_gain?.value)} unrealized gain`}
+          value={
+            insights.highest_gain?.symbol ? (
+              <SecuritySymbol symbol={insights.highest_gain.symbol} />
+            ) : (
+              "—"
+            )
+          }
+          detail={`${formatCurrency(
+            insights.highest_gain?.value,
+          )} unrealized gain`}
         />
       </section>
 
@@ -287,7 +308,7 @@ export default function PortfolioHoldings() {
                       className="border-t border-brand-outline text-brand-muted"
                     >
                       <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">
-                        {holding.symbol}
+                        <SecuritySymbol symbol={holding.symbol} />
                       </td>
 
                       <td className="px-4 py-4">

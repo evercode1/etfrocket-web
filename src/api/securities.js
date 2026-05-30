@@ -35,3 +35,9 @@ export async function listSecuritiesOwnedByUser(portfolioId) {
 
   return response.data;
 }
+
+export async function getSecurityHoverCard(symbol) {
+  const response = await api.get(`/security-hover-card/${symbol}`);
+
+  return response.data.data;
+}

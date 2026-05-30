@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
+
 import {
   BarChart3,
   Edit,
@@ -339,9 +341,7 @@ export default function PortfolioDetail() {
                     key={holding.security_id}
                     className="flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3"
                   >
-                    <span className="font-semibold text-brand-text">
-                      {holding.symbol}
-                    </span>
+                    <SecuritySymbol symbol={holding.symbol} />
 
                     <span className="text-sm text-brand-muted">
                       {formatPercent(holding.allocation_percentage)}
@@ -426,9 +426,7 @@ export default function PortfolioDetail() {
                       >
                         <td className="px-4 py-4">
                           <div>
-                            <p className="font-semibold text-brand-text">
-                              {holding.symbol}
-                            </p>
+                            <SecuritySymbol symbol={holding.symbol} />
                             <p className="text-xs text-brand-muted">
                               {holding.security_name}
                             </p>
@@ -516,11 +514,15 @@ export default function PortfolioDetail() {
                     </td>
 
                     <td className="px-4 py-4">
-                      <p className="font-semibold text-brand-text">
-                        {transaction.security?.symbol ||
-                          transaction.symbol ||
-                          "—"}
-                      </p>
+                      {transaction.security?.symbol || transaction.symbol ? (
+                        <SecuritySymbol
+                          symbol={
+                            transaction.security?.symbol || transaction.symbol
+                          }
+                        />
+                      ) : (
+                        <span>—</span>
+                      )}
                     </td>
 
                     <td className="px-4 py-4">

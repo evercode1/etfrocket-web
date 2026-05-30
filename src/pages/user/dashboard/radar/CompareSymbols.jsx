@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "react-router-dom";
 
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
+
 import {
   AlertTriangle,
   BarChart3,
@@ -297,14 +299,26 @@ export default function CompareSymbols() {
         <MetricCard
           icon={TrendingUp}
           label="Best Return"
-          value={bestReturn?.symbol || "—"}
+          value={
+            bestReturn?.symbol ? (
+              <SecuritySymbol symbol={bestReturn.symbol} />
+            ) : (
+              "—"
+            )
+          }
           detail={formatPercent(bestReturn?.total_return_percentage)}
         />
 
         <MetricCard
           icon={ShieldCheck}
           label="Strongest NAV"
-          value={strongestNav?.symbol || "—"}
+          value={
+            strongestNav?.symbol ? (
+              <SecuritySymbol symbol={strongestNav.symbol} />
+            ) : (
+              "—"
+            )
+          }
           detail={strongestNav?.nav_health || "Unknown"}
         />
       </section>
@@ -517,7 +531,7 @@ export default function CompareSymbols() {
                   className="border-t border-brand-outline text-brand-muted"
                 >
                   <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">
-                    {row.symbol}
+                    <SecuritySymbol symbol={row.symbol} />
                   </td>
 
                   <td className="px-4 py-4">{row.security_name}</td>

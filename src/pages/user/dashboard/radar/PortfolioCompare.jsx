@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
+
 import {
   BarChart3,
   Eye,
@@ -136,14 +138,26 @@ export default function PortfolioCompare() {
         <MetricCard
           icon={TrendingUp}
           label="Best 90D Return"
-          value={summary.best_total_return_symbol || "—"}
+          value={
+            summary.best_total_return_symbol ? (
+              <SecuritySymbol symbol={summary.best_total_return_symbol} />
+            ) : (
+              "—"
+            )
+          }
           detail={formatPercent(summary.best_total_return_percentage)}
         />
 
         <MetricCard
           icon={ShieldCheck}
           label="Strongest NAV"
-          value={summary.strongest_nav_symbol || "—"}
+          value={
+            summary.strongest_nav_symbol ? (
+              <SecuritySymbol symbol={summary.strongest_nav_symbol} />
+            ) : (
+              "—"
+            )
+          }
           detail={formatPercent(summary.strongest_nav_change_percentage)}
         />
       </section>
@@ -335,7 +349,8 @@ export default function PortfolioCompare() {
                           chartColors[index % chartColors.length],
                       }}
                     />
-                    {row.symbol}
+
+                    <SecuritySymbol symbol={row.symbol} />
                   </td>
 
                   <td className="px-4 py-4">{formatNumber(row.shares)}</td>

@@ -11,8 +11,6 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import { getPortfolioCardSummaries } from "../../../../api/portfolios";
-
 export default function Portfolios() {
   const [portfolios, setPortfolios] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

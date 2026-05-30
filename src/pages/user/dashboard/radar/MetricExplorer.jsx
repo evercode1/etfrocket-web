@@ -5,6 +5,8 @@ import { ArrowLeft, Filter, Trophy } from "lucide-react";
 
 import { getMetricExplorer } from "../../../../api/comparisons";
 
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
+
 export default function MetricExplorer() {
   const [metric, setMetric] = useState("total_return");
 
@@ -186,7 +188,10 @@ export default function MetricExplorer() {
                         </td>
 
                         <td className="px-4 py-4 font-display text-xl font-bold text-brand-primary">
-                          {etf.symbol}
+                          <SecuritySymbol
+                            symbol={etf.symbol}
+                            className="font-display text-xl font-bold"
+                          />
                         </td>
 
                         <td className="px-4 py-4">{etf.metric_label}</td>
@@ -230,9 +235,12 @@ function RankCard({ etf, metric }) {
         </span>
       </div>
 
-      <p className="mt-5 font-display text-4xl font-bold text-brand-primary">
-        {etf.symbol}
-      </p>
+      <div className="mt-5">
+        <SecuritySymbol
+          symbol={etf.symbol}
+          className="font-display text-4xl font-bold"
+        />
+      </div>
 
       <div className="mt-6 space-y-3">
         <MiniStat label="Metric" value={etf.metric_label} />

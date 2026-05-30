@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
 
@@ -43,7 +43,17 @@ const chartColors = [
 ];
 
 export default function CompareSymbols() {
+  const [searchParams] = useSearchParams();
+
+  const startingSymbol = searchParams.get("symbol");
+
   const [selectedSymbols, setSelectedSymbols] = useState([]);
+
+  useEffect(() => {
+    if (startingSymbol && !selectedSymbols.includes(startingSymbol)) {
+      setSelectedSymbols([startingSymbol.toUpperCase()]);
+    }
+  }, [startingSymbol]);
 
   const [mutedSymbols, setMutedSymbols] = useState([]);
 

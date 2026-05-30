@@ -56,10 +56,7 @@ import MarketSnapshot from "../pages/user/dashboard/aiSignals/MarketSnapshot";
 import MarketConditions from "../pages/user/dashboard/aiSignals/MarketConditions";
 import MarketEvents from "../pages/user/dashboard/aiSignals/MarketEvents";
 import AiInsights from "../pages/user/dashboard/aiInsights";
-
-import EtfList from "../pages/user/etfs/EtfList";
-import EtfCompare from "../pages/user/etfs/EtfCompare";
-import EtfFilters from "../pages/user/etfs/EtfFilters";
+import SymbolDetails from "../pages/user/dashboard/securities/SymbolDetails";
 
 const router = createBrowserRouter([
   {
@@ -183,18 +180,6 @@ const router = createBrowserRouter([
             element: <Settings />,
           },
           {
-            path: "etfs",
-            element: <EtfList />,
-          },
-          {
-            path: "etfs/compare",
-            element: <EtfCompare />,
-          },
-          {
-            path: "etfs/filters",
-            element: <EtfFilters />,
-          },
-          {
             path: "portfolios",
             element: <Portfolios />,
           },
@@ -294,6 +279,10 @@ const router = createBrowserRouter([
           {
             path: "ai-insights",
             element: <AiInsights />,
+          },
+          {
+            path: "securities/:symbol",
+            element: <SymbolDetails />,
           },
         ],
       },

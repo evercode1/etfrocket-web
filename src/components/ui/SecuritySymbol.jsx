@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 
 import { getSecurityHoverCard } from "../../api/securities";
 
@@ -48,19 +49,12 @@ export default function SecuritySymbol({ symbol, className = "" }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <a
-        href={data?.yahoo_finance_url}
-        target="_blank"
-        rel="noreferrer"
+      <Link
+        to={`/dashboard/securities/${symbol}`}
         className={`cursor-pointer font-semibold text-brand-primary hover:underline ${className}`}
-        onClick={(event) => {
-          if (!data?.yahoo_finance_url) {
-            event.preventDefault();
-          }
-        }}
       >
         {symbol}
-      </a>
+      </Link>
 
       {isOpen &&
         createPortal(

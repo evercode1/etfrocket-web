@@ -41,3 +41,18 @@ export async function getSecurityHoverCard(symbol) {
 
   return response.data.data;
 }
+
+export async function getSecurityDetails(
+  symbol,
+  performanceRangeTypeId,
+  startDate,
+) {
+  const response = await api.get(`/security-details/${symbol}`, {
+    params: {
+      performance_range_type_id: performanceRangeTypeId,
+      start_date: startDate,
+    },
+  });
+
+  return response.data;
+}

@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
+
+import { getSecurityDetails } from "../../../../api/securities";
 
 import {
   ArrowLeft,
@@ -29,7 +31,88 @@ export default function SymbolDetails() {
 
   const [selectedRange, setSelectedRange] = useState("1y");
 
-  const data = useMemo(() => buildMockData(symbol), [symbol]);
+  const [data, setData] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+
+        const today = new Date();
+
+        const rangeConfig = {
+          "30d": {
+            performanceRangeTypeId: 2,
+            startDate: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
+          },
+
+          "90d": {
+            performanceRangeTypeId: 3,
+            startDate: new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
+          },
+
+          YTD: {
+            performanceRangeTypeId: 4,
+            startDate: `${today.getFullYear()}-01-01`,
+          },
+
+          "1y": {
+            performanceRangeTypeId: 5,
+            startDate: new Date(
+              today.getFullYear() - 1,
+              today.getMonth(),
+              today.getDate(),
+            )
+              .toISOString()
+              .split("T")[0],
+          },
+
+          max: {
+            performanceRangeTypeId: 6,
+            startDate: "1900-01-01",
+          },
+        };
+
+        const config = rangeConfig[selectedRange];
+
+        const response = await getSecurityDetails(
+          symbol,
+          config.performanceRangeTypeId,
+          config.startDate,
+        );
+
+        setData(response.data);
+      } catch (error) {
+        console.error("Failed to load security details", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [symbol, selectedRange]);
+
+  if (loading) {
+    return (
+      <div className="glass-card rounded-3xl p-8">
+        Loading security details...
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="glass-card rounded-3xl p-8">
+        Unable to load security details.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -57,15 +140,24 @@ export default function SymbolDetails() {
             </p>
 
             <div className="mt-4 flex flex-wrap gap-3">
-              <Pill label={data.security.security_type} />
-              <Pill label={data.security.issuer} />
-              <Pill label={data.security.frequency} />
+              <Pill
+                label={data.security.security_type_name || "Unknown Type"}
+              />
+
+              <Pill label={data.security.issuer_name || "Unknown Issuer"} />
+
+              <Pill
+                label={
+                  data.security.distribution_frequency_name ||
+                  "Unknown Frequency"
+                }
+              />
             </div>
           </div>
 
           <div className="flex flex-col gap-3">
             <Link
-              to={`/dashboard/radar/compare-symbols`}
+              to={`/dashboard/radar/compare-symbols?symbol=${data.security.symbol}`}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary"
             >
               <BarChart3 className="h-4 w-4" />
@@ -73,7 +165,7 @@ export default function SymbolDetails() {
             </Link>
 
             <a
-              href={`https://finance.yahoo.com/quote/${data.security.symbol}/`}
+              href={data.security.yahoo_finance_url}
               target="_blank"
               rel="noreferrer"
               className="rocket-button-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold"
@@ -89,25 +181,25 @@ export default function SymbolDetails() {
         <MetricCard
           icon={DollarSign}
           label="Current Price"
-          value={`$${data.metrics.current_price}`}
+          value={`$${data.metrics.current_price ?? "-"}`}
         />
 
         <MetricCard
           icon={TrendingUp}
-          label="Forward Yield"
-          value={`${data.metrics.forward_yield}%`}
+          label="Total Return"
+          value={`${data.metrics.total_return ?? "-"}%`}
         />
 
         <MetricCard
           icon={ShieldCheck}
           label="NAV Health"
-          value={data.metrics.nav_health}
+          value={data.metrics.nav_health ?? "-"}
         />
 
         <MetricCard
           icon={LineChart}
           label="AUM Flow"
-          value={`${data.metrics.aum_flow}%`}
+          value={`${data.metrics.aum_flow ?? "-"}%`}
         />
       </section>
 
@@ -130,16 +222,13 @@ export default function SymbolDetails() {
               className="rounded-xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-sm font-semibold text-brand-text"
             >
               <option value="price">Price</option>
-
               <option value="nav">NAV</option>
-
               <option value="aum">AUM</option>
-
               <option value="dividend">Dividend</option>
             </select>
 
             <div className="flex overflow-hidden rounded-xl border border-brand-outline bg-brand-surfaceHigh">
-              {["30d", "90d", "1y", "3y", "max"].map((range) => (
+              {["30d", "90d", "YTD", "1y", "max"].map((range) => (
                 <button
                   key={range}
                   onClick={() => setSelectedRange(range)}
@@ -158,7 +247,7 @@ export default function SymbolDetails() {
 
         <div className="mt-8 h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <RechartsLineChart data={data.chart_rows}>
+            <RechartsLineChart data={data.chart_rows || []}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
 
               <XAxis dataKey="date" />
@@ -170,9 +259,10 @@ export default function SymbolDetails() {
               <Line
                 type="monotone"
                 dataKey={selectedMetric}
-                stroke="currentColor"
+                stroke="#2563eb"
                 strokeWidth={3}
                 dot={false}
+                connectNulls
               />
             </RechartsLineChart>
           </ResponsiveContainer>
@@ -180,9 +270,26 @@ export default function SymbolDetails() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-3">
-        {data.signals.map((signal) => (
-          <SignalCard key={signal.title} signal={signal} />
-        ))}
+        <SignalCard
+          signal={{
+            title: "Distribution Growth",
+            observation: data.signals?.distribution_growth?.label ?? "No Data",
+          }}
+        />
+
+        <SignalCard
+          signal={{
+            title: "AUM Growth",
+            observation: data.signals?.aum_growth?.label ?? "No Data",
+          }}
+        />
+
+        <SignalCard
+          signal={{
+            title: "NAV Stability",
+            observation: data.signals?.nav_stability?.label ?? "No Data",
+          }}
+        />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
@@ -202,16 +309,13 @@ export default function SymbolDetails() {
               </thead>
 
               <tbody>
-                {data.dividend_history.map((row) => (
-                  <tr
-                    key={row.ex_date}
-                    className="border-t border-brand-outline"
-                  >
-                    <td className="px-4 py-4">${row.dividend}</td>
+                {(data.dividend_history || []).map((row) => (
+                  <tr key={row.id} className="border-t border-brand-outline">
+                    <td className="px-4 py-4">${row.dividend_amount}</td>
 
-                    <td className="px-4 py-4">{row.ex_date}</td>
+                    <td className="px-4 py-4">{row.ex_dividend_date}</td>
 
-                    <td className="px-4 py-4">{row.pay_date}</td>
+                    <td className="px-4 py-4">{row.payment_date}</td>
                   </tr>
                 ))}
               </tbody>
@@ -223,81 +327,42 @@ export default function SymbolDetails() {
           <h2 className="font-display text-2xl font-bold">ETF Details</h2>
 
           <div className="mt-6 space-y-4">
-            <DetailRow label="Issuer" value={data.security.issuer} />
+            <DetailRow
+              label="Issuer"
+              value={data.security.issuer_name || "-"}
+            />
 
-            <DetailRow label="Frequency" value={data.security.frequency} />
+            <DetailRow
+              label="Frequency"
+              value={data.security.distribution_frequency_name || "-"}
+            />
 
             <DetailRow
               label="Expense Ratio"
-              value={`${data.security.expense_ratio}%`}
+              value={
+                data.security.expense_ratio
+                  ? `${data.security.expense_ratio}%`
+                  : "-"
+              }
             />
 
-            <DetailRow label="Sector" value={data.security.sector} />
+            <div className="flex justify-between border-b border-brand-outline pb-3">
+              <span className="text-brand-muted">Website</span>
 
-            <DetailRow label="Website" value={data.security.website} />
+              <a
+                href={data.security.website_url}
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-brand-primary"
+              >
+                Visit
+              </a>
+            </div>
           </div>
         </div>
       </section>
     </div>
   );
-}
-
-function buildMockData(symbol) {
-  return {
-    security: {
-      symbol: symbol || "ABNY",
-      security_name: "YieldMax ABNB Option Income Strategy ETF",
-      security_type: "ETF",
-      issuer: "YieldMax",
-      frequency: "Weekly",
-      expense_ratio: 0.99,
-      sector: "Technology",
-      website: "yieldmaxetfs.com",
-    },
-
-    metrics: {
-      current_price: 39.76,
-      forward_yield: 42.15,
-      nav_health: "Stable",
-      aum_flow: 6.72,
-    },
-
-    chart_rows: Array.from({ length: 24 }, (_, i) => ({
-      date: `M${i + 1}`,
-      price: 30 + i * 0.5,
-      nav: 28 + i * 0.4,
-      aum: 100 + i * 10,
-      dividend: 0.25 + i * 0.01,
-    })),
-
-    signals: [
-      {
-        title: "Distribution Growth",
-        observation: "Recent payouts increased.",
-      },
-      {
-        title: "Weekly Cadence",
-        observation: "Weekly schedule appears stable.",
-      },
-      {
-        title: "Income Stability",
-        observation: "Income variance remains healthy.",
-      },
-    ],
-
-    dividend_history: [
-      {
-        dividend: 0.42,
-        ex_date: "2026-05-23",
-        pay_date: "2026-05-30",
-      },
-      {
-        dividend: 0.39,
-        ex_date: "2026-05-16",
-        pay_date: "2026-05-23",
-      },
-    ],
-  };
 }
 
 function MetricCard({ icon: Icon, label, value }) {

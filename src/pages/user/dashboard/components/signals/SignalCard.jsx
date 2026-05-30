@@ -54,13 +54,13 @@ export default function SignalCard({
             </p>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              {details.affectedEtfs.length > 0 ? (
-                details.affectedEtfs.map((etf) => (
+              {details.affectedSecurities.length > 0 ? (
+                details.affectedSecurities.map((security) => (
                   <span
-                    key={etf}
+                    key={security}
                     className="rounded-full border border-brand-outline bg-brand-surface px-3 py-1 text-sm font-semibold text-brand-text"
                   >
-                    {etf}
+                    {security}
                   </span>
                 ))
               ) : (

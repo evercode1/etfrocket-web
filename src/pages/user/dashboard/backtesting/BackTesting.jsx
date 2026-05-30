@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "react-router-dom";
 
+import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
+
 import {
   ArrowLeft,
   CalendarRange,
@@ -27,7 +29,7 @@ import {
 import { runBackTest, getSecuritySelects } from "../../../../api/comparisons";
 
 export default function BackTesting() {
-  const [symbol, setSymbol] = useState("CHPY");
+  const [symbol, setSymbol] = useState(null);
 
   const [timeframe, setTimeframe] = useState("1y");
 
@@ -158,9 +160,12 @@ export default function BackTesting() {
               Current Strategy
             </p>
 
-            <p className="mt-2 font-display text-3xl font-bold text-brand-primary">
-              {symbol}
-            </p>
+            <div className="mt-2">
+              <SecuritySymbol
+                symbol={symbol}
+                className="font-display text-3xl font-bold"
+              />
+            </div>
 
             <p className="mt-2 text-sm text-brand-muted">
               Historical DRIP simulation with recurring contributions.
@@ -190,20 +195,13 @@ export default function BackTesting() {
           <div className="mt-6 space-y-5">
             <InputGroup label="ETF Symbol" icon={TrendingUp}>
               <input
-                list="etf-options"
                 value={symbol}
-                onChange={(event) => setSymbol(event.target.value)}
+                onChange={(event) =>
+                  setSymbol(event.target.value.toUpperCase())
+                }
                 placeholder="Enter ETF symbol"
                 className="w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-sm font-semibold uppercase text-brand-text outline-none transition focus:border-brand-primary"
               />
-
-              <datalist id="etf-options">
-                {etfOptions.map((etf) => (
-                  <option key={etf.id} value={etf.symbol}>
-                    {etf.symbol}
-                  </option>
-                ))}
-              </datalist>
             </InputGroup>
 
             {unsupportedSymbol && (
@@ -276,7 +274,7 @@ export default function BackTesting() {
             <button
               type="button"
               onClick={handleRunBacktest}
-              disabled={isLoading || isLoadingEtfs}
+              disabled={isLoading || isLoadingSecurities}
               className="rocket-button-primary inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-bold disabled:opacity-60"
             >
               <Play className="h-4 w-4" />

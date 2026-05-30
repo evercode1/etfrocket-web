@@ -71,6 +71,12 @@ export default function Dashboard() {
         isLoading={isLoading}
       />
 
+      <RadarSection
+        portfolioId={activePortfolioId}
+        hasPortfolio={hasPortfolio}
+        hasHoldings={hasHoldings}
+      />
+
       <SignalsSection
         signals={missionControl?.signals || []}
         portfolioId={

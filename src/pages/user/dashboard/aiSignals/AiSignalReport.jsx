@@ -6,6 +6,8 @@ import { ArrowLeft, Brain, Clock3, ShieldCheck, Sparkles } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
 
+import { getAiSignal } from "../../../../api/aiSignals";
+
 export default function AiSignalReport() {
   const { id } = useParams();
 
@@ -16,21 +18,9 @@ export default function AiSignalReport() {
   useEffect(() => {
     async function loadData() {
       try {
-        /*
-        |--------------------------------------------------------------------------
-        | TODO
-        |--------------------------------------------------------------------------
-        |
-        | Replace this once the endpoint exists:
-        |
-        | const response =
-        |     await getAiSignal(id);
-        |
-        | setSignal(response.data);
-        |
-        */
+        const response = await getAiSignal(id);
 
-        console.log("Load AI Signal Report", id);
+        setSignal(response.data);
       } catch (error) {
         console.error("Failed to load AI signal", error);
       } finally {

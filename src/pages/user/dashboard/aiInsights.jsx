@@ -13,7 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import { getImportLogs } from "../../../api/monitoring";
+import { getAiSignals } from "../../../api/aiSignals";
 
 export default function AiInsights() {
   const [insights, setInsights] = useState([]);
@@ -25,18 +25,11 @@ export default function AiInsights() {
   useEffect(() => {
     async function loadInsights() {
       try {
-        const response = await getImportLogs();
+        const response = await getAiSignals();
 
-        const filteredInsights = response.logs.data.filter((item) =>
-          [
-            "Market Snapshot",
-            "Market Conditions",
-            "Market Events",
-            "ETF Watchlist",
-          ].includes(item.import_type_name),
-        );
+        setInsights(response.data);
 
-        setInsights(filteredInsights);
+        console.log(response.data);
       } catch (err) {
         setError("Failed to load AI insights.");
       } finally {
@@ -48,7 +41,7 @@ export default function AiInsights() {
   }, []);
 
   const successfulInsights = useMemo(() => {
-    return insights.filter((item) => item.status_name === "COMPLETED").length;
+    return insights.filter((item) => item.is_active).length;
   }, [insights]);
 
   return (
@@ -140,30 +133,26 @@ export default function AiInsights() {
                   <div className="flex items-center gap-3">
                     <span
                       className={`rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
-                        item.status_name === "COMPLETED"
+                        item.is_active
                           ? "border border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
                           : "border border-amber-400/20 bg-amber-400/10 text-amber-300"
                       }`}
                     >
-                      {item.status_name}
+                      {item.is_active ? "ACTIVE" : "INACTIVE"}
                     </span>
 
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Clock3 className="h-4 w-4" />
-
-                      {formatDate(item.started_at)}
+                      {formatDate(item.generated_at)}
                     </div>
                   </div>
 
                   <h3 className="mt-5 font-display text-3xl font-bold text-white">
-                    {item.import_type_name}
+                    {item.title}
                   </h3>
 
-                  <div className="mt-6 prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-strong:text-cyan-300 prose-li:text-slate-300">
-                    <ReactMarkdown>
-                      {item.generated_markdown ||
-                        "No generated content available."}
-                    </ReactMarkdown>
+                  <div className="mt-6">
+                    <p className="text-slate-300">{item.subtitle}</p>
                   </div>
                 </div>
 

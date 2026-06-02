@@ -65,6 +65,22 @@ export default function TelemetrySection({
         >
           <div className="mt-6 space-y-3">
             <Link
+              to="/dashboard/signals/watchlist"
+              className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
+            >
+              <div>
+                <p className="font-semibold text-brand-text transition group-hover:text-brand-primary">
+                  AI ETF Watchlist
+                </p>
+
+                <p className="mt-1 text-sm text-brand-muted">
+                  Top ETFs based on AI analysis.
+                </p>
+              </div>
+
+              <ArrowRight className="h-5 w-5 text-brand-muted transition group-hover:text-brand-primary" />
+            </Link>
+            <Link
               to="/dashboard/signals/market-snapshot"
               className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
             >

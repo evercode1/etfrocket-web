@@ -28,9 +28,12 @@ export default function AiInsights() {
         const response = await getImportLogs();
 
         const filteredInsights = response.logs.data.filter((item) =>
-          ["Market Snapshot", "Market Conditions", "Market Events"].includes(
-            item.import_type_name,
-          ),
+          [
+            "Market Snapshot",
+            "Market Conditions",
+            "Market Events",
+            "ETF Watchlist",
+          ].includes(item.import_type_name),
         );
 
         setInsights(filteredInsights);
@@ -166,7 +169,7 @@ export default function AiInsights() {
 
                 <div className="flex-shrink-0">
                   <Link
-                    to={`/admin/import-detail/${item.id}`}
+                    to={`/dashboard/signals/report/${item.id}`}
                     className="flex items-center gap-2 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400/20"
                   >
                     View Full Report

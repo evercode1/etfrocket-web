@@ -1,53 +1,40 @@
 import { useEffect, useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { ArrowLeft, Brain, Clock3, ShieldCheck, Sparkles } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
 
-import { getAiSignals } from "../../../../api/aiSignals";
+import { getAiSignal } from "../../../../api/aiSignals";
 
-const signalTypeMap = {
-  snapshot: 1,
-  conditions: 2,
-  events: 3,
-  watchlist: 4,
-};
+export default function AiSignalReport() {
+  const { id } = useParams();
 
-export default function AiSignalsPage({ type = "snapshot" }) {
   const [loading, setLoading] = useState(true);
 
   const [signal, setSignal] = useState(null);
 
-  const [market, setMarket] = useState(null);
-
   useEffect(() => {
     async function loadData() {
       try {
-        const response = await getAiSignals();
+        const response = await getAiSignal(id);
 
-        setMarket(response.market);
-
-        const matchedSignal = response.data.find(
-          (item) => item.signal_type_id === signalTypeMap[type],
-        );
-
-        setSignal(matchedSignal || null);
+        setSignal(response.data);
       } catch (error) {
-        console.error("Failed to load AI signals", error);
+        console.error("Failed to load AI signal", error);
       } finally {
         setLoading(false);
       }
     }
 
     loadData();
-  }, [type]);
+  }, [id]);
 
   if (loading) {
     return (
       <div className="glass-card rounded-3xl p-10 text-center text-brand-muted">
-        Loading AI signals...
+        Loading AI report...
       </div>
     );
   }
@@ -55,22 +42,20 @@ export default function AiSignalsPage({ type = "snapshot" }) {
   if (!signal) {
     return (
       <div className="glass-card rounded-3xl p-10 text-center text-brand-muted">
-        No AI signal available.
+        AI report not found.
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-
       <section className="glass-card rounded-3xl p-8">
         <Link
-          to="/dashboard"
+          to="/dashboard/ai-insights"
           className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
+          Back to AI Insights
         </Link>
 
         <div className="mt-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -87,8 +72,6 @@ export default function AiSignalsPage({ type = "snapshot" }) {
               {signal.subtitle}
             </p>
           </div>
-
-          {/* Status Card */}
 
           <div className="glass-card min-w-[280px] rounded-3xl border border-brand-outline p-6">
             <div className="flex items-center gap-3">
@@ -116,50 +99,52 @@ export default function AiSignalsPage({ type = "snapshot" }) {
 
               <TelemetryRow
                 icon={Clock3}
-                label="Market Status"
-                value={market?.status || "UNKNOWN"}
+                label="Generated"
+                value={
+                  signal.generated_at
+                    ? new Date(signal.generated_at).toLocaleDateString()
+                    : "-"
+                }
               />
 
               <TelemetryRow
                 icon={Sparkles}
-                label="Signal Source"
-                value="AI Telemetry"
+                label="Model"
+                value={signal.ai_model}
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-
       <section className="grid gap-6 xl:grid-cols-[1fr_340px]">
-        {/* Markdown */}
-
         <div className="glass-card rounded-3xl p-8">
           <div className="prose prose-invert max-w-none prose-headings:font-display prose-headings:text-white prose-p:text-brand-muted prose-strong:text-brand-primary prose-li:text-brand-muted">
             <ReactMarkdown>{signal.markdown_content}</ReactMarkdown>
           </div>
         </div>
 
-        {/* Sidebar */}
-
         <div className="space-y-6">
           <SignalCard
-            title="AI Signal Status"
-            value={market?.status || "UNKNOWN"}
-            subtitle="Market telemetry feed"
+            title="Signal Type"
+            value={signal.signal_type?.signal_type_name ?? "Unknown"}
+            subtitle="Historical AI report"
+          />
+
+          <SignalCard
+            title="Generated"
+            value={
+              signal.generated_at
+                ? new Date(signal.generated_at).toLocaleDateString()
+                : "-"
+            }
+            subtitle="Report generation date"
           />
 
           <SignalCard
             title="Model"
             value={signal.ai_model}
-            subtitle="Active AI generation model"
-          />
-
-          <SignalCard
-            title="Signal Type"
-            value={signal.signal_type?.signal_type_name || "Unknown"}
-            subtitle="Current intelligence category"
+            subtitle="AI model used"
           />
         </div>
       </section>

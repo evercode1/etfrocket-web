@@ -7,3 +7,9 @@ export async function getAiSignals() {
 
   return response.data;
 }
+
+export async function getAiSignal(id) {
+  const response = await api.get(`/show-ai-signal/${id}`);
+
+  return response.data;
+}

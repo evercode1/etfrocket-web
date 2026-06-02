@@ -55,8 +55,10 @@ import BackTesting from "../pages/user/dashboard/backtesting/BackTesting";
 import MarketSnapshot from "../pages/user/dashboard/aiSignals/MarketSnapshot";
 import MarketConditions from "../pages/user/dashboard/aiSignals/MarketConditions";
 import MarketEvents from "../pages/user/dashboard/aiSignals/MarketEvents";
+import EtfWatchlist from "../pages/user/dashboard/aiSignals/EtfWatchlist";
 import AiInsights from "../pages/user/dashboard/aiInsights";
 import SymbolDetails from "../pages/user/dashboard/securities/SymbolDetails";
+import AiSignalReport from "../pages/user/dashboard/aiSignals/AiSignalReport";
 
 const router = createBrowserRouter([
   {
@@ -250,6 +252,11 @@ const router = createBrowserRouter([
             path: "backtesting",
             element: <BackTesting />,
           },
+
+          {
+            path: "signals/watchlist",
+            element: <EtfWatchlist />,
+          },
           {
             path: "signals/market-snapshot",
             element: <MarketSnapshot />,
@@ -263,6 +270,12 @@ const router = createBrowserRouter([
           {
             path: "signals/market-events",
             element: <MarketEvents />,
+          },
+
+          {
+            path: "signals/report/:id",
+
+            element: <AiSignalReport />,
           },
           {
             path: "support",

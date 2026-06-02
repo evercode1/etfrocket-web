@@ -84,12 +84,6 @@ export default function Dashboard() {
         }
       />
 
-      <RadarSection
-        portfolioId={activePortfolioId}
-        hasPortfolio={hasPortfolio}
-        hasHoldings={hasHoldings}
-      />
-
       <TelemetrySection
         portfolioId={activePortfolioId}
         hasPortfolio={hasPortfolio}

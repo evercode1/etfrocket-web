@@ -22,7 +22,11 @@ export default function AiSignalReport() {
 
         setSignal(response.data);
       } catch (error) {
-        console.error("Failed to load AI signal", error);
+        console.error(
+          "Failed to load AI signal",
+
+          error,
+        );
       } finally {
         setLoading(false);
       }
@@ -45,6 +49,47 @@ export default function AiSignalReport() {
         AI report not found.
       </div>
     );
+  }
+
+  const relatedSymbols = extractSymbols(signal);
+
+  function extractSymbols(signal) {
+    if (!signal?.payload_json?.signal_payload) {
+      return [];
+    }
+
+    const markdown = signal.markdown_content ?? "";
+
+    const payload = signal.payload_json.signal_payload;
+
+    const candidates = [
+      ...(payload.top_performers ?? []),
+      ...(payload.price_movers ?? []),
+      ...(payload.aum_growth ?? []),
+      ...(payload.nav_health ?? []),
+    ];
+
+    const seen = new Set();
+
+    return candidates
+      .map((item) => item.symbol)
+      .filter(Boolean)
+      .filter((symbol) => {
+        if (seen.has(symbol)) {
+          return false;
+        }
+
+        seen.add(symbol);
+
+        const escapedSymbol = symbol.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const regex = new RegExp(
+          `(^|[^A-Z0-9])${escapedSymbol}([^A-Z0-9]|$)`,
+          "i",
+        );
+
+        return regex.test(markdown);
+      });
   }
 
   return (
@@ -125,6 +170,25 @@ export default function AiSignalReport() {
         </div>
 
         <div className="space-y-6">
+          {relatedSymbols.length > 0 && (
+            <div className="glass-card rounded-3xl p-6">
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-muted">
+                ETFs Mentioned
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {relatedSymbols.map((symbol) => (
+                  <Link
+                    key={symbol}
+                    to={`/dashboard/securities/${symbol}`}
+                    className="rounded-xl border border-brand-primary/30 bg-brand-primary/10 px-3 py-2 text-sm font-semibold text-brand-primary transition hover:bg-brand-primary/20"
+                  >
+                    {symbol}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
           <SignalCard
             title="Signal Type"
             value={signal.signal_type?.signal_type_name ?? "Unknown"}
@@ -150,6 +214,35 @@ export default function AiSignalReport() {
       </section>
     </div>
   );
+}
+
+function extractSymbols(signal) {
+  if (!signal?.payload_json?.signal_payload) {
+    return [];
+  }
+
+  const markdown = signal.markdown_content ?? "";
+
+  const payload = signal.payload_json.signal_payload;
+
+  const symbols = new Set();
+
+  [
+    payload.top_performers,
+    payload.price_movers,
+    payload.aum_growth,
+    payload.nav_health,
+  ]
+    .filter(Boolean)
+    .forEach((group) => {
+      group.forEach((item) => {
+        if (item.symbol && markdown.includes(item.symbol)) {
+          symbols.add(item.symbol);
+        }
+      });
+    });
+
+  return [...symbols];
 }
 
 function TelemetryRow({ icon: Icon, label, value }) {

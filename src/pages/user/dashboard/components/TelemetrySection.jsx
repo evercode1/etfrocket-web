@@ -115,24 +115,6 @@ export default function TelemetrySection({
 
               <ArrowRight className="h-5 w-5 text-brand-muted transition group-hover:text-brand-primary" />
             </Link>
-
-            <Link
-              to="/dashboard/signals/market-events"
-              className="group flex items-center justify-between rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-5 py-4 transition hover:border-brand-primary hover:bg-brand-surfaceHighest"
-            >
-              <div>
-                <p className="font-semibold text-brand-text transition group-hover:text-brand-primary">
-                  AI Market Events
-                </p>
-
-                <p className="mt-1 text-sm text-brand-muted">
-                  Upcoming economic events, earnings, Fed activity, and
-                  catalysts impacting markets.
-                </p>
-              </div>
-
-              <ArrowRight className="h-5 w-5 text-brand-muted transition group-hover:text-brand-primary" />
-            </Link>
           </div>
         </TelemetryCard>
 

@@ -30,6 +30,9 @@ import SystemMonitoring from "../pages/admin/system/SystemMonitoring";
 import CronReports from "../pages/admin/system/CronReports";
 import ImportList from "../pages/admin/system/ImportList";
 import ImportDetail from "../pages/admin/system/ImportDetail";
+import SecurityManagement from "../pages/admin/securities/SecurityManagement";
+import CreateSecurity from "../pages/admin/securities/CreateSecurity";
+import EditSecurity from "../pages/admin/securities/EditSecurity";
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
@@ -165,6 +168,21 @@ const router = createBrowserRouter([
           {
             path: "import-detail/:id",
             element: <ImportDetail />,
+          },
+          {
+            path: "securities",
+
+            element: <SecurityManagement />,
+          },
+          {
+            path: "securities/create",
+
+            element: <CreateSecurity />,
+          },
+          {
+            path: "securities/:id/edit",
+
+            element: <EditSecurity />,
           },
         ],
       },

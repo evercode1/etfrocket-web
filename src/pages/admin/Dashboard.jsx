@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Database, LifeBuoy, UsersRound } from "lucide-react";
+import { Database, LifeBuoy, UsersRound, Landmark } from "lucide-react";
 
 import UserSignupChart from "../../components/charts/UserSignupChart";
 
@@ -28,6 +28,14 @@ const adminSections = [
     icon: Database,
     status: "Active",
   },
+  {
+    title: "Security Management",
+    description:
+      "Create, edit, retire, and manage securities, details, issuers, and update schedules.",
+    href: "/admin/securities",
+    icon: Landmark,
+    status: "Active",
+  },
 ];
 
 export default function AdminDashboard() {
@@ -50,7 +58,7 @@ export default function AdminDashboard() {
 
       <UserSignupChart />
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {adminSections.map((section) => {
           const Icon = section.icon;
 

@@ -461,6 +461,36 @@ export default function SecurityManagement() {
                 )}
               </tbody>
             </table>
+            <div className="flex flex-col gap-4 border-t border-brand-outline bg-brand-surfaceHigh/20 px-6 py-5 md:flex-row md:items-center md:justify-between">
+              <div className="text-sm text-brand-muted">
+                Showing{" "}
+                <span className="font-semibold text-brand-text">1–25</span> of{" "}
+                <span className="font-semibold text-brand-text">247</span>{" "}
+                securities
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
+                  Previous
+                </button>
+
+                <button className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-semibold text-black">
+                  1
+                </button>
+
+                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
+                  2
+                </button>
+
+                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
+                  3
+                </button>
+
+                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

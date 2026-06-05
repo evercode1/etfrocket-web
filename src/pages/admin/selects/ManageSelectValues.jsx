@@ -1,9 +1,44 @@
+import { useEffect, useState } from "react";
+
 import { useParams, Link } from "react-router-dom";
+
+import { getAdminSelect } from "../../../api/adminSelects";
 
 import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 
 export default function ManageSelectValues() {
   const { key } = useParams();
+
+  const [config, setConfig] = useState(null);
+
+  const [rows, setRows] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+  useEffect(() => {
+    loadData();
+  }, [key]);
+
+  async function loadData() {
+    try {
+      setLoading(true);
+
+      setError("");
+
+      const response = await getAdminSelect(key);
+
+      setConfig(response.config);
+
+      setRows(response.rows ?? []);
+    } catch (error) {
+      console.error(error);
+
+      setError("Unable to load select values.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -30,12 +65,14 @@ export default function ManageSelectValues() {
         </p>
       </div>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        <StatCard label="Total Values" value="0" />
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Total Values" value={rows.length} />
 
-        <StatCard label="Editable" value="Yes" />
+        <StatCard label="Create" value={config?.allow_create ? "Yes" : "No"} />
 
-        <StatCard label="Deletable" value="No" />
+        <StatCard label="Update" value={config?.allow_update ? "Yes" : "No"} />
+
+        <StatCard label="Delete" value={config?.allow_delete ? "Yes" : "No"} />
       </section>
 
       <section className="glass-card rounded-3xl p-6">
@@ -48,13 +85,15 @@ export default function ManageSelectValues() {
             </p>
           </div>
 
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-5 py-3 font-semibold text-black transition hover:opacity-90"
-          >
-            <Plus className="h-4 w-4" />
-            Add Value
-          </button>
+          {config?.allow_create && (
+            <button
+              type="button"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-5 py-3 font-semibold text-black transition hover:opacity-90"
+            >
+              <Plus className="h-4 w-4" />
+              Add Value
+            </button>
+          )}
         </div>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
@@ -70,14 +109,55 @@ export default function ManageSelectValues() {
             </thead>
 
             <tbody>
-              <tr>
-                <td
-                  colSpan={3}
-                  className="px-6 py-12 text-center text-brand-muted"
-                >
-                  No values loaded yet.
-                </td>
-              </tr>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-6 py-12 text-center text-brand-muted"
+                  >
+                    Loading values...
+                  </td>
+                </tr>
+              ) : rows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-6 py-12 text-center text-brand-muted"
+                  >
+                    No values configured.
+                  </td>
+                </tr>
+              ) : (
+                rows.map((row) => (
+                  <tr key={row.id} className="border-t border-brand-outline">
+                    <td className="px-5 py-5">{row.id}</td>
+
+                    <td className="px-5 py-5">{row.name}</td>
+
+                    <td className="px-5 py-5">
+                      <div className="flex items-center gap-3">
+                        {config?.allow_update && (
+                          <button
+                            type="button"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        )}
+
+                        {config?.allow_delete && (
+                          <button
+                            type="button"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 transition hover:bg-red-500/20"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

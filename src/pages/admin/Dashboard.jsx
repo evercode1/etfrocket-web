@@ -6,6 +6,7 @@ import {
   UsersRound,
   Landmark,
   Building2,
+  ListChecks,
 } from "lucide-react";
 
 import UserSignupChart from "../../components/charts/UserSignupChart";
@@ -95,6 +96,14 @@ const secondarySections = [
     icon: Building2,
     status: "Active",
   },
+  {
+    title: "Select Management",
+    description:
+      "Manage lookup values and reference data used throughout ETF Rocket.",
+    href: "/admin/selects",
+    icon: ListChecks,
+    status: "Active",
+  },
 ];
 
 export default function AdminDashboard() {
@@ -157,7 +166,7 @@ export default function AdminDashboard() {
 
       {/* Reference Data Modules */}
 
-      <section className="grid gap-6 md:grid-cols-2">
+      <section className="grid gap-6 xl:grid-cols-3">
         {secondarySections.map((section) => {
           const Icon = section.icon;
 

@@ -2,11 +2,27 @@ import { useEffect, useState } from "react";
 
 import { useParams, Link } from "react-router-dom";
 
-import { getAdminSelect } from "../../../api/adminSelects";
+import {
+  getAdminSelect,
+  createAdminSelectValue,
+  updateAdminSelectValue,
+  deleteAdminSelectValue,
+} from "../../../api/adminSelects";
+
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 
 export default function ManageSelectValues() {
+  const [showModal, setShowModal] = useState(false);
+
+  const [editingRow, setEditingRow] = useState(null);
+
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const [name, setName] = useState("");
+
+  const [saving, setSaving] = useState(false);
   const { key } = useParams();
 
   const [config, setConfig] = useState(null);
@@ -37,6 +53,62 @@ export default function ManageSelectValues() {
       setError("Unable to load select values.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function handleCreate() {
+    setEditingRow(null);
+
+    setName("");
+
+    setShowModal(true);
+  }
+
+  function handleEdit(row) {
+    setEditingRow(row);
+
+    setName(row.name);
+
+    setShowModal(true);
+  }
+
+  async function handleSave() {
+    try {
+      setSaving(true);
+
+      if (editingRow) {
+        await updateAdminSelectValue(key, editingRow.id, {
+          name,
+        });
+      } else {
+        await createAdminSelectValue(key, {
+          name,
+        });
+      }
+
+      setShowModal(false);
+
+      await loadData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      setSaving(true);
+
+      await deleteAdminSelectValue(key, deleteTarget.id);
+
+      setDeleteTarget(null);
+
+      await loadData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -88,6 +160,7 @@ export default function ManageSelectValues() {
           {config?.allow_create && (
             <button
               type="button"
+              onClick={handleCreate}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-5 py-3 font-semibold text-black transition hover:opacity-90"
             >
               <Plus className="h-4 w-4" />
@@ -136,18 +209,18 @@ export default function ManageSelectValues() {
 
                     <td className="px-5 py-5">
                       <div className="flex items-center gap-3">
-                        {config?.allow_update && (
-                          <button
-                            type="button"
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(row)}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
 
                         {config?.allow_delete && (
                           <button
                             type="button"
+                            onClick={() => setDeleteTarget(row)}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 transition hover:bg-red-500/20"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -162,6 +235,54 @@ export default function ManageSelectValues() {
           </table>
         </div>
       </section>
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-md rounded-3xl border border-brand-outline bg-brand-surface p-6">
+            <h3 className="font-display text-2xl font-bold">
+              <h3 className="font-display text-2xl font-bold">
+                {editingRow
+                  ? `Edit ${config?.label?.slice(0, -1) ?? "Value"}`
+                  : `Add ${config?.label?.slice(0, -1) ?? "Value"}`}
+              </h3>
+            </h3>
+
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="mt-6 w-full rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3"
+            />
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="rounded-2xl border border-brand-outline px-4 py-2"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={saving}
+                className="rounded-2xl bg-brand-primary px-4 py-2 font-semibold text-black"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        title={`Delete ${config?.label?.slice(0, -1) ?? "Value"}?`}
+        message={deleteTarget ? `Delete "${deleteTarget.name}"?` : ""}
+        confirmLabel="Delete"
+        loading={saving}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

@@ -61,7 +61,11 @@ export default function EditEtfIssuer() {
         selectsResponse.data?.statuses,
       );
 
-      setStatuses(normalizedStatuses);
+      const filteredStatuses = normalizedStatuses.filter((status) =>
+        ["Active", "Retired"].includes(status.name),
+      );
+
+      setStatuses(filteredStatuses);
 
       const issuer = issuerResponse.data;
 

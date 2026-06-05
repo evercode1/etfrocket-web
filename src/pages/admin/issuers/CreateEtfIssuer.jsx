@@ -39,11 +39,15 @@ export default function CreateEtfIssuer() {
 
       const normalizedStatuses = normalizeSelects(response.data?.statuses);
 
-      setStatuses(normalizedStatuses);
+      const filteredStatuses = normalizedStatuses.filter((status) =>
+        ["Active", "Retired"].includes(status.name),
+      );
+
+      setStatuses(filteredStatuses);
 
       const activeStatusId =
-        findOptionId(normalizedStatuses, "Active") ??
-        normalizedStatuses[0]?.id ??
+        findOptionId(filteredStatuses, "Active") ??
+        filteredStatuses[0]?.id ??
         "";
 
       setForm((previous) => ({

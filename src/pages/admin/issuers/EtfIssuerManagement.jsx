@@ -1,6 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
+
+import {
+  listEtfIssuers,
+  retireEtfIssuer,
+  etfIssuerSelects,
+} from "../../../api/adminEtfIssuers";
 
 import {
   Archive,
@@ -14,57 +20,109 @@ import {
 
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
-const mockIssuers = [
-  {
-    id: 1,
-    etf_issuer_name: "YieldMax",
-    website_url: "https://yieldmaxetfs.com",
-    status: "Active",
-    updated_at: "2026-06-04",
-  },
-  {
-    id: 2,
-    etf_issuer_name: "Roundhill",
-    website_url: "https://roundhillinvestments.com",
-    status: "Active",
-    updated_at: "2026-06-03",
-  },
-  {
-    id: 3,
-    etf_issuer_name: "NEOS",
-    website_url: "https://neosfunds.com",
-    status: "Retired",
-    updated_at: "2026-05-15",
-  },
-];
-
 export default function EtfIssuerManagement() {
+  const [issuers, setIssuers] = useState([]);
+
+  const [pagination, setPagination] = useState(null);
+
+  const [meta, setMeta] = useState({
+    total_active: 0,
+    total_retired: 0,
+  });
+
   const [search, setSearch] = useState("");
 
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  const [retiring, setRetiring] = useState(false);
 
   const [issuerToRetire, setIssuerToRetire] = useState(null);
 
-  const filteredIssuers = useMemo(() => {
-    return mockIssuers.filter((issuer) => {
-      const matchesSearch =
-        issuer.etf_issuer_name.toLowerCase().includes(search.toLowerCase()) ||
-        issuer.website_url.toLowerCase().includes(search.toLowerCase());
+  const [statuses, setStatuses] = useState([]);
 
-      const matchesStatus =
-        statusFilter === "all" || issuer.status.toLowerCase() === statusFilter;
+  useEffect(() => {
+    loadSelects();
+  }, []);
 
-      return matchesSearch && matchesStatus;
-    });
+  useEffect(() => {
+    loadData();
   }, [search, statusFilter]);
 
-  const activeCount = mockIssuers.filter(
-    (issuer) => issuer.status === "Active",
-  ).length;
+  async function loadSelects() {
+    try {
+      const response = await etfIssuerSelects();
 
-  const retiredCount = mockIssuers.filter(
-    (issuer) => issuer.status === "Retired",
-  ).length;
+      setStatuses(
+        normalizeSelects(response.data.statuses).filter((status) =>
+          ["Active", "Retired"].includes(status.name),
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function loadData(page = 1) {
+    try {
+      setLoading(true);
+
+      const response = await listEtfIssuers({
+        page,
+
+        search,
+
+        status_id: statusFilter || undefined,
+      });
+
+      console.log(response);
+
+      setIssuers(response.data.data);
+
+      setPagination(response.data);
+
+      setMeta(
+        response.meta ?? {
+          total_active: 0,
+
+          total_retired: 0,
+        },
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+
+      setInitialLoading(false);
+    }
+  }
+
+  if (initialLoading) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+            ETF Issuer Management
+          </p>
+
+          <h1 className="mt-3 font-display text-4xl font-bold">ETF Issuers</h1>
+
+          <p className="mt-3 text-brand-muted">Loading issuers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  function formatDate(value) {
+    if (!value) {
+      return "—";
+    }
+
+    return new Date(value).toLocaleString();
+  }
 
   return (
     <div className="space-y-8">
@@ -89,15 +147,13 @@ export default function EtfIssuerManagement() {
           Add ETF Issuer
         </Link>
       </div>
-
       <section className="grid gap-6 md:grid-cols-3">
-        <StatCard label="Total Issuers" value={mockIssuers.length} />
+        <StatCard label="Total Issuers" value={pagination?.total ?? 0} />
 
-        <StatCard label="Active" value={activeCount} />
+        <StatCard label="Active" value={meta.total_active ?? 0} />
 
-        <StatCard label="Retired" value={retiredCount} />
+        <StatCard label="Retired" value={meta.total_retired ?? 0} />
       </section>
-
       <section className="glass-card rounded-3xl p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="relative w-full max-w-2xl">
@@ -116,11 +172,13 @@ export default function EtfIssuerManagement() {
             onChange={(event) => setStatusFilter(event.target.value)}
             className="rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-brand-text outline-none transition focus:border-brand-primary"
           >
-            <option value="all">All Statuses</option>
+            <option value="">All Statuses</option>
 
-            <option value="active">Active</option>
-
-            <option value="retired">Retired</option>
+            {statuses.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -142,7 +200,7 @@ export default function EtfIssuerManagement() {
               </thead>
 
               <tbody>
-                {filteredIssuers.length === 0 ? (
+                {issuers.length === 0 ? (
                   <tr>
                     <td
                       colSpan={5}
@@ -152,7 +210,7 @@ export default function EtfIssuerManagement() {
                     </td>
                   </tr>
                 ) : (
-                  filteredIssuers.map((issuer) => (
+                  issuers.map((issuer) => (
                     <tr
                       key={issuer.id}
                       className="border-t border-brand-outline transition hover:bg-brand-surfaceHigh/60"
@@ -185,7 +243,7 @@ export default function EtfIssuerManagement() {
                         <StatusBadge status={issuer.status} />
                       </TableCell>
 
-                      <TableCell>{issuer.updated_at}</TableCell>
+                      <TableCell>{formatDate(issuer.updated_at)}</TableCell>
 
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -217,14 +275,13 @@ export default function EtfIssuerManagement() {
             <div className="text-sm text-brand-muted">
               Showing{" "}
               <span className="font-semibold text-brand-text">
-                {filteredIssuers.length}
+                {pagination?.total ?? 0}
               </span>{" "}
               issuers
             </div>
           </div>
         </div>
       </section>
-
       <ConfirmDialog
         isOpen={Boolean(issuerToRetire)}
         title="Retire ETF Issuer?"
@@ -234,11 +291,24 @@ export default function EtfIssuerManagement() {
             : ""
         }
         confirmLabel="Retire Issuer"
-        onConfirm={() => {
-          console.log("Retire issuer", issuerToRetire?.id);
+        loading={retiring}
+        onConfirm={async () => {
+          try {
+            setRetiring(true);
+
+            await retireEtfIssuer(issuerToRetire.id);
+
+            setIssuerToRetire(null);
+
+            await loadData();
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setRetiring(false);
+          }
         }}
         onCancel={() => setIssuerToRetire(null)}
-      />
+      />{" "}
     </div>
   );
 }
@@ -289,4 +359,22 @@ function StatusBadge({ status }) {
       {status}
     </span>
   );
+}
+
+function normalizeSelects(selects) {
+  if (!selects) {
+    return [];
+  }
+
+  if (Array.isArray(selects)) {
+    return selects.map((option) => ({
+      id: String(option.id),
+      name: option.name,
+    }));
+  }
+
+  return Object.entries(selects).map(([id, name]) => ({
+    id: String(id),
+    name,
+  }));
 }

@@ -56,7 +56,13 @@ export default function SecurityManagement() {
     try {
       const response = await securityDataSelects();
 
-      setStatuses(normalizeSelects(response.data?.statuses));
+      const normalizedStatuses = normalizeSelects(response.data?.statuses);
+
+      const filteredStatuses = normalizedStatuses.filter((status) =>
+        ["Active", "Retired"].includes(status.name),
+      );
+
+      setStatuses(filteredStatuses);
     } catch (error) {
       console.error(error);
     }

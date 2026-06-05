@@ -11,7 +11,7 @@ import {
   ShieldOff,
 } from "lucide-react";
 
-import ConfirmDialog from "../../../components/UI/ConfirmDialog";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 import {
   listSecuritiesData,

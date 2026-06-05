@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { AlertTriangle, ArrowLeft, Plus, Save, Trash2 } from "lucide-react";
 
-import ConfirmDialog from "../../../components/UI/ConfirmDialog";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 import {
   retireSecurityData,

@@ -1,278 +1,152 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
 import {
+  Archive,
   Pencil,
   Plus,
   Search,
-  Trash2,
   ShieldCheck,
   ShieldOff,
 } from "lucide-react";
 
-const mockLookups = {
-  statuses: [
-    {
-      id: 1,
-      name: "Active",
-    },
-    {
-      id: 2,
-      name: "Retired",
-    },
-    {
-      id: 3,
-      name: "Pending",
-    },
-  ],
+import ConfirmDialog from "../../../components/UI/ConfirmDialog";
 
-  securityTypes: [
-    {
-      id: 1,
-      name: "ETF",
-    },
-    {
-      id: 2,
-      name: "Stock",
-    },
-  ],
-
-  etfIssuers: [
-    {
-      id: 1,
-      name: "YieldMax",
-    },
-    {
-      id: 2,
-      name: "Roundhill",
-    },
-    {
-      id: 3,
-      name: "NEOS",
-    },
-    {
-      id: 4,
-      name: "REX Shares",
-    },
-  ],
-
-  etfStrategyTypes: [
-    {
-      id: 1,
-      name: "Option Income",
-    },
-    {
-      id: 2,
-      name: "Covered Call",
-    },
-    {
-      id: 3,
-      name: "High Income",
-    },
-    {
-      id: 4,
-      name: "Growth Income",
-    },
-  ],
-
-  distributionFrequencies: [
-    {
-      id: 1,
-      name: "Weekly",
-    },
-    {
-      id: 2,
-      name: "Monthly",
-    },
-    {
-      id: 3,
-      name: "Quarterly",
-    },
-  ],
-};
-
-const mockSecurities = [
-  {
-    id: 1,
-    security_type_id: 1,
-    status_id: 1,
-    symbol: "CHPY",
-
-    detail: {
-      security_name: "YieldMax Semiconductor Portfolio Option Income ETF",
-      etf_issuer_id: 1,
-      etf_strategy_type_id: 1,
-      distribution_frequency_id: 2,
-      expense_ratio: "0.9900",
-      website_url: "https://www.yieldmaxetfs.com",
-      notes: "Semiconductor-focused option income ETF.",
-    },
-
-    schedules: [
-      {
-        id: 1,
-        security_update_type_name: "Price History",
-        run_day: 1,
-        run_hour: 2,
-        status_id: 1,
-        last_run_at: "2026-06-02 02:00:00",
-      },
-      {
-        id: 2,
-        security_update_type_name: "Dividend History",
-        run_day: 5,
-        run_hour: 4,
-        status_id: 1,
-        last_run_at: "2026-06-01 04:00:00",
-      },
-    ],
-  },
-
-  {
-    id: 2,
-    security_type_id: 1,
-    status_id: 1,
-    symbol: "AAPW",
-
-    detail: {
-      security_name: "Roundhill AAPL WeeklyPay ETF",
-      etf_issuer_id: 2,
-      etf_strategy_type_id: 2,
-      distribution_frequency_id: 1,
-      expense_ratio: "0.9900",
-      website_url: "https://www.roundhillinvestments.com",
-      notes: "Weekly income strategy linked to AAPL.",
-    },
-
-    schedules: [
-      {
-        id: 3,
-        security_update_type_name: "Price History",
-        run_day: 1,
-        run_hour: 2,
-        status_id: 1,
-        last_run_at: "2026-06-02 02:00:00",
-      },
-    ],
-  },
-
-  {
-    id: 3,
-    security_type_id: 1,
-    status_id: 1,
-    symbol: "NVII",
-
-    detail: {
-      security_name: "NEOS Nasdaq-100 High Income ETF",
-      etf_issuer_id: 3,
-      etf_strategy_type_id: 3,
-      distribution_frequency_id: 2,
-      expense_ratio: "0.6800",
-      website_url: "https://neosfunds.com",
-      notes: "Nasdaq-focused income ETF.",
-    },
-
-    schedules: [
-      {
-        id: 4,
-        security_update_type_name: "Price History",
-        run_day: 1,
-        run_hour: 3,
-        status_id: 1,
-        last_run_at: "2026-06-02 03:00:00",
-      },
-      {
-        id: 5,
-        security_update_type_name: "AUM History",
-        run_day: 1,
-        run_hour: 5,
-        status_id: 1,
-        last_run_at: "2026-06-01 05:00:00",
-      },
-    ],
-  },
-
-  {
-    id: 4,
-    security_type_id: 1,
-    status_id: 2,
-    symbol: "FEAT",
-
-    detail: {
-      security_name: "Future ETF",
-      etf_issuer_id: null,
-      etf_strategy_type_id: null,
-      distribution_frequency_id: null,
-      expense_ratio: null,
-      website_url: "",
-      notes: "Candidate for retirement.",
-    },
-
-    schedules: [],
-  },
-];
+import {
+  listSecuritiesData,
+  retireSecurityData,
+  securityDataSelects,
+} from "../../../api/adminSecurities";
 
 export default function SecurityManagement() {
+  const [securities, setSecurities] = useState([]);
+
+  const [statuses, setStatuses] = useState([]);
+
   const [search, setSearch] = useState("");
 
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredSecurities = useMemo(() => {
-    return mockSecurities.filter((security) => {
-      const statusName = getLookupName(
-        mockLookups.statuses,
-        security.status_id,
-      );
+  const [perPage, setPerPage] = useState(25);
 
-      const issuerName = getLookupName(
-        mockLookups.etfIssuers,
-        security.detail.etf_issuer_id,
-      );
+  const [currentPage, setCurrentPage] = useState(1);
 
-      const strategyName = getLookupName(
-        mockLookups.etfStrategyTypes,
-        security.detail.etf_strategy_type_id,
-      );
+  const [lastPage, setLastPage] = useState(1);
 
-      const distributionName = getLookupName(
-        mockLookups.distributionFrequencies,
-        security.detail.distribution_frequency_id,
-      );
+  const [total, setTotal] = useState(0);
 
-      const searchableText = [
-        security.symbol,
-        security.detail.security_name,
-        issuerName,
-        strategyName,
-        distributionName,
-        statusName,
-      ]
-        .join(" ")
-        .toLowerCase();
+  const [loading, setLoading] = useState(true);
 
-      const matchesSearch = searchableText.includes(search.toLowerCase());
+  const [error, setError] = useState("");
 
-      const matchesStatus =
-        statusFilter === "all" || statusName.toLowerCase() === statusFilter;
+  const [retireTarget, setRetireTarget] = useState(null);
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [search, statusFilter]);
+  const [retiring, setRetiring] = useState(false);
 
-  const activeCount = mockSecurities.filter(
-    (security) =>
-      getLookupName(mockLookups.statuses, security.status_id) === "Active",
+  useEffect(() => {
+    loadSelects();
+  }, []);
+
+  useEffect(() => {
+    loadSecurities();
+  }, [currentPage, perPage, search, statusFilter]);
+
+  async function loadSelects() {
+    try {
+      const response = await securityDataSelects();
+
+      setStatuses(normalizeSelects(response.data?.statuses));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function loadSecurities() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const params = {
+        page: currentPage,
+        per_page: perPage,
+      };
+
+      if (search.trim()) {
+        params.search = search.trim();
+      }
+
+      if (statusFilter !== "all") {
+        params.status_id = statusFilter;
+      }
+
+      const response = await listSecuritiesData(params);
+
+      const paginator = response.data;
+
+      setSecurities(paginator.data ?? []);
+      setCurrentPage(paginator.current_page ?? 1);
+      setLastPage(paginator.last_page ?? 1);
+      setTotal(paginator.total ?? 0);
+    } catch (error) {
+      console.error(error);
+      setError("Unable to load securities.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRetire() {
+    if (!retireTarget) {
+      return;
+    }
+
+    try {
+      setRetiring(true);
+
+      await retireSecurityData(retireTarget.id);
+
+      setRetireTarget(null);
+
+      await loadSecurities();
+    } catch (error) {
+      console.error(error);
+      setError("Unable to retire security.");
+    } finally {
+      setRetiring(false);
+    }
+  }
+
+  function handleSearchChange(value) {
+    setSearch(value);
+    setCurrentPage(1);
+  }
+
+  function handleStatusChange(value) {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  }
+
+  function handlePerPageChange(value) {
+    setPerPage(Number(value));
+    setCurrentPage(1);
+  }
+
+  const activeCount = securities.filter(
+    (security) => security.status === "Active",
   ).length;
 
-  const retiredCount = mockSecurities.filter(
-    (security) =>
-      getLookupName(mockLookups.statuses, security.status_id) === "Retired",
+  const retiredCount = securities.filter(
+    (security) => security.status === "Retired",
   ).length;
 
-  const scheduledCount = mockSecurities.filter(
-    (security) => security.schedules.length > 0,
+  const scheduledCount = securities.filter(
+    (security) => Number(security.schedule_count) > 0,
   ).length;
+
+  const showingFrom = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
+
+  const showingTo = Math.min(currentPage * perPage, total);
 
   return (
     <div className="space-y-8">
@@ -301,13 +175,13 @@ export default function SecurityManagement() {
       </div>
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total Securities" value={mockSecurities.length} />
+        <StatCard label="Total Securities" value={total} />
 
-        <StatCard label="Active" value={activeCount} />
+        <StatCard label="Active On Page" value={activeCount} />
 
-        <StatCard label="Retired" value={retiredCount} />
+        <StatCard label="Retired On Page" value={retiredCount} />
 
-        <StatCard label="Scheduled Updates" value={scheduledCount} />
+        <StatCard label="Scheduled On Page" value={scheduledCount} />
       </section>
 
       <section className="glass-card rounded-3xl p-6">
@@ -317,8 +191,8 @@ export default function SecurityManagement() {
 
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by symbol, name, issuer, strategy, distribution, or status..."
+              onChange={(event) => handleSearchChange(event.target.value)}
+              placeholder="Search by symbol or security name..."
               className="w-full rounded-2xl border border-brand-outline bg-brand-surfaceHigh py-3 pl-12 pr-4 text-brand-text outline-none transition placeholder:text-brand-muted focus:border-brand-primary"
             />
           </div>
@@ -326,16 +200,35 @@ export default function SecurityManagement() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <select
               value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value)}
+              onChange={(event) => handleStatusChange(event.target.value)}
               className="rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-brand-text outline-none transition focus:border-brand-primary"
             >
               <option value="all">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="retired">Retired</option>
-              <option value="pending">Pending</option>
+
+              {statuses.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {status.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={perPage}
+              onChange={(event) => handlePerPageChange(event.target.value)}
+              className="rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-brand-text outline-none transition focus:border-brand-primary"
+            >
+              <option value={25}>25 per page</option>
+              <option value={50}>50 per page</option>
+              <option value={100}>100 per page</option>
             </select>
           </div>
         </div>
+
+        {error && (
+          <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-4 text-red-300">
+            {error}
+          </div>
+        )}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
           <div className="overflow-x-auto">
@@ -343,25 +236,27 @@ export default function SecurityManagement() {
               <thead className="bg-brand-surfaceHigh">
                 <tr>
                   <TableHeading>Symbol</TableHeading>
-
                   <TableHeading>Security Name</TableHeading>
-
                   <TableHeading>Issuer</TableHeading>
-
                   <TableHeading>Strategy</TableHeading>
-
                   <TableHeading>Distribution</TableHeading>
-
                   <TableHeading>Status</TableHeading>
-
                   <TableHeading>Schedules</TableHeading>
-
                   <TableHeading>Actions</TableHeading>
                 </tr>
               </thead>
 
               <tbody>
-                {filteredSecurities.length === 0 ? (
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="px-6 py-12 text-center text-brand-muted"
+                    >
+                      Loading securities...
+                    </td>
+                  </tr>
+                ) : securities.length === 0 ? (
                   <tr>
                     <td
                       colSpan={8}
@@ -371,129 +266,127 @@ export default function SecurityManagement() {
                     </td>
                   </tr>
                 ) : (
-                  filteredSecurities.map((security) => {
-                    const statusName = getLookupName(
-                      mockLookups.statuses,
-                      security.status_id,
-                    );
+                  securities.map((security) => (
+                    <tr
+                      key={security.id}
+                      className="border-t border-brand-outline transition hover:bg-brand-surfaceHigh/60"
+                    >
+                      <TableCell>
+                        <div className="font-display text-xl font-bold text-brand-text">
+                          {security.symbol}
+                        </div>
 
-                    return (
-                      <tr
-                        key={security.id}
-                        className="border-t border-brand-outline transition hover:bg-brand-surfaceHigh/60"
-                      >
-                        <TableCell>
-                          <div className="font-display text-xl font-bold text-brand-text">
-                            {security.symbol}
-                          </div>
+                        <div className="mt-1 text-xs text-brand-muted">
+                          ID #{security.id}
+                        </div>
+                      </TableCell>
 
-                          <div className="mt-1 text-xs text-brand-muted">
-                            ID #{security.id}
-                          </div>
-                        </TableCell>
+                      <TableCell>
+                        <div className="max-w-md font-semibold text-brand-text">
+                          {security.security_name ?? "—"}
+                        </div>
 
-                        <TableCell>
-                          <div className="max-w-md font-semibold text-brand-text">
-                            {security.detail.security_name}
-                          </div>
+                        <div className="mt-1 text-xs text-brand-muted">
+                          {security.security_type ?? "—"}
+                        </div>
+                      </TableCell>
 
-                          {security.detail.website_url && (
-                            <div className="mt-1 truncate text-xs text-brand-muted">
-                              {security.detail.website_url}
-                            </div>
-                          )}
-                        </TableCell>
+                      <TableCell>{security.issuer ?? "—"}</TableCell>
 
-                        <TableCell>
-                          {getLookupName(
-                            mockLookups.etfIssuers,
-                            security.detail.etf_issuer_id,
-                          )}
-                        </TableCell>
+                      <TableCell>{security.strategy ?? "—"}</TableCell>
 
-                        <TableCell>
-                          {getLookupName(
-                            mockLookups.etfStrategyTypes,
-                            security.detail.etf_strategy_type_id,
-                          )}
-                        </TableCell>
+                      <TableCell>
+                        {security.distribution_frequency ?? "—"}
+                      </TableCell>
 
-                        <TableCell>
-                          {getLookupName(
-                            mockLookups.distributionFrequencies,
-                            security.detail.distribution_frequency_id,
-                          )}
-                        </TableCell>
+                      <TableCell>
+                        <StatusBadge status={security.status} />
+                      </TableCell>
 
-                        <TableCell>
-                          <StatusBadge status={statusName} />
-                        </TableCell>
+                      <TableCell>
+                        <ScheduleSummary count={security.schedule_count} />
+                      </TableCell>
 
-                        <TableCell>
-                          <ScheduleSummary schedules={security.schedules} />
-                        </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Link
+                            to={`/admin/securities/${security.id}/edit`}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary"
+                            title="Edit security"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Link>
 
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Link
-                              to={`/admin/securities/${security.id}/edit`}
-                              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary"
-                              title="Edit security"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Link>
-
-                            <button
-                              type="button"
-                              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 transition hover:bg-red-500/20"
-                              title="Delete security"
-                              onClick={() => {
-                                console.log("Delete security", security.id);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </tr>
-                    );
-                  })
+                          <button
+                            type="button"
+                            disabled={security.status === "Retired"}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 transition hover:bg-yellow-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                            title="Retire security"
+                            onClick={() => setRetireTarget(security)}
+                          >
+                            <Archive className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
-            <div className="flex flex-col gap-4 border-t border-brand-outline bg-brand-surfaceHigh/20 px-6 py-5 md:flex-row md:items-center md:justify-between">
-              <div className="text-sm text-brand-muted">
-                Showing{" "}
-                <span className="font-semibold text-brand-text">1–25</span> of{" "}
-                <span className="font-semibold text-brand-text">247</span>{" "}
-                securities
-              </div>
+          </div>
 
-              <div className="flex items-center gap-2">
-                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
-                  Previous
-                </button>
+          <div className="flex flex-col gap-4 border-t border-brand-outline bg-brand-surfaceHigh/20 px-6 py-5 md:flex-row md:items-center md:justify-between">
+            <div className="text-sm text-brand-muted">
+              Showing{" "}
+              <span className="font-semibold text-brand-text">
+                {showingFrom}–{showingTo}
+              </span>{" "}
+              of <span className="font-semibold text-brand-text">{total}</span>{" "}
+              securities
+            </div>
 
-                <button className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-semibold text-black">
-                  1
-                </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={currentPage <= 1 || loading}
+                onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Previous
+              </button>
 
-                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
-                  2
-                </button>
+              <span className="rounded-xl border border-brand-primary bg-brand-primary/15 px-4 py-2 text-sm font-semibold text-brand-primary">
+                {currentPage}
+              </span>
 
-                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
-                  3
-                </button>
-
-                <button className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary">
-                  Next
-                </button>
-              </div>
+              <button
+                type="button"
+                disabled={currentPage >= lastPage || loading}
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(page + 1, lastPage))
+                }
+                className="rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-muted transition hover:border-brand-primary disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
       </section>
+
+      <ConfirmDialog
+        isOpen={Boolean(retireTarget)}
+        title="Retire Security?"
+        message={
+          retireTarget
+            ? `This will retire ${retireTarget.symbol} and disable its related update schedules. Historical records will remain intact.`
+            : ""
+        }
+        confirmLabel="Retire Security"
+        loading={retiring}
+        onConfirm={handleRetire}
+        onCancel={() => setRetireTarget(null)}
+      />
     </div>
   );
 }
@@ -545,37 +438,43 @@ function StatusBadge({ status }) {
         <ShieldOff className="h-3.5 w-3.5" />
       )}
 
-      {status}
+      {status ?? "Unknown"}
     </span>
   );
 }
 
-function ScheduleSummary({ schedules }) {
-  if (!schedules.length) {
+function ScheduleSummary({ count }) {
+  const scheduleCount = Number(count ?? 0);
+
+  if (scheduleCount === 0) {
     return <span className="text-brand-muted">No schedules</span>;
   }
 
   return (
     <div className="space-y-1">
       <div className="font-semibold text-brand-text">
-        {schedules.length} configured
+        {scheduleCount} configured
       </div>
 
-      <div className="text-xs text-brand-muted">
-        {schedules
-          .slice(0, 2)
-          .map((schedule) => schedule.security_update_type_name)
-          .join(", ")}
-        {schedules.length > 2 ? "..." : ""}
-      </div>
+      <div className="text-xs text-brand-muted">Update schedules active</div>
     </div>
   );
 }
 
-function getLookupName(options, id) {
-  if (!id) {
-    return "—";
+function normalizeSelects(selects) {
+  if (!selects) {
+    return [];
   }
 
-  return options.find((option) => option.id === id)?.name ?? "Unknown";
+  if (Array.isArray(selects)) {
+    return selects.map((option) => ({
+      id: option.id,
+      name: option.name,
+    }));
+  }
+
+  return Object.entries(selects).map(([id, name]) => ({
+    id,
+    name,
+  }));
 }

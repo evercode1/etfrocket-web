@@ -71,16 +71,27 @@ export default function EditSecurity() {
         showSecurityData(id),
       ]);
 
+      const allStatuses = normalizeSelects(selectsResponse.data?.statuses);
+
+      const filteredStatuses = allStatuses.filter((status) =>
+        ["Active", "Retired"].includes(status.name),
+      );
+
       setLookups({
         securityTypes: normalizeSelects(selectsResponse.data?.security_types),
-        statuses: normalizeSelects(selectsResponse.data?.statuses),
+
+        statuses: filteredStatuses,
+
         etfIssuers: normalizeSelects(selectsResponse.data?.etf_issuers),
+
         etfStrategyTypes: normalizeSelects(
           selectsResponse.data?.etf_strategy_types,
         ),
+
         distributionFrequencies: normalizeSelects(
           selectsResponse.data?.distribution_frequencies,
         ),
+
         securityUpdateTypes: normalizeSelects(
           selectsResponse.data?.security_update_types,
         ),

@@ -55,14 +55,25 @@ export default function CreateSecurity() {
 
       const response = await securityDataSelects();
 
+      const allStatuses = normalizeSelects(response.data?.statuses);
+
+      const filteredStatuses = allStatuses.filter((status) =>
+        ["Active", "Retired"].includes(status.name),
+      );
+
       const normalizedLookups = {
         securityTypes: normalizeSelects(response.data?.security_types),
-        statuses: normalizeSelects(response.data?.statuses),
+
+        statuses: filteredStatuses,
+
         etfIssuers: normalizeSelects(response.data?.etf_issuers),
+
         etfStrategyTypes: normalizeSelects(response.data?.etf_strategy_types),
+
         distributionFrequencies: normalizeSelects(
           response.data?.distribution_frequencies,
         ),
+
         securityUpdateTypes: normalizeSelects(
           response.data?.security_update_types,
         ),

@@ -33,6 +33,9 @@ import ImportDetail from "../pages/admin/system/ImportDetail";
 import SecurityManagement from "../pages/admin/securities/SecurityManagement";
 import CreateSecurity from "../pages/admin/securities/CreateSecurity";
 import EditSecurity from "../pages/admin/securities/EditSecurity";
+import EtfIssuerManagement from "../pages/admin/issuers/EtfIssuerManagement";
+import CreateEtfIssuer from "../pages/admin/issuers/CreateEtfIssuer";
+import EditEtfIssuer from "../pages/admin/issuers/EditEtfIssuer";
 
 import Dashboard from "../pages/user/dashboard/Dashboard";
 import Settings from "../pages/user/settings/Settings";
@@ -183,6 +186,20 @@ const router = createBrowserRouter([
             path: "securities/:id/edit",
 
             element: <EditSecurity />,
+          },
+          {
+            path: "issuers",
+
+            element: <EtfIssuerManagement />,
+          },
+          {
+            path: "issuers/create",
+
+            element: <CreateEtfIssuer />,
+          },
+          {
+            path: "issuers/:id/edit",
+            element: <EditEtfIssuer />,
           },
         ],
       },

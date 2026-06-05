@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
 
-import { Database, LifeBuoy, UsersRound, Landmark } from "lucide-react";
+import {
+  Database,
+  LifeBuoy,
+  UsersRound,
+  Landmark,
+  Building2,
+} from "lucide-react";
 
 import UserSignupChart from "../../components/charts/UserSignupChart";
 
@@ -36,6 +42,59 @@ const adminSections = [
     icon: Landmark,
     status: "Active",
   },
+  {
+    title: "ETF Issuer Management",
+    description:
+      "Create, edit, and manage ETF issuers used throughout ETF Rocket.",
+    href: "/admin/issuers",
+    icon: Building2,
+    status: "Active",
+  },
+];
+
+const primarySections = [
+  {
+    title: "User Management",
+    description: "Search, inspect, edit, and manage ETF Rocket user accounts.",
+    href: "/admin/users",
+    icon: UsersRound,
+    status: "Active",
+  },
+  {
+    title: "Support",
+    description:
+      "Review support tickets, respond to users, and manage open issues.",
+    href: "/admin/support",
+    icon: LifeBuoy,
+    status: "Active",
+  },
+  {
+    title: "Data Management",
+    description:
+      "Monitor ETF imports, price history, dividend history, and data operations.",
+    href: "/admin/data",
+    icon: Database,
+    status: "Active",
+  },
+];
+
+const secondarySections = [
+  {
+    title: "Security Management",
+    description:
+      "Create, edit, retire, and manage securities, details, issuers, and update schedules.",
+    href: "/admin/securities",
+    icon: Landmark,
+    status: "Active",
+  },
+  {
+    title: "ETF Issuer Management",
+    description:
+      "Create, edit, and manage ETF issuers used throughout ETF Rocket.",
+    href: "/admin/issuers",
+    icon: Building2,
+    status: "Active",
+  },
 ];
 
 export default function AdminDashboard() {
@@ -58,8 +117,48 @@ export default function AdminDashboard() {
 
       <UserSignupChart />
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {adminSections.map((section) => {
+      {/* Primary Modules */}
+
+      <section className="grid gap-6 xl:grid-cols-3">
+        {primarySections.map((section) => {
+          const Icon = section.icon;
+
+          return (
+            <Link
+              key={section.title}
+              to={section.href}
+              className="glass-card group rounded-3xl p-8 transition hover:-translate-y-1 hover:border-brand-primary/40"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primaryStrong/10 text-brand-primary">
+                  <Icon className="h-7 w-7" />
+                </div>
+
+                <span className="rounded-full border border-brand-outline px-3 py-1 font-mono text-xs uppercase tracking-widest text-brand-muted">
+                  {section.status}
+                </span>
+              </div>
+
+              <h2 className="mt-8 font-display text-2xl font-bold text-brand-text transition group-hover:text-brand-primary">
+                {section.title}
+              </h2>
+
+              <p className="mt-4 leading-relaxed text-brand-muted">
+                {section.description}
+              </p>
+
+              <div className="mt-8 font-mono text-xs uppercase tracking-widest text-brand-primary">
+                Open Module →
+              </div>
+            </Link>
+          );
+        })}
+      </section>
+
+      {/* Reference Data Modules */}
+
+      <section className="grid gap-6 md:grid-cols-2">
+        {secondarySections.map((section) => {
           const Icon = section.icon;
 
           return (

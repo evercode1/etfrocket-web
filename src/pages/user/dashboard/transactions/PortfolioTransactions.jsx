@@ -498,7 +498,7 @@ export default function PortfolioTransactions() {
                       loadTransactions(
                         currentPage - 1,
                         sortConfig,
-                        selectedEtfId,
+                        selectedSecurityId,
                       )
                     }
                     disabled={currentPage <= 1}
@@ -517,7 +517,7 @@ export default function PortfolioTransactions() {
                       loadTransactions(
                         currentPage + 1,
                         sortConfig,
-                        selectedEtfId,
+                        selectedSecurityId,
                       )
                     }
                     disabled={currentPage >= pagination.last_page}

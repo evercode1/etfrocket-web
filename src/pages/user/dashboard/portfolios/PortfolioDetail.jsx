@@ -296,7 +296,10 @@ export default function PortfolioDetail() {
           />
 
           {holdings.length === 0 ? (
-            <EmptyPanel message="No holdings yet. Add transactions to build this allocation chart." />
+            <EmptyPanel
+              message="No holdings yet. Add transactions to build this allocation chart."
+              to={`/dashboard/portfolios/${portfolio.id}/transactions/create`}
+            />
           ) : (
             <>
               <div className="mt-6 h-80">
@@ -403,7 +406,10 @@ export default function PortfolioDetail() {
           )}
 
           {holdings.length === 0 ? (
-            <EmptyPanel message="No holdings yet. Add a transaction or import a CSV to start tracking this portfolio." />
+            <EmptyPanel
+              message="No holdings yet. Add a transaction or import a CSV to start tracking this portfolio."
+              to={`/dashboard/portfolios/${portfolio.id}/transactions/create`}
+            />
           ) : (
             <>
               <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
@@ -488,7 +494,10 @@ export default function PortfolioDetail() {
         </div>
 
         {recentTransactions.length === 0 ? (
-          <EmptyPanel message="No transactions yet. Add a transaction or import a CSV to start building this portfolio." />
+          <EmptyPanel
+            message="No transactions yet. Add a transaction or import a CSV to start building this portfolio."
+            to={`/dashboard/portfolios/${portfolio.id}/transactions/create`}
+          />
         ) : (
           <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
             <table className="w-full text-left text-sm">
@@ -611,11 +620,21 @@ function CardTitle({ icon: Icon, title, subtitle }) {
   );
 }
 
-function EmptyPanel({ message }) {
-  return (
-    <div className="mt-6 rounded-2xl border border-dashed border-brand-outline bg-brand-surfaceHigh p-8 text-center text-brand-muted">
+function EmptyPanel({ message, to = null }) {
+  const content = (
+    <div className="mt-6 rounded-2xl border border-dashed border-brand-outline bg-brand-surfaceHigh p-8 text-center text-brand-muted transition hover:border-brand-primary hover:text-brand-primary">
       {message}
     </div>
+  );
+
+  if (!to) {
+    return content;
+  }
+
+  return (
+    <Link to={to} className="block">
+      {content}
+    </Link>
   );
 }
 

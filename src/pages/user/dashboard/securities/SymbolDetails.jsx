@@ -180,7 +180,7 @@ export default function SymbolDetails() {
       <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={DollarSign}
-          label="Current Price"
+          label="Last Close Price"
           value={`$${data.metrics.current_price ?? "-"}`}
         />
 

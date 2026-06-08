@@ -293,7 +293,7 @@ export default function AddPortfolioTransaction() {
             <div className="flex flex-col gap-3 pt-2 sm:flex-row">
               <button
                 type="submit"
-                disabled={isSaving || isLoadingEtfs}
+                disabled={isSaving || isLoadingSecurities}
                 className="rocket-button-primary inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Plus className="h-4 w-4" />

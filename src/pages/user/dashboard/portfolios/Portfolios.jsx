@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
 
+import { getPortfolioCardSummaries } from "../../../../api/portfolios";
+
 import {
   ArrowUpRight,
   Plus,

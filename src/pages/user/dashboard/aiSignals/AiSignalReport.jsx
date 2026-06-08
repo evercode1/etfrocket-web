@@ -151,12 +151,6 @@ export default function AiSignalReport() {
                     : "-"
                 }
               />
-
-              <TelemetryRow
-                icon={Sparkles}
-                label="Model"
-                value={signal.ai_model}
-              />
             </div>
           </div>
         </div>
@@ -203,12 +197,6 @@ export default function AiSignalReport() {
                 : "-"
             }
             subtitle="Report generation date"
-          />
-
-          <SignalCard
-            title="Model"
-            value={signal.ai_model}
-            subtitle="AI model used"
           />
         </div>
       </section>

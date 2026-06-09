@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
-
-import SecuritySymbol from "../../../../components/ui/SecuritySymbol";
 
 import {
   ArrowLeft,
@@ -10,9 +8,7 @@ import {
   Edit,
   Plus,
   Rocket,
-  Settings,
   Trash2,
-  Upload,
 } from "lucide-react";
 
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
@@ -21,17 +17,17 @@ import { listSecuritiesOwnedByUser } from "../../../../api/securities";
 import { viewPortfolio } from "../../../../api/portfolios";
 
 import {
-  csvUploadPortfolioTransactions,
   deletePortfolioTransaction,
   listPortfolioTransactions,
 } from "../../../../api/portfolioTransactions";
+
+import ImportTransactionsButton from "../../../../components/portfolios/ImportTransactionsButton";
 
 import { setStoredPortfolioId } from "../../../../utils/portfolioContext";
 
 export default function PortfolioTransactions() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
 
   const [portfolio, setPortfolio] = useState(null);
   const [portfolioSelects, setPortfolioSelects] = useState({});
@@ -49,8 +45,6 @@ export default function PortfolioTransactions() {
     sortOrder: "desc",
   });
 
-  const [isImporting, setIsImporting] = useState(false);
-  const [importMessage, setImportMessage] = useState("");
   const [importError, setImportError] = useState("");
 
   const [transactionToDelete, setTransactionToDelete] = useState(null);
@@ -144,39 +138,6 @@ export default function PortfolioTransactions() {
     loadTransactions(1, sortConfig, securityId);
   }
 
-  async function handleImportCsv(event) {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    setIsImporting(true);
-    setImportMessage("");
-    setImportError("");
-
-    try {
-      const response = await csvUploadPortfolioTransactions(id, file);
-
-      const data = response.data;
-
-      setImportMessage(
-        `Import complete. Imported: ${data.imported_rows}, Duplicates: ${data.duplicate_rows}, Failed: ${data.failed_rows}.`,
-      );
-
-      await loadSecurities();
-      await loadTransactions(currentPage, sortConfig, selectedSecurityId);
-    } catch (error) {
-      setImportError(
-        error.response?.data?.message ||
-          "Unable to import portfolio transactions.",
-      );
-    } finally {
-      setIsImporting(false);
-      event.target.value = "";
-    }
-  }
-
   async function handleDeleteTransaction() {
     if (!transactionToDelete) {
       return;
@@ -241,23 +202,17 @@ export default function PortfolioTransactions() {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,text/csv"
-                onChange={handleImportCsv}
-                className="hidden"
+              <ImportTransactionsButton
+                portfolioId={id}
+                onImportComplete={async () => {
+                  await loadSecurities();
+                  await loadTransactions(
+                    currentPage,
+                    sortConfig,
+                    selectedSecurityId,
+                  );
+                }}
               />
-
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isImporting}
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <Upload className="h-4 w-4" />
-                {isImporting ? "Importing..." : "Import CSV"}
-              </button>
 
               <Link
                 to={`/dashboard/portfolios/${id}/transactions/create`}
@@ -294,12 +249,6 @@ export default function PortfolioTransactions() {
           </div>
         </div>
       </section>
-
-      {importMessage && (
-        <div className="glass-card rounded-3xl border border-brand-primary/40 bg-brand-primary/10 p-5 text-sm font-semibold text-brand-primary">
-          {importMessage}
-        </div>
-      )}
 
       {importError && (
         <div className="glass-card rounded-3xl border border-brand-danger/40 bg-brand-danger/10 p-5 text-sm font-semibold text-brand-danger">
@@ -361,9 +310,14 @@ export default function PortfolioTransactions() {
         </div>
 
         {transactions.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-brand-outline bg-brand-surfaceHigh p-8 text-center text-brand-muted">
-            No transactions found for the selected filter.
-          </div>
+          <Link
+            to={`/dashboard/portfolios/${id}/transactions/create`}
+            className="block"
+          >
+            <div className="mt-6 rounded-2xl border border-dashed border-brand-outline bg-brand-surfaceHigh p-8 text-center text-brand-muted transition hover:border-brand-primary hover:text-brand-primary">
+              No transactions found. Click here to add your first transaction.
+            </div>
+          </Link>
         ) : (
           <div className="mt-6 overflow-hidden rounded-2xl border border-brand-outline">
             <table className="w-full text-left text-sm">

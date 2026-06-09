@@ -30,6 +30,8 @@ const COMMANDS = [
 
   {
     keywords: [
+      "pofolio",
+      "porfolio",
       "portfolio",
       "portfolios",
       "protfolio",

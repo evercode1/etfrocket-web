@@ -17,6 +17,8 @@ import { createPortfolioTransaction } from "../../../../api/portfolioTransaction
 
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 
+import ImportTransactionsButton from "../../../../components/portfolios/ImportTransactionsButton";
+
 const transactionTypes = [
   { id: 1, name: "Buy" },
   { id: 2, name: "Sell" },
@@ -119,30 +121,38 @@ export default function AddPortfolioTransaction() {
   return (
     <div className="space-y-8">
       <section className="glass-card rounded-3xl p-8">
-        <Link
-          to={`/dashboard/portfolios/${id}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Portfolio
-        </Link>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Link
+              to={`/dashboard/portfolios/${id}`}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted transition hover:text-brand-primary"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Portfolio
+            </Link>
 
-        <div className="mt-6">
-          <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
-            Portfolio Transaction
-          </p>
+            <div className="mt-6">
+              <p className="font-mono text-sm uppercase tracking-[0.3em] text-brand-primary">
+                Portfolio Transaction
+              </p>
 
-          <h1 className="mt-3 font-display text-5xl font-bold">
-            Add Transaction
-          </h1>
+              <h1 className="mt-3 font-display text-5xl font-bold">
+                Add Transaction
+              </h1>
 
-          <p className="mt-4 max-w-3xl text-brand-muted">
-            Record a buy or sell transaction for this portfolio.
-          </p>
+              <p className="mt-4 max-w-3xl text-brand-muted">
+                Record a buy or sell transaction for this portfolio.
+              </p>
 
-          <p className="mt-3 font-mono text-xs uppercase tracking-widest text-brand-muted">
-            Portfolio ID: {id}
-          </p>
+              <p className="mt-3 font-mono text-xs uppercase tracking-widest text-brand-muted">
+                Portfolio ID: {id}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <ImportTransactionsButton portfolioId={id} />
+          </div>
         </div>
       </section>
 

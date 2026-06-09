@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   Snowflake,
   Trash2,
-  Upload,
   WalletCards,
 } from "lucide-react";
 
@@ -24,17 +23,15 @@ import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 
 import { deletePortfolio, viewPortfolio } from "../../../../api/portfolios";
 
-import {
-  csvUploadPortfolioTransactions,
-  listPortfolioTransactions,
-} from "../../../../api/portfolioTransactions";
+import { listPortfolioTransactions } from "../../../../api/portfolioTransactions";
 
 import { setStoredPortfolioId } from "../../../../utils/portfolioContext";
+
+import ImportTransactionsButton from "../../../../components/portfolios/ImportTransactionsButton";
 
 export default function PortfolioDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
 
   const [portfolio, setPortfolio] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
@@ -43,10 +40,6 @@ export default function PortfolioDetail() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
-
-  const [isImporting, setIsImporting] = useState(false);
-  const [importMessage, setImportMessage] = useState("");
-  const [importError, setImportError] = useState("");
 
   async function loadPortfolio() {
     setIsLoading(true);
@@ -90,38 +83,6 @@ export default function PortfolioDetail() {
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);
-    }
-  }
-
-  async function handleImportCsv(event) {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    setIsImporting(true);
-    setImportMessage("");
-    setImportError("");
-
-    try {
-      const response = await csvUploadPortfolioTransactions(portfolio.id, file);
-
-      const data = response.data;
-
-      setImportMessage(
-        `Import complete. Imported: ${data.imported_rows}, Duplicates: ${data.duplicate_rows}, Failed: ${data.failed_rows}.`,
-      );
-
-      await loadPortfolio();
-    } catch (error) {
-      setImportError(
-        error.response?.data?.message ||
-          "Unable to import portfolio transactions.",
-      );
-    } finally {
-      setIsImporting(false);
-      event.target.value = "";
     }
   }
 
@@ -365,23 +326,10 @@ export default function PortfolioDetail() {
             />
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,text/csv"
-                onChange={handleImportCsv}
-                className="hidden"
+              <ImportTransactionsButton
+                portfolioId={portfolio.id}
+                onImportComplete={loadPortfolio}
               />
-
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isImporting}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-outline px-5 py-3 text-sm font-semibold text-brand-muted transition hover:border-brand-primary hover:text-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <Upload className="h-4 w-4" />
-                {isImporting ? "Importing..." : "Import CSV"}
-              </button>
 
               <Link
                 to={`/dashboard/portfolios/${portfolio.id}/transactions/create`}
@@ -392,18 +340,6 @@ export default function PortfolioDetail() {
               </Link>
             </div>
           </div>
-
-          {importMessage && (
-            <div className="mt-5 rounded-2xl border border-brand-primary/40 bg-brand-primary/10 p-4 text-sm font-semibold text-brand-primary">
-              {importMessage}
-            </div>
-          )}
-
-          {importError && (
-            <div className="mt-5 rounded-2xl border border-brand-danger/40 bg-brand-danger/10 p-4 text-sm font-semibold text-brand-danger">
-              {importError}
-            </div>
-          )}
 
           {holdings.length === 0 ? (
             <EmptyPanel

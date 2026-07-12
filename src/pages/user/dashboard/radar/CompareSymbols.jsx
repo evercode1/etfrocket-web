@@ -643,9 +643,31 @@ function formatValue(value, metric) {
       return formatCurrency(value);
 
     case "aum":
-      return Number(value).toLocaleString("en-US");
+      return formatAum(value);
 
     default:
       return formatPercent(value);
   }
+}
+
+function formatAum(value) {
+  const number = Number(value);
+
+  if (number >= 1_000_000_000_000) {
+    return `${(number / 1_000_000_000_000).toFixed(2)}T`;
+  }
+
+  if (number >= 1_000_000_000) {
+    return `${(number / 1_000_000_000).toFixed(2)}B`;
+  }
+
+  if (number >= 1_000_000) {
+    return `${(number / 1_000_000).toFixed(1)}M`;
+  }
+
+  if (number >= 1_000) {
+    return `${(number / 1_000).toFixed(0)}K`;
+  }
+
+  return number.toLocaleString("en-US");
 }

@@ -653,21 +653,25 @@ function formatValue(value, metric) {
 function formatAum(value) {
   const number = Number(value);
 
-  if (number >= 1_000_000_000_000) {
-    return `${(number / 1_000_000_000_000).toFixed(2)}T`;
+  if (number >= 1000000000000) {
+    return `${stripTrailingZeros((number / 1000000000000).toFixed(2))}T`;
   }
 
-  if (number >= 1_000_000_000) {
-    return `${(number / 1_000_000_000).toFixed(2)}B`;
+  if (number >= 1000000000) {
+    return `${stripTrailingZeros((number / 1000000000).toFixed(2))}B`;
   }
 
-  if (number >= 1_000_000) {
-    return `${(number / 1_000_000).toFixed(1)}M`;
+  if (number >= 1000000) {
+    return `${stripTrailingZeros((number / 1000000).toFixed(1))}M`;
   }
 
-  if (number >= 1_000) {
-    return `${(number / 1_000).toFixed(0)}K`;
+  if (number >= 1000) {
+    return `${stripTrailingZeros((number / 1000).toFixed(1))}K`;
   }
 
   return number.toLocaleString("en-US");
+}
+
+function stripTrailingZeros(value) {
+  return value.replace(/\.?0+$/, "");
 }

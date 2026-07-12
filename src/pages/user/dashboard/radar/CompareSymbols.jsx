@@ -483,6 +483,7 @@ export default function CompareSymbols() {
                   itemStyle={{
                     color: "#f8fafc",
                   }}
+                  formatter={(value) => [formatValue(value, selectedMetric)]}
                 />
 
                 {visibleRows.map((row, index) => (
@@ -630,13 +631,17 @@ function formatValue(value, metric) {
     return "—";
   }
 
-  if (metric === "price") {
-    return formatCurrency(value);
-  }
+  switch (metric) {
+    case "price":
+      return formatCurrency(value);
 
-  if (metric === "aum") {
-    return Number(value).toLocaleString("en-US");
-  }
+    case "dividend":
+      return formatCurrency(value);
 
-  return formatPercent(value);
+    case "aum":
+      return Number(value).toLocaleString("en-US");
+
+    default:
+      return formatPercent(value);
+  }
 }

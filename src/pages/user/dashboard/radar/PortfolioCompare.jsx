@@ -282,7 +282,7 @@ export default function PortfolioCompare() {
                   itemStyle={{
                     color: "#f8fafc",
                   }}
-                  formatter={(value) => formatChartTooltipValue(value)}
+                  formatter={(value) => formatValue(value, selectedMetric)}
                 />
 
                 {tableRows.map((row, index) => (
@@ -434,6 +434,26 @@ function MetricCard({ icon: Icon, label, value, detail }) {
   );
 }
 
+function formatValue(value, metric) {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+
+  switch (metric) {
+    case "price":
+      return formatCurrency(value);
+
+    case "dividend":
+      return formatCurrency(value);
+
+    case "aum":
+      return formatAum(value);
+
+    default:
+      return formatPercent(value);
+  }
+}
+
 function formatCurrency(value) {
   if (value === null || value === undefined) {
     return "—";
@@ -472,12 +492,28 @@ function formatChartAxisValue(value, metric) {
   return Number(value).toFixed(0);
 }
 
-function formatChartTooltipValue(value) {
-  if (value === null || value === undefined) {
-    return "—";
+function formatAum(value) {
+  const number = Number(value);
+
+  if (number >= 1000000000000) {
+    return `${stripTrailingZeros((number / 1000000000000).toFixed(2))}T`;
   }
 
-  return Number(value).toLocaleString("en-US", {
-    maximumFractionDigits: 4,
-  });
+  if (number >= 1000000000) {
+    return `${stripTrailingZeros((number / 1000000000).toFixed(2))}B`;
+  }
+
+  if (number >= 1000000) {
+    return `${stripTrailingZeros((number / 1000000).toFixed(1))}M`;
+  }
+
+  if (number >= 1000) {
+    return `${stripTrailingZeros((number / 1000).toFixed(1))}K`;
+  }
+
+  return number.toLocaleString("en-US");
+}
+
+function stripTrailingZeros(value) {
+  return value.replace(/\.?0+$/, "");
 }

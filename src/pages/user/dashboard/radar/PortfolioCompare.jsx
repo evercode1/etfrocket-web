@@ -282,7 +282,11 @@ export default function PortfolioCompare() {
                   itemStyle={{
                     color: "#f8fafc",
                   }}
-                  formatter={(value) => formatValue(value, selectedMetric)}
+                  formatter={(value, name) => [
+                    formatValue(value, selectedMetric),
+
+                    name,
+                  ]}
                 />
 
                 {tableRows.map((row, index) => (

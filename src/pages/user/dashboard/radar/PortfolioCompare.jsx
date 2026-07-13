@@ -447,7 +447,7 @@ function formatValue(value, metric) {
     case "price":
       return formatCurrency(value);
 
-    case "dividend":
+    case "dividends":
       return formatCurrency(value);
 
     case "aum":

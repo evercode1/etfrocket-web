@@ -6,6 +6,7 @@ import {
   Calculator,
   DatabaseZap,
   FileSpreadsheet,
+  PencilLine,
 } from "lucide-react";
 
 import {
@@ -13,12 +14,14 @@ import {
   calculateSecurityMetrics,
   runAiDataExtractions,
   truncateTables,
+  updatePriceHistory,
 } from "../../../api/adminData";
 
 const initialOutputs = {
   priceHistory: null,
   metrics: null,
   aiExtraction: null,
+  updatePriceHistory: null,
   truncate: null,
 };
 
@@ -33,6 +36,10 @@ export default function DataManagement() {
   const [outputs, setOutputs] = useState(initialOutputs);
   const [confirmAction, setConfirmAction] = useState(null);
 
+  const [updatePriceSymbol, setUpdatePriceSymbol] = useState("");
+  const [updatePriceDate, setUpdatePriceDate] = useState("");
+  const [updateClosePrice, setUpdateClosePrice] = useState("");
+
   function clearOutput(key) {
     setOutputs((current) => ({
       ...current,
@@ -40,7 +47,7 @@ export default function DataManagement() {
     }));
   }
 
-  async function runCommand(key, callback) {
+  async function runCommand(key, callback, onSuccess = null) {
     setLoadingKey(key);
 
     try {
@@ -53,6 +60,8 @@ export default function DataManagement() {
           message: response.message || "Command completed successfully.",
         },
       }));
+
+      onSuccess?.(response);
     } catch (error) {
       setOutputs((current) => ({
         ...current,
@@ -71,6 +80,61 @@ export default function DataManagement() {
 
   function openConfirm(action) {
     setConfirmAction(action);
+  }
+
+  function openPriceHistoryUpdateConfirm() {
+    const symbol = updatePriceSymbol.trim().toUpperCase();
+    const price = Number(updateClosePrice);
+
+    if (!symbol || !updatePriceDate || !updateClosePrice) {
+      setOutputs((current) => ({
+        ...current,
+        updatePriceHistory: {
+          status: "error",
+          message: "ETF symbol, price date, and closing price are required.",
+        },
+      }));
+
+      return;
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+      setOutputs((current) => ({
+        ...current,
+        updatePriceHistory: {
+          status: "error",
+          message: "Closing price must be greater than zero.",
+        },
+      }));
+
+      return;
+    }
+
+    clearOutput("updatePriceHistory");
+
+    openConfirm({
+      key: "updatePriceHistory",
+      title: "Update Price History?",
+      message: `This will change the closing price for ${symbol} on ${updatePriceDate} to $${price.toFixed(
+        6,
+      )}.`,
+      confirmLabel: "Update Price History",
+      onConfirm: () =>
+        runCommand(
+          "updatePriceHistory",
+          () =>
+            updatePriceHistory({
+              symbol,
+              price_date: updatePriceDate,
+              close_price: price,
+            }),
+          () => {
+            setUpdatePriceSymbol("");
+            setUpdatePriceDate("");
+            setUpdateClosePrice("");
+          },
+        ),
+    });
   }
 
   return (
@@ -203,6 +267,46 @@ export default function DataManagement() {
         </CommandCard>
 
         <CommandCard
+          icon={PencilLine}
+          title="Update Price History"
+          description="Correct the closing price for a specific ETF and trading date."
+          warning="This changes an existing price history record and may affect charts, returns, and calculated metrics."
+          loading={loadingKey === "updatePriceHistory"}
+          output={outputs.updatePriceHistory}
+          clearOutput={() => clearOutput("updatePriceHistory")}
+          buttonLabel="Update Price History"
+          onSubmit={openPriceHistoryUpdateConfirm}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextInput
+              label="ETF Symbol"
+              value={updatePriceSymbol}
+              onChange={setUpdatePriceSymbol}
+              placeholder="NVII"
+            />
+
+            <TextInput
+              label="Price Date"
+              value={updatePriceDate}
+              onChange={setUpdatePriceDate}
+              type="date"
+            />
+
+            <div className="md:col-span-2">
+              <TextInput
+                label="Closing Price"
+                value={updateClosePrice}
+                onChange={setUpdateClosePrice}
+                placeholder="18.425000"
+                type="number"
+                min="0"
+                step="0.000001"
+              />
+            </div>
+          </div>
+        </CommandCard>
+
+        <CommandCard
           icon={DatabaseZap}
           title="Truncate Tables"
           description="Truncate one or more database tables using a comma-separated table list."
@@ -259,9 +363,10 @@ function CommandCard({
   buttonLabel,
   onSubmit,
   children,
+  className = "",
 }) {
   return (
-    <div className="glass-card rounded-3xl p-7">
+    <div className={`glass-card rounded-3xl p-7 ${className}`}>
       <div className="flex items-start gap-4">
         <div
           className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
@@ -340,7 +445,15 @@ function CommandCard({
   );
 }
 
-function TextInput({ label, value, onChange, placeholder, type = "text" }) {
+function TextInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  min,
+  step,
+}) {
   return (
     <label className="block">
       <span className="font-mono text-xs uppercase tracking-widest text-brand-muted">
@@ -352,6 +465,8 @@ function TextInput({ label, value, onChange, placeholder, type = "text" }) {
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
+        min={min}
+        step={step}
         className="mt-2 w-full rounded-xl border border-brand-outline bg-brand-surface px-4 py-3 text-brand-text outline-none transition placeholder:text-brand-muted/60 focus:border-brand-primary"
       />
     </label>

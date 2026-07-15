@@ -29,3 +29,9 @@ export async function updatePriceHistory(payload) {
 
   return response.data;
 }
+
+export async function addOrUpdateDividendHistory(payload) {
+  const response = await api.put("/admin/data/dividend-history", payload);
+
+  return response.data;
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import {
   AlertTriangle,
+  BadgeDollarSign,
   BrainCircuit,
   Calculator,
   DatabaseZap,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 
 import {
+  addOrUpdateDividendHistory,
   backfillPriceHistory,
   calculateSecurityMetrics,
   runAiDataExtractions,
@@ -22,6 +24,7 @@ const initialOutputs = {
   metrics: null,
   aiExtraction: null,
   updatePriceHistory: null,
+  updateDividendHistory: null,
   truncate: null,
 };
 
@@ -39,6 +42,11 @@ export default function DataManagement() {
   const [updatePriceSymbol, setUpdatePriceSymbol] = useState("");
   const [updatePriceDate, setUpdatePriceDate] = useState("");
   const [updateClosePrice, setUpdateClosePrice] = useState("");
+
+  const [dividendSymbol, setDividendSymbol] = useState("");
+  const [dividendExDate, setDividendExDate] = useState("");
+  const [dividendAmount, setDividendAmount] = useState("");
+  const [dividendPaymentDate, setDividendPaymentDate] = useState("");
 
   function clearOutput(key) {
     setOutputs((current) => ({
@@ -80,6 +88,63 @@ export default function DataManagement() {
 
   function openConfirm(action) {
     setConfirmAction(action);
+  }
+
+  function openDividendHistoryUpdateConfirm() {
+    const symbol = dividendSymbol.trim().toUpperCase();
+    const amount = Number(dividendAmount);
+
+    if (!symbol || !dividendExDate || !dividendAmount) {
+      setOutputs((current) => ({
+        ...current,
+        updateDividendHistory: {
+          status: "error",
+          message:
+            "ETF symbol, ex-dividend date, and dividend amount are required.",
+        },
+      }));
+
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setOutputs((current) => ({
+        ...current,
+        updateDividendHistory: {
+          status: "error",
+          message: "Dividend amount must be greater than zero.",
+        },
+      }));
+
+      return;
+    }
+
+    clearOutput("updateDividendHistory");
+
+    openConfirm({
+      key: "updateDividendHistory",
+      title: "Add or Update Dividend History?",
+      message: `This will add or update the dividend record for ${symbol} on ${dividendExDate} to $${amount.toFixed(
+        6,
+      )}.`,
+      confirmLabel: "Add / Update Dividend",
+      onConfirm: () =>
+        runCommand(
+          "updateDividendHistory",
+          () =>
+            addOrUpdateDividendHistory({
+              symbol,
+              ex_dividend_date: dividendExDate,
+              payment_date: dividendPaymentDate,
+              dividend_amount: amount,
+            }),
+          () => {
+            setDividendSymbol("");
+            setDividendExDate("");
+            setDividendAmount("");
+          },
+        ),
+    });
   }
 
   function openPriceHistoryUpdateConfirm() {
@@ -298,6 +363,53 @@ export default function DataManagement() {
                 value={updateClosePrice}
                 onChange={setUpdateClosePrice}
                 placeholder="18.425000"
+                type="number"
+                min="0"
+                step="0.000001"
+              />
+            </div>
+          </div>
+        </CommandCard>
+
+        <CommandCard
+          icon={BadgeDollarSign}
+          title="Add / Update Dividend History"
+          description="Add a new dividend record or correct an existing dividend amount for a specific ETF and ex-dividend date."
+          warning="This may affect total return calculations, dividend history, charts, and calculated metrics."
+          loading={loadingKey === "updateDividendHistory"}
+          output={outputs.updateDividendHistory}
+          clearOutput={() => clearOutput("updateDividendHistory")}
+          buttonLabel="Add / Update Dividend"
+          onSubmit={openDividendHistoryUpdateConfirm}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextInput
+              label="ETF Symbol"
+              value={dividendSymbol}
+              onChange={setDividendSymbol}
+              placeholder="NVII"
+            />
+
+            <TextInput
+              label="Ex-Dividend Date"
+              value={dividendExDate}
+              onChange={setDividendExDate}
+              type="date"
+            />
+
+            <TextInput
+              label="Payment Date"
+              value={dividendPaymentDate}
+              onChange={setDividendPaymentDate}
+              type="date"
+            />
+
+            <div className="md:col-span-2">
+              <TextInput
+                label="Dividend Amount"
+                value={dividendAmount}
+                onChange={setDividendAmount}
+                placeholder="0.245000"
                 type="number"
                 min="0"
                 step="0.000001"

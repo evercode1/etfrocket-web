@@ -28,7 +28,7 @@ export default function AddPortfolioTransaction() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [securities, setSecurities] = useState({});
+  const [securities, setSecurities] = useState([]);
   const [isLoadingSecurities, setIsLoadingSecurities] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -48,7 +48,7 @@ export default function AddPortfolioTransaction() {
     try {
       const response = await getSecuritySelects();
 
-      setSecurities(response.data || {});
+      setSecurities(response.data || []);
     } catch (error) {
       setError("Unable to load security options.");
     } finally {
@@ -111,7 +111,10 @@ export default function AddPortfolioTransaction() {
   const estimatedValue =
     Number(form.shares || 0) * Number(form.price_per_share || 0);
 
-  const selectedSymbol = securities[form.security_id] || "selected security";
+  const selectedSymbol =
+    securities.find(
+      (security) => Number(security.id) === Number(form.security_id),
+    )?.symbol || "selected security";
 
   const selectedTransactionType =
     transactionTypes.find(
@@ -204,9 +207,9 @@ export default function AddPortfolioTransaction() {
                     : "Select a security"}
                 </option>
 
-                {Object.entries(securities).map(([securityId, symbol]) => (
-                  <option key={securityId} value={securityId}>
-                    {symbol}
+                {securities.map((security) => (
+                  <option key={security.id} value={security.id}>
+                    {security.symbol}
                   </option>
                 ))}
               </select>

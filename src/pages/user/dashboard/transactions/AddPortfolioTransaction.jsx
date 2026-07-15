@@ -57,8 +57,10 @@ export default function AddPortfolioTransaction() {
   }
 
   useEffect(() => {
-    loadSecurities();
-  }, []);
+    if (isOpen) {
+      loadSelects();
+    }
+  }, [isOpen]);
 
   function handleChange(event) {
     const { name, value } = event.target;

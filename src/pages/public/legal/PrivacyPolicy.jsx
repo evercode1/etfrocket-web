@@ -13,8 +13,8 @@ export default function PrivacyPolicy() {
         <h1 className="mt-4 font-display text-5xl font-bold">Privacy Policy</h1>
 
         <p className="mt-4 text-brand-muted">
-          Learn how ETF Rocket handles privacy, account data, and platform
-          information.
+          What ETF Rocket does and doesn&apos;t collect. In short: no accounts,
+          no personal information, no tracking.
         </p>
       </div>
 

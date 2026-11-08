@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
@@ -13,13 +13,14 @@ import HelpCenter from "../pages/public/help/HelpCenter";
 import HelpArticle from "../pages/public/help/HelpArticle";
 import PrivacyPolicy from "../pages/public/legal/PrivacyPolicy";
 import TermsOfService from "../pages/public/legal/TermsOfService";
+import AumLeaderboard from "../pages/public/aum/AumLeaderboard";
+import AumSymbolDetail from "../pages/public/aum/AumSymbolDetail";
 
 import Login from "../pages/auth/Login";
-import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
-import AdminDashboard from "../pages/admin/Dashboard";
+import PipelineHealth from "../pages/admin/system/PipelineHealth";
 import ListUsers from "../pages/admin/user/ListUsers.jsx";
 import ViewUser from "../pages/admin/user/ViewUser.jsx";
 import EditUser from "../pages/admin/user/EditUser.jsx";
@@ -78,6 +79,14 @@ const router = createBrowserRouter([
         element: <LandingPage />,
       },
       {
+        path: "aum",
+        element: <AumLeaderboard />,
+      },
+      {
+        path: "aum/:symbol",
+        element: <AumSymbolDetail />,
+      },
+      {
         path: "account/verify/:token",
         element: <VerifyAccount />,
       },
@@ -109,8 +118,9 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        // Registration is closed; the only account is the admin's.
         path: "register",
-        element: <Register />,
+        element: <Navigate to="/auth/login" replace />,
       },
       {
         path: "forgot-password",
@@ -132,7 +142,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminDashboard />,
+            element: <PipelineHealth />,
           },
           {
             path: "users",

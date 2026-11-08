@@ -1,20 +1,39 @@
 import { useState } from "react";
 
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import {
+  Activity,
+  Building2,
   ChevronDown,
   CircleUserRound,
-  LayoutDashboard,
+  ExternalLink,
+  FileClock,
+  Headset,
+  ListChecks,
   LogOut,
   Rocket,
-  Compass,
-  Activity,
+  Timer,
+  Users,
+  Wallet,
 } from "lucide-react";
 
 import AdminSupportBell from "../components/support/AdminSupportBell";
+import EtfSearch from "../components/search/EtfSearch";
 
 import { useAuth } from "../context/AuthContext";
+import SiteDisclaimer from "../components/layout/SiteDisclaimer";
+
+const NAV_ITEMS = [
+  { to: "/admin", label: "Pipeline Health", icon: Activity, end: true },
+  { to: "/admin/securities", label: "Securities", icon: Wallet },
+  { to: "/admin/issuers", label: "Issuers", icon: Building2 },
+  { to: "/admin/selects", label: "Selects", icon: ListChecks },
+  { to: "/admin/cron-reports", label: "Cron Reports", icon: Timer },
+  { to: "/admin/import-list", label: "Import Activity", icon: FileClock },
+  { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/support", label: "Support", icon: Headset },
+];
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -32,47 +51,31 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-brand-background text-brand-text">
       <header className="border-b border-brand-outline bg-brand-surface">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex flex-1 items-center justify-between gap-6">
-            <Link
-              to="/admin"
-              className="flex items-center gap-3 font-display text-2xl font-bold text-brand-primary"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
-                <Rocket className="h-5 w-5 text-brand-primary" />
-              </div>
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 sm:px-6">
+          <Link
+            to="/admin"
+            className="flex shrink-0 items-center gap-3 font-display text-2xl font-bold text-brand-primary"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
+              <Rocket className="h-5 w-5 text-brand-primary" />
+            </div>
 
-              <span>ETF Rocket Admin</span>
+            <span className="hidden sm:inline">
+              ETF Rocket <span className="text-brand-muted">Admin</span>
+            </span>
+          </Link>
+
+          <EtfSearch className="ml-auto hidden w-72 lg:block" />
+
+          <div className="ml-auto flex items-center gap-3 lg:ml-0">
+            <Link
+              to="/aum"
+              className="hidden items-center gap-1.5 text-sm text-brand-muted transition hover:text-brand-primary md:inline-flex"
+            >
+              View site
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
 
-            <nav className="ml-auto mr-8 flex gap-4 text-sm text-brand-muted">
-              <Link
-                to="/admin"
-                className="flex items-center gap-2 transition hover:text-brand-primary"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Admin Dashboard
-              </Link>
-
-              <Link
-                to="/dashboard"
-                className="flex items-center gap-2 transition hover:text-brand-primary"
-              >
-                <Compass className="h-4 w-4" />
-                User Dashboard
-              </Link>
-
-              <Link
-                to="/admin/system-monitoring"
-                className="flex items-center gap-2 transition hover:text-brand-primary"
-              >
-                <Activity className="h-4 w-4" />
-                System Monitoring
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
             <AdminSupportBell />
 
             <div className="relative">
@@ -125,11 +128,42 @@ export default function AdminLayout() {
             </div>
           </div>
         </div>
+
+        <div className="border-t border-brand-outline/60 px-4 py-3 sm:px-6 lg:hidden">
+          <EtfSearch className="w-full" />
+        </div>
+
+        <nav
+          aria-label="Admin sections"
+          className="border-t border-brand-outline/60"
+        >
+          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-6">
+            {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  `flex shrink-0 items-center gap-2 border-b-2 px-3 py-3 text-sm transition ${
+                    isActive
+                      ? "border-brand-primary text-brand-primary"
+                      : "border-transparent text-brand-muted hover:text-brand-text"
+                  }`
+                }
+              >
+                <Icon className="h-4 w-4" aria-hidden="true" />
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <Outlet />
       </main>
+
+      <SiteDisclaimer />
     </div>
   );
 }

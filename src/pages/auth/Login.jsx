@@ -35,9 +35,9 @@ export default function Login() {
     setError(null);
 
     try {
-      await login(form);
+      const response = await login(form);
 
-      navigate("/dashboard");
+      navigate(response.user?.is_admin ? "/admin" : "/dashboard");
     } catch (err) {
       setError(
         err.response?.data?.message || "Unable to login. Please try again.",
@@ -84,23 +84,13 @@ export default function Login() {
 
       <SubmitButton loading={loading}>Login</SubmitButton>
 
-      <div className="space-y-3 text-center text-sm">
+      <div className="text-center text-sm">
         <Link
           to="/auth/forgot-password"
           className="block text-brand-muted hover:text-brand-primary hover:underline"
         >
           Forgot your password?
         </Link>
-
-        <p className="text-brand-muted">
-          Need an account?{" "}
-          <Link
-            to="/auth/register"
-            className="font-semibold text-brand-primary hover:underline"
-          >
-            Create one
-          </Link>
-        </p>
       </div>
     </form>
   );

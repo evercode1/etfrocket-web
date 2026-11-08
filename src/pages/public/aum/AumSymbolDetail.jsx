@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ExternalLink } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -263,9 +263,11 @@ export default function AumSymbolDetail() {
   const security = data.security;
 
   if (!view) {
+    // The API only returns 200 without data for covered ETFs ("pending").
     return (
       <PageFrame>
-        <NotCovered symbol={security.symbol} />
+        <SecurityHeader security={security} />
+        <AwaitingData symbol={security.symbol} />
       </PageFrame>
     );
   }
@@ -279,6 +281,13 @@ export default function AumSymbolDetail() {
   return (
     <PageFrame>
       <SecurityHeader security={security} asOf={data.latest.date} />
+
+      {data.coverage_status === "stale" && (
+        <StaleNotice
+          lastUpdated={data.latest.date}
+          staleAfterDays={data.stale_after_days}
+        />
+      )}
 
       <div
         className={`transition-opacity ${loading ? "opacity-60" : "opacity-100"}`}
@@ -425,6 +434,47 @@ function NotCovered({ symbol }) {
           AUM Leaderboard
         </Link>
         , or search for another fund above.
+      </p>
+    </div>
+  );
+}
+
+function AwaitingData({ symbol }) {
+  return (
+    <div className="glass-card rounded-3xl p-8">
+      <p className="font-display text-xl font-bold text-white">
+        AUM data for {symbol} isn't available yet.
+      </p>
+
+      <p className="mt-2 text-brand-muted">
+        We track {symbol} and collect its data daily from the issuer's
+        website. Check back soon, or browse the ETFs with data on the{" "}
+        <Link to="/aum" className="text-brand-primary hover:underline">
+          AUM Leaderboard
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}
+
+function StaleNotice({ lastUpdated, staleAfterDays }) {
+  return (
+    <div
+      role="status"
+      className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100"
+    >
+      <AlertTriangle
+        className="mt-0.5 h-4 w-4 shrink-0 text-amber-300"
+        aria-hidden="true"
+      />
+
+      <p>
+        <strong className="font-semibold">
+          Last updated {formatDate(lastUpdated)}.
+        </strong>{" "}
+        We haven't been able to collect new data for this ETF in over{" "}
+        {staleAfterDays} days, so the figures below may be out of date.
       </p>
     </div>
   );

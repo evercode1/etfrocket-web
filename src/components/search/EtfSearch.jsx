@@ -251,6 +251,12 @@ export default function EtfSearch({ className = "" }) {
                       </span>
                     )}
                   </span>
+
+                  {etf.status === "pending" && (
+                    <span className="shrink-0 self-center rounded-full bg-brand-secondary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-secondary">
+                      Data coming soon
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

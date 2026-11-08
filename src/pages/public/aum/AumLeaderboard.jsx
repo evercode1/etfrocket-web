@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowDown, ArrowUp, Search } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Search } from "lucide-react";
 
 import { getAumLeaderboard } from "../../../api/aum";
 import {
@@ -207,6 +207,14 @@ export default function AumLeaderboard() {
           </span>
           .
         </p>
+
+        {leaderboard.pending_count > 0 && (
+          <p className="mt-2 text-sm text-brand-muted">
+            {leaderboard.pending_count === 1
+              ? "1 ETF we track is awaiting its first data and will appear here once collected."
+              : `${leaderboard.pending_count} ETFs we track are awaiting their first data and will appear here once collected.`}
+          </p>
+        )}
       </header>
 
       <section className="mb-8 grid gap-4 sm:grid-cols-3">
@@ -340,10 +348,20 @@ export default function AumLeaderboard() {
                     <td className="px-4 py-3 text-right font-mono font-semibold text-white">
                       {formatCompact(row.aum)}
 
-                      {row.aum_date !== leaderboard.as_of && (
-                        <div className="text-[11px] font-normal text-brand-muted">
-                          as of {formatDate(row.aum_date)}
+                      {row.is_stale ? (
+                        <div
+                          className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-normal text-amber-300"
+                          title={`No new data in over ${leaderboard.stale_after_days} days; may be out of date.`}
+                        >
+                          <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                          Stale · {formatDate(row.aum_date)}
                         </div>
+                      ) : (
+                        row.aum_date !== leaderboard.as_of && (
+                          <div className="text-[11px] font-normal text-brand-muted">
+                            as of {formatDate(row.aum_date)}
+                          </div>
+                        )
                       )}
                     </td>
 

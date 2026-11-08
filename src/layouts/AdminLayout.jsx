@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import AdminSupportBell from "../components/support/AdminSupportBell";
+import EtfSearch from "../components/search/EtfSearch";
 
 import { useAuth } from "../context/AuthContext";
 import SiteDisclaimer from "../components/layout/SiteDisclaimer";
@@ -74,6 +75,8 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            <EtfSearch className="hidden w-64 xl:block" />
+
             <AdminSupportBell />
 
             <div className="relative">
@@ -125,6 +128,10 @@ export default function AdminLayout() {
               )}
             </div>
           </div>
+        </div>
+
+        <div className="border-t border-brand-outline/60 px-4 py-3 sm:px-6 xl:hidden">
+          <EtfSearch className="w-full" />
         </div>
       </header>
 

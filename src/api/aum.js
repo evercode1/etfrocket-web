@@ -6,6 +6,12 @@ export async function getAumLeaderboard() {
   return response.data;
 }
 
+export async function getEtfSearchIndex() {
+  const response = await api.get("/etf-search-index");
+
+  return response.data;
+}
+
 export async function getAumHistory(symbol) {
   const response = await api.get(`/aum-history/${encodeURIComponent(symbol)}`);
 

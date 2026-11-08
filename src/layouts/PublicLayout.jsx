@@ -3,6 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import SiteDisclaimer from "../components/layout/SiteDisclaimer";
+import EtfSearch from "../components/search/EtfSearch";
 
 import { Rocket } from "lucide-react";
 
@@ -18,7 +19,7 @@ export default function PublicLayout() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-brand-background text-brand-text">
       <header className="relative z-40 border-b border-brand-outline bg-brand-surface/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-3 px-4 py-5 sm:px-6">
           <Link
             to="/"
             className="flex items-center gap-3 font-display text-2xl font-bold text-brand-primary"
@@ -31,13 +32,16 @@ export default function PublicLayout() {
             <span className="hidden whitespace-nowrap sm:inline">ETF Rocket</span>
           </Link>
 
+          {/* Own full-width row below lg; inline between logo and nav at lg+. */}
+          <EtfSearch className="order-last w-full lg:order-none lg:mx-4 lg:w-auto lg:max-w-xs lg:flex-1" />
+
           <nav className="flex items-center gap-2 sm:gap-4">
             <Link to="/aum" className={outlineLink}>
               <span className="sm:hidden">AUM</span>
               <span className="hidden sm:inline">AUM Leaderboard</span>
             </Link>
 
-            <Link to="/help" className={`hidden md:inline-block ${outlineLink}`}>
+            <Link to="/help" className={`hidden xl:inline-block ${outlineLink}`}>
               Help Center
             </Link>
 

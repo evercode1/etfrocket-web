@@ -13,6 +13,7 @@ import HelpCenter from "../pages/public/help/HelpCenter";
 import HelpArticle from "../pages/public/help/HelpArticle";
 import PrivacyPolicy from "../pages/public/legal/PrivacyPolicy";
 import TermsOfService from "../pages/public/legal/TermsOfService";
+import AumLeaderboard from "../pages/public/aum/AumLeaderboard";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />,
+      },
+      {
+        path: "aum",
+        element: <AumLeaderboard />,
       },
       {
         path: "account/verify/:token",

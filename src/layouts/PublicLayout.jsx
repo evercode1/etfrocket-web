@@ -26,6 +26,13 @@ export default function PublicLayout() {
 
           <nav className="flex items-center gap-4">
             <Link
+              to="/aum"
+              className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
+            >
+              AUM Leaderboard
+            </Link>
+
+            <Link
               to="/help"
               className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
             >

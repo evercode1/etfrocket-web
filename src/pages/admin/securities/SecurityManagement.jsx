@@ -3,9 +3,15 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
+  AlertOctagon,
+  AlertTriangle,
   Archive,
+  CheckCircle2,
+  Clock,
+  MinusCircle,
   Pencil,
   Plus,
+  RefreshCw,
   Search,
   ShieldCheck,
   ShieldOff,
@@ -16,8 +22,22 @@ import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 import {
   listSecuritiesData,
   retireSecurityData,
+  runSecurityFundDataUpdate,
   securityDataSelects,
 } from "../../../api/adminSecurities";
+import { formatCompact, formatDate, formatNav } from "../../../utils/aumFormat";
+
+/*
+| Data (fund data coverage) filter values match the API's `coverage` param.
+*/
+const COVERAGE_FILTERS = [
+  { value: "all", label: "All Data" },
+  { value: "current", label: "Current" },
+  { value: "stale", label: "Stale" },
+  { value: "failing", label: "Scrape failing" },
+  { value: "pending", label: "Awaiting first data" },
+  { value: "not_covered", label: "Not covered" },
+];
 
 export default function SecurityManagement() {
   const [securities, setSecurities] = useState([]);
@@ -27,6 +47,11 @@ export default function SecurityManagement() {
   const [search, setSearch] = useState("");
 
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const [coverageFilter, setCoverageFilter] = useState("all");
+
+  // security id -> "running" | { succeeded, data, error }
+  const [updateResults, setUpdateResults] = useState({});
 
   const [perPage, setPerPage] = useState(25);
 
@@ -50,7 +75,7 @@ export default function SecurityManagement() {
 
   useEffect(() => {
     loadSecurities();
-  }, [currentPage, perPage, search, statusFilter]);
+  }, [currentPage, perPage, search, statusFilter, coverageFilter]);
 
   async function loadSelects() {
     try {
@@ -84,6 +109,10 @@ export default function SecurityManagement() {
 
       if (statusFilter !== "all") {
         params.status_id = statusFilter;
+      }
+
+      if (coverageFilter !== "all") {
+        params.coverage = coverageFilter;
       }
 
       const response = await listSecuritiesData(params);
@@ -123,6 +152,33 @@ export default function SecurityManagement() {
     }
   }
 
+  async function handleRunUpdate(security) {
+    setUpdateResults((results) => ({ ...results, [security.id]: "running" }));
+
+    let result;
+
+    try {
+      const response = await runSecurityFundDataUpdate(security.id);
+
+      result = response.data;
+    } catch (err) {
+      result = {
+        succeeded: false,
+        error: err.response?.data?.message || "Unable to run the update.",
+      };
+    }
+
+    setUpdateResults((results) => ({ ...results, [security.id]: result }));
+
+    // Refresh the row's data status (latest AUM date, last scrape).
+    await loadSecurities();
+  }
+
+  function handleCoverageChange(value) {
+    setCoverageFilter(value);
+    setCurrentPage(1);
+  }
+
   function handleSearchChange(value) {
     setSearch(value);
     setCurrentPage(1);
@@ -146,8 +202,9 @@ export default function SecurityManagement() {
     (security) => security.status === "Retired",
   ).length;
 
-  const scheduledCount = securities.filter(
-    (security) => Number(security.schedule_count) > 0,
+  const attentionCount = securities.filter(
+    (security) =>
+      security.coverage_status === "stale" || security.last_scrape?.failed,
   ).length;
 
   const showingFrom = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
@@ -187,7 +244,7 @@ export default function SecurityManagement() {
 
         <StatCard label="Retired On Page" value={retiredCount} />
 
-        <StatCard label="Scheduled On Page" value={scheduledCount} />
+        <StatCard label="Needs Attention (Page)" value={attentionCount} />
       </section>
 
       <section className="glass-card rounded-3xl p-6">
@@ -204,6 +261,19 @@ export default function SecurityManagement() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
+            <select
+              value={coverageFilter}
+              onChange={(event) => handleCoverageChange(event.target.value)}
+              aria-label="Filter by data status"
+              className="rounded-2xl border border-brand-outline bg-brand-surfaceHigh px-4 py-3 text-brand-text outline-none transition focus:border-brand-primary"
+            >
+              {COVERAGE_FILTERS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
             <select
               value={statusFilter}
               onChange={(event) => handleStatusChange(event.target.value)}
@@ -245,9 +315,8 @@ export default function SecurityManagement() {
                   <TableHeading>Security Name</TableHeading>
                   <TableHeading>Issuer</TableHeading>
                   <TableHeading>Strategy</TableHeading>
-                  <TableHeading>Distribution</TableHeading>
                   <TableHeading>Status</TableHeading>
-                  <TableHeading>Schedules</TableHeading>
+                  <TableHeading>Data</TableHeading>
                   <TableHeading>Actions</TableHeading>
                 </tr>
               </thead>
@@ -256,7 +325,7 @@ export default function SecurityManagement() {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={7}
                       className="px-6 py-12 text-center text-brand-muted"
                     >
                       Loading securities...
@@ -265,7 +334,7 @@ export default function SecurityManagement() {
                 ) : securities.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={7}
                       className="px-6 py-12 text-center text-brand-muted"
                     >
                       No securities match your search.
@@ -302,19 +371,41 @@ export default function SecurityManagement() {
                       <TableCell>{security.strategy ?? "—"}</TableCell>
 
                       <TableCell>
-                        {security.distribution_frequency ?? "—"}
-                      </TableCell>
-
-                      <TableCell>
                         <StatusBadge status={security.status} />
                       </TableCell>
 
                       <TableCell>
-                        <ScheduleSummary count={security.schedule_count} />
+                        <DataStatus security={security} />
+
+                        <UpdateResult result={updateResults[security.id]} />
                       </TableCell>
 
                       <TableCell>
                         <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            disabled={
+                              !security.has_scraper ||
+                              updateResults[security.id] === "running"
+                            }
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary disabled:cursor-not-allowed disabled:opacity-40"
+                            title={
+                              security.has_scraper
+                                ? "Update now: scrape AUM and NAV for this ETF"
+                                : "No scraper for this issuer"
+                            }
+                            aria-label={`Update ${security.symbol} now`}
+                            onClick={() => handleRunUpdate(security)}
+                          >
+                            <RefreshCw
+                              className={`h-4 w-4 ${
+                                updateResults[security.id] === "running"
+                                  ? "animate-spin"
+                                  : ""
+                              }`}
+                            />
+                          </button>
+
                           <Link
                             to={`/admin/securities/${security.id}/edit`}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-outline bg-brand-surfaceHigh text-brand-primary transition hover:border-brand-primary"
@@ -449,20 +540,108 @@ function StatusBadge({ status }) {
   );
 }
 
-function ScheduleSummary({ count }) {
-  const scheduleCount = Number(count ?? 0);
+const COVERAGE_CHIPS = {
+  current: {
+    label: "Current",
+    icon: CheckCircle2,
+    className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+  },
+  stale: {
+    label: "Stale",
+    icon: AlertTriangle,
+    className: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+  },
+  pending: {
+    label: "Awaiting data",
+    icon: Clock,
+    className: "border-brand-outline bg-brand-surfaceHigh text-brand-muted",
+  },
+  not_covered: {
+    label: "Not covered",
+    icon: MinusCircle,
+    className: "border-brand-outline bg-brand-surfaceHigh text-brand-muted",
+  },
+};
 
-  if (scheduleCount === 0) {
-    return <span className="text-brand-muted">No schedules</span>;
+function Chip({ icon: Icon, label, className }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold ${className}`}
+    >
+      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      {label}
+    </span>
+  );
+}
+
+function DataStatus({ security }) {
+  const chip = COVERAGE_CHIPS[security.coverage_status] ?? COVERAGE_CHIPS.not_covered;
+  const scrape = security.last_scrape ?? {};
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex flex-wrap gap-1.5">
+        <Chip {...chip} />
+
+        {scrape.failed && (
+          <Chip
+            icon={AlertOctagon}
+            label="Scrape failing"
+            className="border-red-400/30 bg-red-400/10 text-red-300"
+          />
+        )}
+      </div>
+
+      <div className="text-xs text-brand-muted">
+        {security.latest_aum_date
+          ? `AUM as of ${formatDate(security.latest_aum_date)}`
+          : "No AUM data yet"}
+      </div>
+
+      {scrape.failed && scrape.last_error && (
+        <div
+          className="max-w-xs truncate text-xs text-red-300"
+          title={scrape.last_error}
+        >
+          {scrape.last_error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UpdateResult({ result }) {
+  if (!result) {
+    return null;
+  }
+
+  if (result === "running") {
+    return (
+      <div className="mt-2 text-xs text-brand-primary" role="status">
+        Updating…
+      </div>
+    );
+  }
+
+  if (result.succeeded) {
+    const data = result.data ?? {};
+
+    return (
+      <div className="mt-2 max-w-xs text-xs text-emerald-300" role="status">
+        Updated: AUM {formatCompact(data.assets_under_management)}
+        {data.aum_date ? ` (${formatDate(data.aum_date)})` : ""}, NAV{" "}
+        {formatNav(data.nav_per_share)}
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-1">
-      <div className="font-semibold text-brand-text">
-        {scheduleCount} configured
-      </div>
-
-      <div className="text-xs text-brand-muted">Update schedules active</div>
+    <div
+      className="mt-2 max-w-xs text-xs text-red-300"
+      role="status"
+      title={result.error}
+    >
+      Update failed: {result.error}
     </div>
   );
 }

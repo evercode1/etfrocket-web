@@ -32,6 +32,12 @@ export async function updateSecurityData(id, payload) {
   return response.data;
 }
 
+export async function runSecurityFundDataUpdate(id) {
+  const response = await api.post(`/admin/security-data-run-update/${id}`);
+
+  return response.data;
+}
+
 export async function retireSecurityData(id) {
   const response = await api.put(`/admin/security-data-retire/${id}`);
 

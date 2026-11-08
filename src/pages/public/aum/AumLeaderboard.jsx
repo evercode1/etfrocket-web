@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowDown, ArrowUp, Search } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowDownUp,
+  ArrowUp,
+  ChevronsUpDown,
+  Search,
+} from "lucide-react";
 
 import { getAumLeaderboard } from "../../../api/aum";
 import {
@@ -20,6 +27,8 @@ const PERIOD_LABELS = {
   "1y": "1Y",
 };
 
+const DEFAULT_PERIOD = "1m";
+
 const SORTERS = {
   rank: (row) => row.rank,
   symbol: (row) => row.symbol,
@@ -31,18 +40,45 @@ const SORTERS = {
   nav: (row) => row.nav,
 };
 
+const SORT_LABELS = {
+  rank: "Rank (AUM)",
+  symbol: "Symbol",
+  issuer: "Issuer",
+  aum: "AUM",
+  change: "Change ($)",
+  pct: "Change (%)",
+  flow: "Est. flows",
+  nav: "NAV",
+};
+
+// Text and rank read naturally ascending; numbers biggest-first.
+function defaultDirection(sortKey) {
+  return ["rank", "symbol", "issuer"].includes(sortKey) ? "asc" : "desc";
+}
+
+function isMissing(value) {
+  return value === null || value === undefined;
+}
+
 function compareRows(a, b, sortKey, direction, period) {
   const valueA = SORTERS[sortKey](a, period);
   const valueB = SORTERS[sortKey](b, period);
 
-  // Missing values always sort last.
-  if (valueA === null || valueA === undefined) return 1;
-  if (valueB === null || valueB === undefined) return -1;
+  // Missing values always sort last, in either direction; ties fall back to rank.
+  if (isMissing(valueA) || isMissing(valueB)) {
+    if (isMissing(valueA) && isMissing(valueB)) return a.rank - b.rank;
+
+    return isMissing(valueA) ? 1 : -1;
+  }
 
   const result =
     typeof valueA === "string"
       ? valueA.localeCompare(valueB)
       : valueA - valueB;
+
+  if (result === 0) {
+    return a.rank - b.rank;
+  }
 
   return direction === "asc" ? result : -result;
 }
@@ -53,11 +89,46 @@ export default function AumLeaderboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [period, setPeriod] = useState("1m");
-  const [issuer, setIssuer] = useState("");
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState("rank");
-  const [direction, setDirection] = useState("asc");
+
+  // Period, issuer filter and sort live in the URL (?period=3m&sort=flow&dir=desc)
+  // so they survive back/forward navigation and can be shared as links.
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const period = PERIOD_LABELS[searchParams.get("period")]
+    ? searchParams.get("period")
+    : DEFAULT_PERIOD;
+  const issuer = searchParams.get("issuer") ?? "";
+  const sortKey = SORTERS[searchParams.get("sort")]
+    ? searchParams.get("sort")
+    : "rank";
+  const direction = ["asc", "desc"].includes(searchParams.get("dir"))
+    ? searchParams.get("dir")
+    : defaultDirection(sortKey);
+
+  function updateParams(changes) {
+    const next = new URLSearchParams(searchParams);
+
+    Object.entries(changes).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === "") {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+    });
+
+    // Keep URLs clean: drop values that match the defaults.
+    if (next.get("period") === DEFAULT_PERIOD) next.delete("period");
+    if (next.get("sort") === "rank") next.delete("sort");
+    if (next.get("dir") === defaultDirection(next.get("sort") ?? "rank")) {
+      next.delete("dir");
+    }
+
+    setSearchParams(next, { replace: true });
+  }
+
+  const setPeriod = (value) => updateParams({ period: value });
+  const setIssuer = (value) => updateParams({ issuer: value });
 
   useEffect(() => {
     async function load() {
@@ -146,14 +217,12 @@ export default function AumLeaderboard() {
 
   function handleSort(key) {
     if (sortKey === key) {
-      setDirection(direction === "asc" ? "desc" : "asc");
+      updateParams({ dir: direction === "asc" ? "desc" : "asc" });
 
       return;
     }
 
-    setSortKey(key);
-    // Text and rank read naturally ascending; numbers biggest-first.
-    setDirection(["rank", "symbol", "issuer"].includes(key) ? "asc" : "desc");
+    updateParams({ sort: key, dir: defaultDirection(key) });
   }
 
   if (loading) {
@@ -293,6 +362,39 @@ export default function AumLeaderboard() {
               className="w-full rounded-xl border border-brand-outline bg-brand-surfaceLow py-2.5 pl-9 pr-4 text-sm text-brand-text placeholder:text-brand-muted focus:border-brand-primary focus:outline-none sm:w-64"
             />
           </label>
+
+          {/* Small screens hide some columns; this reaches every sort. */}
+          <div className="flex gap-2 md:hidden">
+            <select
+              value={sortKey}
+              onChange={(event) =>
+                updateParams({
+                  sort: event.target.value,
+                  dir: defaultDirection(event.target.value),
+                })
+              }
+              className="flex-1 rounded-xl border border-brand-outline bg-brand-surfaceLow px-4 py-2.5 text-sm text-brand-text focus:border-brand-primary focus:outline-none"
+              aria-label="Sort by"
+            >
+              {Object.entries(SORT_LABELS).map(([key, label]) => (
+                <option key={key} value={key}>
+                  Sort: {label}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={() =>
+                updateParams({ dir: direction === "asc" ? "desc" : "asc" })
+              }
+              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-outline bg-brand-surfaceLow px-3 py-2.5 text-sm text-brand-text"
+              aria-label={`Sort direction: ${direction === "asc" ? "ascending" : "descending"}. Click to reverse.`}
+            >
+              <ArrowDownUp className="h-4 w-4" aria-hidden="true" />
+              {direction === "asc" ? "Asc" : "Desc"}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -446,25 +548,35 @@ function SortHeader({
   className = "",
 }) {
   const active = sortKey === sortName;
-  const Icon = direction === "asc" ? ArrowUp : ArrowDown;
+  const Icon = active
+    ? direction === "asc"
+      ? ArrowUp
+      : ArrowDown
+    : ChevronsUpDown;
 
   return (
     <th
       scope="col"
       aria-sort={active ? (direction === "asc" ? "ascending" : "descending") : "none"}
-      className={`px-4 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-brand-muted ${
+      className={`px-2 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-brand-muted ${
         align === "right" ? "text-right" : ""
       } ${className}`}
     >
       <button
         type="button"
         onClick={() => handleSort(sortName)}
-        className={`inline-flex items-center gap-1 uppercase transition hover:text-brand-text ${
+        title={`Sort by ${SORT_LABELS[sortName]}`}
+        className={`group inline-flex items-center gap-1 rounded-lg px-2 py-1 uppercase transition hover:bg-brand-surfaceHigh hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
           align === "right" ? "flex-row-reverse" : ""
-        } ${active ? "text-brand-primary" : ""}`}
+        } ${active ? "bg-brand-primary/10 text-brand-primary" : ""}`}
       >
         {label}
-        {active && <Icon className="h-3 w-3" />}
+        <Icon
+          className={`h-3 w-3 shrink-0 ${
+            active ? "" : "opacity-40 transition group-hover:opacity-100"
+          }`}
+          aria-hidden="true"
+        />
       </button>
     </th>
   );

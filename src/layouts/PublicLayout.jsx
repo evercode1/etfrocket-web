@@ -46,7 +46,10 @@ export default function PublicLayout() {
             </Link>
 
             {user ? (
-              <Link to="/dashboard" className={primaryLink}>
+              <Link
+                to={user.is_admin ? "/admin" : "/dashboard"}
+                className={primaryLink}
+              >
                 Dashboard
               </Link>
             ) : (

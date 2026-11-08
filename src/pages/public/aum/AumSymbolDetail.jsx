@@ -382,7 +382,6 @@ export default function AumSymbolDetail() {
         <p className="mt-4 text-xs text-brand-muted">
           Shares outstanding are derived as AUM / NAV. Estimated flows are the
           change in shares outstanding multiplied by NAV and are approximate.
-          Data is informational and not investment advice.
         </p>
       </div>
     </PageFrame>

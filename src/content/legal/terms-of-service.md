@@ -1,6 +1,6 @@
 # ETF Rocket Terms of Service
 
-_Last Updated: May 17, 2026_
+_Last Updated: November 8, 2026_
 
 ## 1. Acceptance of Terms
 
@@ -78,7 +78,7 @@ You should consult licensed financial, legal, and tax professionals before makin
 
 # 4. No Guarantees or Warranties Regarding Financial Data
 
-ETF Rocket aggregates financial data from third-party sources and internal calculations.
+ETF Rocket aggregates financial data from third-party sources and internal calculations, including data collected automatically from publicly available ETF issuer websites. Automated collection may fail, capture incorrect or outdated values, or misread source pages.
 
 We do not guarantee:
 
@@ -94,7 +94,10 @@ We do not guarantee:
 of any data, including but not limited to:
 
 - ETF prices
+- Assets under management (AUM)
 - NAV values
+- Shares outstanding
+- Estimated fund flows, rankings, and other derived or calculated figures
 - Dividend information
 - Yield calculations
 - Historical performance

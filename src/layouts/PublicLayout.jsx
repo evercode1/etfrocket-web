@@ -2,7 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
-import PublicFooter from "../components/layout/PublicFooter";
+import SiteDisclaimer from "../components/layout/SiteDisclaimer";
 
 import { Rocket } from "lucide-react";
 
@@ -68,9 +68,7 @@ export default function PublicLayout() {
           <Outlet />
         </main>
 
-        {/* Footer floats over landing page video/background */}
-
-        <div className="relative z-30"></div>
+        <SiteDisclaimer />
       </div>
     </div>
   );

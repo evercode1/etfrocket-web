@@ -396,7 +396,7 @@ export default function AumLeaderboard() {
       <p className="mt-4 text-xs text-brand-muted">
         Estimated flows are derived from changes in shares outstanding (AUM /
         NAV) and are approximate. Funds marked “New” launched during the
-        selected period. Data is informational and not investment advice.
+        selected period.
       </p>
     </div>
   );

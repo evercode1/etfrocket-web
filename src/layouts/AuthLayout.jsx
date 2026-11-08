@@ -2,6 +2,8 @@ import { Link, Outlet } from "react-router-dom";
 
 import { Rocket } from "lucide-react";
 
+import SiteDisclaimer from "../components/layout/SiteDisclaimer";
+
 export default function AuthLayout() {
   return (
     <div className="min-h-screen bg-brand-background text-brand-text">
@@ -27,6 +29,8 @@ export default function AuthLayout() {
           <Outlet />
         </div>
       </div>
+
+      <SiteDisclaimer />
     </div>
   );
 }

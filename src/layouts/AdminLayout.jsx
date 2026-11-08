@@ -15,6 +15,7 @@ import {
 import AdminSupportBell from "../components/support/AdminSupportBell";
 
 import { useAuth } from "../context/AuthContext";
+import SiteDisclaimer from "../components/layout/SiteDisclaimer";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -130,6 +131,8 @@ export default function AdminLayout() {
       <main className="mx-auto max-w-7xl px-6 py-8">
         <Outlet />
       </main>
+
+      <SiteDisclaimer />
     </div>
   );
 }

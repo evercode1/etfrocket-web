@@ -21,6 +21,7 @@ import {
 import SupportBell from "../components/support/SupportBell";
 
 import { useAuth } from "../context/AuthContext";
+import SiteDisclaimer from "../components/layout/SiteDisclaimer";
 
 const COMMANDS = [
   {
@@ -475,6 +476,8 @@ export default function UserLayout() {
       <main className="mx-auto max-w-7xl px-6 py-8">
         <Outlet />
       </main>
+
+      <SiteDisclaimer />
     </div>
   );
 }

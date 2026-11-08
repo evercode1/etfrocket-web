@@ -211,17 +211,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Copyright */}
-
-        <div className="mt-8 text-center">
-          <p className="text-sm text-slate-400">
-            © 2026 ETF Rocket. All rights reserved.
-          </p>
-
-          <p className="mt-2 font-mono text-xs uppercase tracking-[0.35em] text-slate-500">
-            ETF Mission Control
-          </p>
-        </div>
+        {/* Copyright + disclaimer: SiteDisclaimer (rendered by PublicLayout) */}
       </footer>
     </main>
   );

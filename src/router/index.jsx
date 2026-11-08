@@ -14,6 +14,7 @@ import HelpArticle from "../pages/public/help/HelpArticle";
 import PrivacyPolicy from "../pages/public/legal/PrivacyPolicy";
 import TermsOfService from "../pages/public/legal/TermsOfService";
 import AumLeaderboard from "../pages/public/aum/AumLeaderboard";
+import AumSymbolDetail from "../pages/public/aum/AumSymbolDetail";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
       {
         path: "aum",
         element: <AumLeaderboard />,
+      },
+      {
+        path: "aum/:symbol",
+        element: <AumSymbolDetail />,
       },
       {
         path: "account/verify/:token",

@@ -1,7 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowDown, ArrowUp, Search } from "lucide-react";
 
 import { getAumLeaderboard } from "../../../api/aum";
+import {
+  formatCompact,
+  formatDate,
+  formatNav,
+  formatPercent,
+  formatSignedCompact,
+  trendClass,
+} from "../../../utils/aumFormat";
 
 const PERIOD_LABELS = {
   "1w": "1W",
@@ -10,68 +19,6 @@ const PERIOD_LABELS = {
   ytd: "YTD",
   "1y": "1Y",
 };
-
-const compactCurrency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  notation: "compact",
-  maximumFractionDigits: 2,
-});
-
-const navCurrency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-function formatCompact(value) {
-  if (value === null || value === undefined) {
-    return "—";
-  }
-
-  return compactCurrency.format(value);
-}
-
-function formatSignedCompact(value) {
-  if (value === null || value === undefined) {
-    return "—";
-  }
-
-  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
-
-  return `${sign}${compactCurrency.format(Math.abs(value))}`;
-}
-
-function formatPercent(value) {
-  if (value === null || value === undefined) {
-    return "—";
-  }
-
-  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
-
-  return `${sign}${Math.abs(value).toFixed(2)}%`;
-}
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function trendClass(value) {
-  if (value === null || value === undefined || value === 0) {
-    return "text-brand-muted";
-  }
-
-  return value > 0 ? "text-emerald-300" : "text-brand-danger";
-}
 
 const SORTERS = {
   rank: (row) => row.rank,
@@ -102,6 +49,7 @@ function compareRows(a, b, sortKey, direction, period) {
 
 export default function AumLeaderboard() {
   const [leaderboard, setLeaderboard] = useState(null);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -364,16 +312,21 @@ export default function AumLeaderboard() {
                 return (
                   <tr
                     key={row.security_id}
-                    className="transition hover:bg-brand-surfaceHigh/60"
+                    onClick={() => navigate(`/aum/${row.symbol}`)}
+                    className="cursor-pointer transition hover:bg-brand-surfaceHigh/60"
                   >
                     <td className="px-4 py-3 font-mono text-brand-muted">
                       {row.rank}
                     </td>
 
                     <td className="px-4 py-3">
-                      <div className="font-mono font-bold text-brand-primary">
+                      <Link
+                        to={`/aum/${row.symbol}`}
+                        onClick={(event) => event.stopPropagation()}
+                        className="font-mono font-bold text-brand-primary hover:underline focus:underline focus:outline-none"
+                      >
                         {row.symbol}
-                      </div>
+                      </Link>
 
                       <div className="max-w-[16rem] truncate text-xs text-brand-muted">
                         {row.name}
@@ -422,7 +375,7 @@ export default function AumLeaderboard() {
                     </td>
 
                     <td className="hidden px-4 py-3 text-right font-mono text-brand-muted xl:table-cell">
-                      {row.nav !== null ? navCurrency.format(row.nav) : "—"}
+                      {formatNav(row.nav)}
                     </td>
                   </tr>
                 );
@@ -441,7 +394,7 @@ export default function AumLeaderboard() {
       </section>
 
       <p className="mt-4 text-xs text-brand-muted">
-        Estimated flows are derived from changes in shares outstanding (AUM ÷
+        Estimated flows are derived from changes in shares outstanding (AUM /
         NAV) and are approximate. Funds marked “New” launched during the
         selected period. Data is informational and not investment advice.
       </p>

@@ -6,58 +6,54 @@ import PublicFooter from "../components/layout/PublicFooter";
 
 import { Rocket } from "lucide-react";
 
+const outlineLink =
+  "whitespace-nowrap rounded-xl border border-brand-outline px-3 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest sm:px-5";
+
+const primaryLink =
+  "whitespace-nowrap rounded-xl bg-brand-primaryStrong px-3 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:scale-105 sm:px-5";
+
 export default function PublicLayout() {
   const { user } = useAuth();
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-brand-background text-brand-text">
       <header className="relative z-40 border-b border-brand-outline bg-brand-surface/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-5 sm:px-6">
           <Link
             to="/"
             className="flex items-center gap-3 font-display text-2xl font-bold text-brand-primary"
+            aria-label="ETF Rocket home"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-primary/10 shadow-glow">
               <Rocket className="h-5 w-5 text-brand-primary" />
             </div>
 
-            <span>ETF Rocket</span>
+            <span className="hidden whitespace-nowrap sm:inline">ETF Rocket</span>
           </Link>
 
-          <nav className="flex items-center gap-4">
-            <Link
-              to="/aum"
-              className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
-            >
-              AUM Leaderboard
+          <nav className="flex items-center gap-2 sm:gap-4">
+            <Link to="/aum" className={outlineLink}>
+              <span className="sm:hidden">AUM</span>
+              <span className="hidden sm:inline">AUM Leaderboard</span>
             </Link>
 
-            <Link
-              to="/help"
-              className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
-            >
+            <Link to="/help" className={`hidden md:inline-block ${outlineLink}`}>
               Help Center
             </Link>
 
             {user ? (
-              <Link
-                to="/dashboard"
-                className="rounded-xl bg-brand-primaryStrong px-5 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:scale-105"
-              >
+              <Link to="/dashboard" className={primaryLink}>
                 Dashboard
               </Link>
             ) : (
               <>
-                <Link
-                  to="/auth/login"
-                  className="rounded-xl border border-brand-outline px-5 py-2 text-sm font-semibold text-brand-text transition hover:bg-brand-surfaceHighest"
-                >
+                <Link to="/auth/login" className={outlineLink}>
                   Login
                 </Link>
 
                 <Link
                   to="/auth/register"
-                  className="rounded-xl bg-brand-primaryStrong px-5 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:scale-105"
+                  className={`hidden sm:inline-block ${primaryLink}`}
                 >
                   Get Started
                 </Link>

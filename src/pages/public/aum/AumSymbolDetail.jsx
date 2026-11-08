@@ -160,8 +160,12 @@ export default function AumSymbolDetail() {
         if (!cancelled) {
           setError(
             err.response?.status === 404
-              ? `No ETF found for “${symbol.toUpperCase()}”.`
-              : err.response?.data?.message || "Unable to load AUM history.",
+              ? { notCovered: true }
+              : {
+                  message:
+                    err.response?.data?.message ||
+                    "Unable to load AUM history.",
+                },
           );
         }
       } finally {
@@ -238,11 +242,19 @@ export default function AumSymbolDetail() {
     );
   }
 
+  if (error?.notCovered) {
+    return (
+      <PageFrame>
+        <NotCovered symbol={symbol} />
+      </PageFrame>
+    );
+  }
+
   if (error) {
     return (
       <PageFrame>
         <div className="glass-card rounded-3xl p-8 text-brand-danger">
-          {error}
+          {error.message}
         </div>
       </PageFrame>
     );
@@ -253,11 +265,7 @@ export default function AumSymbolDetail() {
   if (!view) {
     return (
       <PageFrame>
-        <SecurityHeader security={security} />
-
-        <div className="glass-card rounded-3xl p-8 text-brand-muted">
-          No AUM data has been collected for this ETF yet.
-        </div>
+        <NotCovered symbol={security.symbol} />
       </PageFrame>
     );
   }
@@ -400,6 +408,24 @@ function PageFrame({ children }) {
       </Link>
 
       {children}
+    </div>
+  );
+}
+
+function NotCovered({ symbol }) {
+  return (
+    <div className="glass-card rounded-3xl p-8">
+      <p className="font-display text-xl font-bold text-white">
+        We don't currently provide coverage for {symbol.toUpperCase()}.
+      </p>
+
+      <p className="mt-2 text-brand-muted">
+        Browse the ETFs we track on the{" "}
+        <Link to="/aum" className="text-brand-primary hover:underline">
+          AUM Leaderboard
+        </Link>
+        , or search for another fund above.
+      </p>
     </div>
   );
 }

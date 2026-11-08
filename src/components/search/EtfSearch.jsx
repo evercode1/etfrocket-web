@@ -58,6 +58,18 @@ function search(index, rawQuery) {
     .map((item) => item.etf);
 }
 
+// Ticker-like input ("tsla", "BRK.B") reads as a symbol; anything else
+// (e.g. "tesla income") is treated as a name search.
+function noCoverageMessage(rawQuery) {
+  const query = rawQuery.trim();
+
+  if (/^[A-Za-z0-9.-]{1,6}$/.test(query)) {
+    return `We don't currently provide coverage for ${query.toUpperCase()}.`;
+  }
+
+  return `We don't currently cover any ETFs matching “${query}”.`;
+}
+
 function isTypingTarget(element) {
   return (
     element instanceof HTMLElement &&
@@ -247,7 +259,7 @@ export default function EtfSearch({ className = "" }) {
               {loadError
                 ? "Search is unavailable right now."
                 : index
-                  ? `No ETFs match “${query.trim()}”.`
+                  ? noCoverageMessage(query)
                   : "Loading…"}
             </p>
           )}

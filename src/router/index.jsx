@@ -21,7 +21,7 @@ import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
-import AdminDashboard from "../pages/admin/Dashboard";
+import PipelineHealth from "../pages/admin/system/PipelineHealth";
 import ListUsers from "../pages/admin/user/ListUsers.jsx";
 import ViewUser from "../pages/admin/user/ViewUser.jsx";
 import EditUser from "../pages/admin/user/EditUser.jsx";
@@ -142,7 +142,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminDashboard />,
+            element: <PipelineHealth />,
           },
           {
             path: "users",

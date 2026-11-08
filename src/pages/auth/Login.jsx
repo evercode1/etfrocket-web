@@ -35,9 +35,9 @@ export default function Login() {
     setError(null);
 
     try {
-      await login(form);
+      const response = await login(form);
 
-      navigate("/dashboard");
+      navigate(response.user?.is_admin ? "/admin" : "/dashboard");
     } catch (err) {
       setError(
         err.response?.data?.message || "Unable to login. Please try again.",

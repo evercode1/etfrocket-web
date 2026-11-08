@@ -1,5 +1,11 @@
 import api from "./client";
 
+export async function getPipelineHealth() {
+  const response = await api.get("/admin/pipeline-health");
+
+  return response.data;
+}
+
 export async function getCronReports() {
   const response = await api.get("/admin/cron-reports");
 

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
@@ -17,7 +17,6 @@ import AumLeaderboard from "../pages/public/aum/AumLeaderboard";
 import AumSymbolDetail from "../pages/public/aum/AumSymbolDetail";
 
 import Login from "../pages/auth/Login";
-import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
@@ -119,8 +118,9 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        // Registration is closed; the only account is the admin's.
         path: "register",
-        element: <Register />,
+        element: <Navigate to="/auth/login" replace />,
       },
       {
         path: "forgot-password",

@@ -41,30 +41,19 @@ export default function PublicLayout() {
               <span className="hidden sm:inline">AUM Leaderboard</span>
             </Link>
 
-            <Link to="/help" className={`hidden xl:inline-block ${outlineLink}`}>
+            <Link to="/help" className={`hidden sm:inline-block ${outlineLink}`}>
               Help Center
             </Link>
 
-            {user ? (
+            {/* No public sign-in or sign-up: the only account is the admin's,
+                who signs in at /auth/login directly. */}
+            {user && (
               <Link
                 to={user.is_admin ? "/admin" : "/dashboard"}
                 className={primaryLink}
               >
                 Dashboard
               </Link>
-            ) : (
-              <>
-                <Link to="/auth/login" className={outlineLink}>
-                  Login
-                </Link>
-
-                <Link
-                  to="/auth/register"
-                  className={`hidden sm:inline-block ${primaryLink}`}
-                >
-                  Get Started
-                </Link>
-              </>
             )}
           </nav>
         </div>

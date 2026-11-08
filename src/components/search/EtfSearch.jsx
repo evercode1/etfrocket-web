@@ -78,7 +78,18 @@ function isTypingTarget(element) {
   );
 }
 
-export default function EtfSearch({ className = "" }) {
+/*
+| size: "md" (headers) or "lg" (landing hero).
+| hotkey: whether "/" focuses this instance. Only one visible instance per
+| page should claim it (the header's), so secondary instances pass false.
+*/
+export default function EtfSearch({
+  className = "",
+  size = "md",
+  hotkey = true,
+  placeholder = "Search ETFs",
+}) {
+  const large = size === "lg";
   const navigate = useNavigate();
   const listboxId = useId();
   const inputRef = useRef(null);
@@ -104,6 +115,10 @@ export default function EtfSearch({ className = "" }) {
 
   // "/" focuses the search from anywhere on the page (when not typing).
   useEffect(() => {
+    if (!hotkey) {
+      return undefined;
+    }
+
     function handleKeyDown(event) {
       if (
         event.key !== "/" ||
@@ -124,7 +139,7 @@ export default function EtfSearch({ className = "" }) {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [hotkey]);
 
   const results = useMemo(
     () => (index ? search(index, query) : []),
@@ -173,7 +188,9 @@ export default function EtfSearch({ className = "" }) {
       </label>
 
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted"
+        className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-brand-muted ${
+          large ? "left-4 h-5 w-5" : "left-3 h-4 w-4"
+        }`}
         aria-hidden="true"
       />
 
@@ -193,7 +210,7 @@ export default function EtfSearch({ className = "" }) {
             : undefined
         }
         value={query}
-        placeholder="Search ETFs"
+        placeholder={placeholder}
         onFocus={() => {
           ensureIndex();
           setOpen(true);
@@ -206,15 +223,21 @@ export default function EtfSearch({ className = "" }) {
           setOpen(true);
         }}
         onKeyDown={handleKeyDown}
-        className="w-full rounded-xl border border-brand-outline bg-brand-surfaceLow py-2 pl-9 pr-9 text-sm text-brand-text placeholder:text-brand-muted transition focus:border-brand-primary focus:outline-none"
+        className={`w-full rounded-xl border border-brand-outline bg-brand-surfaceLow text-brand-text placeholder:text-brand-muted transition focus:border-brand-primary focus:outline-none ${
+          large
+            ? "py-3 pl-12 pr-4 text-base"
+            : "py-2 pl-9 pr-9 text-sm"
+        }`}
       />
 
-      <kbd
-        className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-brand-outline px-1.5 font-mono text-[10px] text-brand-muted md:block"
-        aria-hidden="true"
-      >
-        /
-      </kbd>
+      {hotkey && (
+        <kbd
+          className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-brand-outline px-1.5 font-mono text-[10px] text-brand-muted md:block"
+          aria-hidden="true"
+        >
+          /
+        </kbd>
+      )}
 
       {showPanel && (
         <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-brand-outline bg-brand-surface shadow-glow">

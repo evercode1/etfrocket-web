@@ -5,14 +5,23 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
+  Play,
   RefreshCw,
+  X,
   XCircle,
 } from "lucide-react";
 
-import { getPipelineHealth } from "../../../api/monitoring";
+import {
+  getLatestManualRun,
+  getManualRun,
+  getPipelineHealth,
+  startManualRun,
+} from "../../../api/monitoring";
 import { formatDate } from "../../../utils/aumFormat";
 
 const REFRESH_MS = 5 * 60 * 1000;
+
+const RUN_POLL_MS = 4000;
 
 /*
 | Status tokens (reserved for state; always paired with an icon + label).
@@ -118,6 +127,60 @@ export default function PipelineHealth() {
     return () => clearInterval(timer);
   }, [fetchHealth, load]);
 
+  /*
+  | Manual AUM runs: resume the latest run on load, poll while it is
+  | running, and refresh the health data once it finishes.
+  */
+  const [run, setRun] = useState(null);
+  const [runPanelOpen, setRunPanelOpen] = useState(false);
+  const [runError, setRunError] = useState(null);
+  const [startingRun, setStartingRun] = useState(false);
+
+  useEffect(() => {
+    getLatestManualRun()
+      .then((response) => setRun(response.data))
+      .catch(() => {});
+  }, []);
+
+  const runId = run?.id;
+  const runActive = Boolean(run && !run.is_complete && !run.is_stalled);
+
+  useEffect(() => {
+    if (!runId || !runActive) {
+      return undefined;
+    }
+
+    const timer = setInterval(() => {
+      getManualRun(runId)
+        .then((response) => {
+          setRun(response.data);
+
+          if (response.data.is_complete) {
+            fetchHealth();
+          }
+        })
+        .catch(() => {});
+    }, RUN_POLL_MS);
+
+    return () => clearInterval(timer);
+  }, [runId, runActive, fetchHealth]);
+
+  async function handleStartRun(scope, issuerId = null) {
+    setStartingRun(true);
+    setRunError(null);
+
+    try {
+      const response = await startManualRun(scope, issuerId);
+
+      setRun(response.data);
+      setRunPanelOpen(false);
+    } catch (err) {
+      setRunError(err.response?.data?.message || "Unable to start the AUM update.");
+    } finally {
+      setStartingRun(false);
+    }
+  }
+
   return (
     <div className="space-y-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -142,19 +205,50 @@ export default function PipelineHealth() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={load}
-          disabled={loading}
-          className="inline-flex items-center gap-2 self-start rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-text transition hover:bg-brand-surfaceHigh disabled:opacity-60 sm:self-auto"
-        >
-          <RefreshCw
-            className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-            aria-hidden="true"
-          />
-          Refresh
-        </button>
+        <div className="flex gap-3 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setRunPanelOpen((open) => !open)}
+            disabled={!data || runActive}
+            aria-expanded={runPanelOpen}
+            title={runActive ? "An AUM update is already running" : undefined}
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-primaryStrong px-4 py-2 text-sm font-bold text-brand-background shadow-glow transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" aria-hidden="true" />
+            Run AUM update
+          </button>
+
+          <button
+            type="button"
+            onClick={load}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl border border-brand-outline px-4 py-2 text-sm text-brand-text transition hover:bg-brand-surfaceHigh disabled:opacity-60"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              aria-hidden="true"
+            />
+            Refresh
+          </button>
+        </div>
       </header>
+
+      {runPanelOpen && data && (
+        <RunPanel
+          data={data}
+          starting={startingRun}
+          onStart={handleStartRun}
+          onClose={() => setRunPanelOpen(false)}
+        />
+      )}
+
+      {runError && (
+        <div className="rounded-2xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-100" role="alert">
+          {runError}
+        </div>
+      )}
+
+      {run && <ManualRunCard run={run} onDismiss={() => setRun(null)} />}
 
       {error && (
         <div className="rounded-2xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-100">
@@ -184,12 +278,211 @@ export default function PipelineHealth() {
           <IssuerTable
             issuers={data.issuers}
             windowDays={data.issuer_window_days}
+            runDisabled={runActive || startingRun}
+            onRun={(issuerId) => handleStartRun("issuer", issuerId)}
           />
 
           <ProblemTable problems={data.problems} />
         </div>
       )}
     </div>
+  );
+}
+
+const RUN_SCOPES = [
+  { value: "problems", label: "ETFs needing attention" },
+  { value: "issuer", label: "One issuer" },
+  { value: "all", label: "All covered ETFs" },
+];
+
+function RunPanel({ data, starting, onStart, onClose }) {
+  const [scope, setScope] = useState("problems");
+  const [issuerId, setIssuerId] = useState("");
+
+  const counts = {
+    problems: data.problems.length,
+    issuer: issuerId
+      ? (data.issuers.find((issuer) => String(issuer.issuer_id) === issuerId)?.covered ?? 0)
+      : null,
+    all: data.coverage.covered + (data.coverage.unscheduled ?? 0),
+  };
+
+  const count = counts[scope];
+  const canStart = !starting && count > 0 && (scope !== "issuer" || issuerId);
+
+  return (
+    <section className="glass-card rounded-3xl p-6" aria-label="Run AUM update">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-display text-xl font-bold text-white">Run AUM update now</h2>
+          <p className="mt-1 text-sm text-brand-muted">
+            Scrapes AUM and NAV right away instead of waiting for each ETF&apos;s
+            scheduled hour. ETFs that were never scheduled get a schedule too.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg p-1 text-brand-muted transition hover:text-brand-text"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5" aria-hidden="true" />
+        </button>
+      </div>
+
+      <fieldset className="mt-5 space-y-3">
+        <legend className="sr-only">Which ETFs</legend>
+
+        {RUN_SCOPES.map((option) => (
+          <label key={option.value} className="flex flex-wrap items-center gap-3 text-sm text-brand-text">
+            <input
+              type="radio"
+              name="run-scope"
+              value={option.value}
+              checked={scope === option.value}
+              onChange={() => setScope(option.value)}
+              className="accent-[#00d1ff]"
+            />
+            <span>
+              {option.label}
+              {option.value !== "issuer" && (
+                <span className="ml-2 text-brand-muted">({counts[option.value]})</span>
+              )}
+            </span>
+
+            {option.value === "issuer" && (
+              <select
+                value={issuerId}
+                onChange={(event) => {
+                  setIssuerId(event.target.value);
+                  setScope("issuer");
+                }}
+                aria-label="Issuer"
+                className="rounded-xl border border-brand-outline bg-brand-surfaceLow px-3 py-1.5 text-sm text-brand-text focus:border-brand-primary focus:outline-none"
+              >
+                <option value="">Choose issuer…</option>
+                {data.issuers.map((issuer) => (
+                  <option key={issuer.issuer_id} value={issuer.issuer_id}>
+                    {issuer.issuer_name} ({issuer.covered})
+                  </option>
+                ))}
+              </select>
+            )}
+          </label>
+        ))}
+      </fieldset>
+
+      <div className="mt-6 flex items-center gap-3">
+        <button
+          type="button"
+          disabled={!canStart}
+          onClick={() => onStart(scope, scope === "issuer" ? Number(issuerId) : null)}
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-primaryStrong px-4 py-2 text-sm font-bold text-brand-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Play className="h-4 w-4" aria-hidden="true" />
+          {starting ? "Starting…" : count ? `Start (${count} ETFs)` : "Start"}
+        </button>
+
+        {count === 0 && (
+          <span className="text-sm text-brand-muted">Nothing to update for this selection.</span>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ManualRunCard({ run, onDismiss }) {
+  const percent = run.total > 0 ? Math.round((run.processed / run.total) * 100) : 0;
+
+  const state = run.is_complete
+    ? run.failed > 0
+      ? { tone: "warning", label: "Finished with failures" }
+      : { tone: "good", label: "Finished" }
+    : run.is_stalled
+      ? { tone: "critical", label: "Stalled" }
+      : { tone: "neutral", label: "Running" };
+
+  return (
+    <section className="glass-card rounded-3xl p-6" aria-live="polite">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="font-display text-lg font-bold text-white">AUM update</h2>
+            <StatusChip tone={state.tone} label={state.label} />
+          </div>
+
+          <p className="mt-1 text-sm text-brand-muted">
+            {run.description.replace(/\.?\s*$/, ".")} Started{" "}
+            {relativeTime(run.started_at)}.
+          </p>
+        </div>
+
+        {(run.is_complete || run.is_stalled) && (
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="rounded-lg p-1 text-brand-muted transition hover:text-brand-text"
+            aria-label="Dismiss"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+
+      <div
+        className="mt-4 h-2 overflow-hidden rounded-full bg-brand-surfaceHighest"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={run.total}
+        aria-valuenow={run.processed}
+        aria-label="AUM update progress"
+      >
+        <div
+          className={`h-full rounded-full transition-all ${
+            run.failed > 0 ? "bg-amber-300" : "bg-brand-primaryStrong"
+          }`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+
+      <p className="mt-2 font-mono text-sm tabular-nums text-brand-text">
+        {run.processed} / {run.total} done ·{" "}
+        <span className="text-emerald-300">{run.succeeded} succeeded</span> ·{" "}
+        <span className={run.failed > 0 ? "text-brand-danger" : "text-brand-muted"}>
+          {run.failed} failed
+        </span>
+        {run.schedules_created > 0 && (
+          <span className="text-brand-muted"> · {run.schedules_created} newly scheduled</span>
+        )}
+      </p>
+
+      {run.is_stalled && (
+        <p className="mt-3 text-sm text-red-200">
+          This run stopped making progress. Check that the queue worker is
+          running, then start a new run.
+        </p>
+      )}
+
+      {run.failures.length > 0 && (
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm text-brand-text">
+            Show failures ({run.failed})
+          </summary>
+
+          <ul className="mt-2 space-y-1 text-xs">
+            {run.failures.map((failure) => (
+              <li key={failure.symbol} className="flex gap-2">
+                <span className="w-14 shrink-0 font-mono font-bold text-brand-primary">
+                  {failure.symbol}
+                </span>
+                <span className="text-red-200">{failure.error}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
   );
 }
 
@@ -256,10 +549,24 @@ function CoverageCards({ coverage, staleAfterDays }) {
       value: coverage.pending,
       detail: "Covered, never scraped successfully",
     },
+    ...(coverage.unscheduled > 0
+      ? [
+          {
+            label: "Not scheduled",
+            value: coverage.unscheduled,
+            detail: "Have a scraper, never scheduled. A run schedules them.",
+            tone: "warning",
+          },
+        ]
+      : []),
   ];
 
   return (
-    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <section
+      className={`grid gap-4 sm:grid-cols-2 ${
+        cards.length > 5 ? "lg:grid-cols-3 xl:grid-cols-6" : "lg:grid-cols-5"
+      }`}
+    >
       {cards.map((card) => (
         <div key={card.label} className="glass-card rounded-3xl p-5">
           <p className="font-mono text-xs uppercase tracking-widest text-brand-muted">
@@ -439,13 +746,13 @@ function SuccessMeter({ rate }) {
   );
 }
 
-function IssuerTable({ issuers, windowDays }) {
+function IssuerTable({ issuers, windowDays, runDisabled, onRun }) {
   return (
     <Card
       title="Scrapers by issuer"
       subtitle={`Scrape success over the last ${windowDays} days. A whole issuer failing usually means its website changed.`}
     >
-      <table className="w-full min-w-[860px] text-sm">
+      <table className="w-full min-w-[940px] text-sm">
         <thead className="bg-brand-surfaceLow/80">
           <tr>
             <Th>Issuer</Th>
@@ -456,6 +763,7 @@ function IssuerTable({ issuers, windowDays }) {
             <Th align="right">Attempts</Th>
             <Th>Last success</Th>
             <Th align="right">Stale</Th>
+            <Th align="right">Update</Th>
           </tr>
         </thead>
 
@@ -493,6 +801,18 @@ function IssuerTable({ issuers, windowDays }) {
                 >
                   {issuer.stale}
                 </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    type="button"
+                    disabled={runDisabled}
+                    onClick={() => onRun(issuer.issuer_id)}
+                    title={`Scrape all ${issuer.issuer_name} ETFs now`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-brand-outline px-2.5 py-1 text-xs text-brand-text transition hover:border-brand-primary hover:text-brand-primary disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <Play className="h-3 w-3" aria-hidden="true" />
+                    Run
+                  </button>
+                </td>
               </tr>
             );
           })}
@@ -505,6 +825,7 @@ function IssuerTable({ issuers, windowDays }) {
 function problemStatus(problem) {
   if (problem.status === "stale") return { tone: "warning", label: "Stale" };
   if (problem.status === "pending") return { tone: "neutral", label: "Awaiting data" };
+  if (problem.status === "unscheduled") return { tone: "warning", label: "Not scheduled" };
 
   return { tone: "critical", label: "Scrape failing" };
 }

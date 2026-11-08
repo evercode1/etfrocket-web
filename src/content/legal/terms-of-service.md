@@ -4,7 +4,7 @@ _Last Updated: November 8, 2026_
 
 ## 1. Acceptance of Terms
 
-Welcome to ETF Rocket (“ETF Rocket,” “we,” “our,” or “us”). By accessing or using the ETF Rocket website, applications, services, tools, analytics, charts, content, APIs, or related features (collectively, the “Services”), you agree to be bound by these Terms of Service (“Terms”).
+Welcome to ETF Rocket (“ETF Rocket,” “we,” “our,” or “us”). By accessing or using the ETF Rocket website, data, charts, rankings, search, help center, content, APIs, or related features (collectively, the “Services”), you agree to be bound by these Terms of Service (“Terms”).
 
 If you do not agree to these Terms, you may not access or use the Services.
 
@@ -12,9 +12,9 @@ You must be at least 18 years old or the age of majority in your jurisdiction to
 
 ---
 
-# 2. Important Financial Disclaimer
+## 2. Important Financial Disclaimer
 
-## ETF Rocket Is Not An Investment Adviser
+### ETF Rocket Is Not An Investment Adviser
 
 ETF Rocket is an educational and informational platform.
 
@@ -39,7 +39,7 @@ Nothing provided through ETF Rocket constitutes:
 - Trading advice
 - Personalized recommendations
 - Recommendations to buy, sell, or hold securities
-- Portfolio suitability determinations
+- Suitability determinations
 - Fiduciary guidance
 
 All information is provided strictly for general informational and educational purposes.
@@ -48,11 +48,11 @@ You are solely responsible for your investment decisions.
 
 ---
 
-# 3. No Personalized Advice
+## 3. No Personalized Advice
 
 ETF Rocket does not provide individualized investment recommendations.
 
-Any rankings, analytics, metrics, comparisons, portfolio tools, screening systems, charts, calculations, projections, commentary, alerts, or insights are:
+Any rankings, leaderboards, analytics, metrics, comparisons, charts, calculations, estimated flows, commentary, or other information are:
 
 - Generalized
 - Algorithmic
@@ -72,13 +72,17 @@ ETF Rocket does not consider your:
 
 before displaying information.
 
+A fund’s ranking, asset growth, or estimated inflows do not indicate that it is a suitable or good investment.
+
 You should consult licensed financial, legal, and tax professionals before making investment decisions.
 
 ---
 
-# 4. No Guarantees or Warranties Regarding Financial Data
+## 4. No Guarantees or Warranties Regarding Financial Data
 
 ETF Rocket aggregates financial data from third-party sources and internal calculations, including data collected automatically from publicly available ETF issuer websites. Automated collection may fail, capture incorrect or outdated values, or misread source pages.
+
+The Services and all data are provided “as is” and “as available,” without warranties of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose, accuracy, and non-infringement.
 
 We do not guarantee:
 
@@ -93,37 +97,31 @@ We do not guarantee:
 
 of any data, including but not limited to:
 
-- ETF prices
 - Assets under management (AUM)
-- NAV values
+- Net asset value (NAV)
 - Shares outstanding
-- Estimated fund flows, rankings, and other derived or calculated figures
-- Dividend information
-- Yield calculations
-- Historical performance
-- Portfolio analytics
-- Import data
-- Fund metadata
-- Risk metrics
-- Distribution classifications
-- Tax classifications
-- Return calculations
+- Estimated fund flows
+- Rankings, period changes, and other derived or calculated figures
+- ETF prices and historical performance
+- Distribution information
+- Fund names, issuers, strategies, and other fund metadata
+- Coverage, meaning which ETFs are or are not tracked
 
 Financial markets are volatile and data may contain delays, omissions, inaccuracies, or interruptions.
 
-You acknowledge that ETF Rocket may contain errors.
+You acknowledge that ETF Rocket may contain errors. Always verify information with the fund issuer and the fund’s prospectus.
 
 ---
 
-# 5. Investment Risk Disclosure
+## 5. Investment Risk Disclosure
 
 Investing in securities involves substantial risk.
 
 You acknowledge that:
 
-- Investments may lose value
-- Past performance does not guarantee future results
-- Dividend yields may change or disappear
+- Investments may lose value, including principal
+- Past performance and historical asset levels do not guarantee future results
+- Distributions and yields may change or stop
 - ETFs may experience NAV erosion
 - Leveraged and inverse ETFs carry elevated risks
 - Income strategies may involve significant principal risk
@@ -138,80 +136,64 @@ ETF Rocket is not responsible for:
 - Trading losses
 - Tax liabilities
 - Missed opportunities
-- Portfolio underperformance
+- Investment underperformance
 - Data inaccuracies
 - Delayed information
 - Service interruptions
 
 ---
 
-# 6. User Accounts
+## 6. No Public Accounts
 
-You may be required to create an account to access certain features.
+The Services are available without an account. ETF Rocket does not offer public registration, and visitors cannot create accounts.
 
-You are responsible for:
+Any accounts on the Services are administrative accounts used only by ETF Rocket’s operator. You may not attempt to create, access, or use any account, or attempt to access any administrative area of the Services.
 
-- Maintaining account security
-- Protecting your credentials
-- Restricting access to your devices
-- All activities occurring under your account
-
-You agree to provide accurate information and keep your account information current.
-
-We reserve the right to suspend or terminate accounts at our discretion.
+If ETF Rocket introduces optional accounts in the future, additional terms may apply and these Terms will be updated before accounts become available.
 
 ---
 
-# 7. Acceptable Use
+## 7. Free Service
+
+The Services are currently provided free of charge. ETF Rocket may introduce, change, or discontinue features, including paid features, at any time. Any paid features would be subject to additional terms presented before purchase.
+
+---
+
+## 8. Acceptable Use
 
 You agree not to:
 
 - Violate laws or regulations
 - Use the Services for unlawful purposes
-- Attempt unauthorized access
-- Scrape or harvest data excessively
+- Attempt unauthorized access to the Services, servers, or administrative areas
+- Scrape, crawl, or harvest data excessively, or make automated requests that exceed rate limits or burden the Services
 - Reverse engineer the platform
-- Interfere with service operation
-- Upload malicious code
-- Abuse support systems
-- Impersonate others
-- Manipulate rankings or analytics
-- Circumvent security measures
+- Interfere with or disrupt service operation
+- Upload or transmit malicious code
+- Impersonate others or misrepresent an affiliation with ETF Rocket
+- Manipulate or misrepresent rankings, data, or analytics
+- Circumvent rate limits or security measures
 
-We reserve the right to restrict or terminate access for violations.
-
----
-
-# 8. User Content
-
-You may submit support tickets, feedback, portfolio information, comments, or other content (“User Content”).
-
-You retain ownership of your User Content.
-
-By submitting User Content, you grant ETF Rocket a non-exclusive, worldwide, royalty-free license to:
-
-- Store
-- Process
-- Display
-- Analyze
-- Use
-
-such content solely for operating and improving the Services.
-
-You represent that you have the right to submit any content you provide.
+We reserve the right to restrict, block, or terminate access for violations.
 
 ---
 
-# 9. Intellectual Property
+## 9. Feedback
 
-The Services, including software, designs, branding, graphics, interfaces, content, analytics, and proprietary calculations are owned by ETF Rocket or its licensors and are protected by intellectual property laws.
+If you provide ETF Rocket with suggestions, ideas, or other feedback by any means, you grant ETF Rocket a non-exclusive, worldwide, perpetual, royalty-free license to use that feedback for any purpose, without obligation or compensation to you.
 
-You may not:
+---
+
+## 10. Intellectual Property
+
+The Services, including software, designs, branding, graphics, interfaces, content, compilations of data, analytics, and proprietary calculations, are owned by ETF Rocket or its licensors and are protected by intellectual property laws.
+
+You may view and use the Services for your personal, non-commercial informational purposes. You may not:
 
 - Reproduce
 - Redistribute
 - Commercialize
-- Copy
+- Copy in bulk
 - Modify
 - Republish
 - Resell
@@ -219,11 +201,13 @@ You may not:
 
 without written permission.
 
+Fund names, issuer names, and related trademarks belong to their respective owners and are used for identification only.
+
 ---
 
-# 10. Third-Party Services and Data
+## 11. Third-Party Services, Data, and Links
 
-ETF Rocket may rely on or link to third-party services, providers, APIs, or websites.
+ETF Rocket relies on, and links to, third-party services, providers, and websites, including ETF issuer websites.
 
 We are not responsible for:
 
@@ -232,12 +216,13 @@ We are not responsible for:
 - Third-party outages
 - Third-party privacy practices
 - Third-party financial data
+- Changes made to third-party websites
 
 Your interactions with third parties are solely between you and those third parties.
 
 ---
 
-# 11. Service Availability
+## 12. Service Availability
 
 ETF Rocket does not guarantee uninterrupted access.
 
@@ -247,15 +232,15 @@ The Services may experience:
 - Delays
 - Downtime
 - Bugs
-- Data interruptions
+- Data interruptions or gaps
 - Security incidents
 - Infrastructure failures
 
-We may modify, suspend, or discontinue features at any time.
+We may modify, suspend, or discontinue the Services, any feature, or coverage of any ETF or issuer at any time, without notice.
 
 ---
 
-# 12. Limitation of Liability
+## 13. Limitation of Liability
 
 To the fullest extent permitted by law, ETF Rocket and its owners, operators, affiliates, employees, contractors, licensors, and service providers shall not be liable for:
 
@@ -269,9 +254,9 @@ To the fullest extent permitted by law, ETF Rocket and its owners, operators, af
 - Lost business opportunities
 - Data loss
 - Trading losses
-- Portfolio losses
+- Investment losses
 
-arising out of or relating to the Services.
+arising out of or relating to the Services, including any reliance on data or information provided through the Services.
 
 Your use of the Services is at your sole risk.
 
@@ -282,7 +267,7 @@ If liability cannot be excluded, our total liability shall not exceed the greate
 
 ---
 
-# 13. No SEC or Regulatory Endorsement
+## 14. No SEC or Regulatory Endorsement
 
 ETF Rocket is not endorsed, approved, or sponsored by:
 
@@ -293,13 +278,13 @@ ETF Rocket is not endorsed, approved, or sponsored by:
 - Any ETF issuer
 - Any government authority
 
-References to ETFs, issuers, or financial products do not imply endorsement.
+ETF Rocket is not affiliated with any ETF issuer or fund shown on the Services. References to ETFs, issuers, or financial products do not imply endorsement.
 
 ---
 
-# 14. Indemnification
+## 15. Indemnification
 
-You agree to defend, indemnify, and hold harmless ETF Rocket and its affiliates from any claims, liabilities, damages, losses, costs, or expenses arising from:
+You agree to defend, indemnify, and hold harmless ETF Rocket and its owners, operators, and affiliates from any claims, liabilities, damages, losses, costs, or expenses arising from:
 
 - Your use of the Services
 - Your violation of these Terms
@@ -308,31 +293,31 @@ You agree to defend, indemnify, and hold harmless ETF Rocket and its affiliates 
 
 ---
 
-# 15. Privacy
+## 16. Privacy
 
-Your use of the Services is also governed by our Privacy Policy.
+Your use of the Services is also governed by our Privacy Policy, which explains that ETF Rocket does not offer accounts and does not collect personal information from visitors.
 
 ---
 
-# 16. Termination
+## 17. Termination
 
-We may suspend or terminate access to the Services at any time, with or without notice, for any reason.
+We may suspend, restrict, or terminate access to the Services at any time, with or without notice, for any reason.
 
 Sections intended to survive termination shall remain in effect.
 
 ---
 
-# 17. Changes to Terms
+## 18. Changes to Terms
 
 We may update these Terms periodically.
 
-Updated Terms become effective upon posting.
+Updated Terms become effective upon posting, and the “Last Updated” date above will change.
 
 Continued use of the Services constitutes acceptance of revised Terms.
 
 ---
 
-# 18. Governing Law
+## 19. Governing Law
 
 These Terms shall be governed by the laws of the State of California, without regard to conflict of law principles.
 
@@ -340,18 +325,18 @@ You agree that any disputes shall be resolved exclusively in courts located in C
 
 ---
 
-# 19. Severability
+## 20. Severability
 
 If any provision of these Terms is found unenforceable, the remaining provisions shall remain in full force and effect.
 
 ---
 
-# 20. Entire Agreement
+## 21. Entire Agreement
 
-These Terms constitute the entire agreement between you and ETF Rocket regarding the Services and supersede prior agreements or understandings.
+These Terms, together with the Privacy Policy, constitute the entire agreement between you and ETF Rocket regarding the Services and supersede prior agreements or understandings.
 
 ---
 
-# 21. Contact
+## 22. Contact
 
-For questions regarding these Terms, please contact ETF Rocket support through the Help Center or Support system available within the platform.
+ETF Rocket does not currently provide user support or a public contact channel. If one becomes available, it will be listed here.

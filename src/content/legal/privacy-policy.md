@@ -1,273 +1,174 @@
 # ETF Rocket Privacy Policy
 
-_Last Updated: May 17, 2026_
+_Last Updated: November 8, 2026_
 
 ## 1. Introduction
 
-ETF Rocket (“ETF Rocket,” “we,” “our,” or “us”) respects your privacy and is committed to protecting your personal information.
+ETF Rocket (“ETF Rocket,” “we,” “our,” or “us”) respects your privacy.
 
-This Privacy Policy explains how we collect, use, disclose, and safeguard information when you access or use the ETF Rocket website, applications, services, tools, analytics, support systems, and related features (collectively, the “Services”).
+This Privacy Policy explains what information is and is not collected when you access or use the ETF Rocket website, data, charts, search, help center, and related features (collectively, the “Services”).
 
-By using the Services, you consent to the practices described in this Privacy Policy.
+**In short:**
 
----
+- You can use ETF Rocket without creating an account. We do not offer public registration.
+- We do not ask for, collect, or store your name, email address, or other personal information.
+- We do not use cookies, analytics, advertising, or tracking tools on the public site.
+- We do not sell or share personal information.
+- Like nearly every website, our hosting providers keep standard technical logs, such as IP addresses, to deliver and protect the Services.
 
-# 2. Information We Collect
-
-## Information You Provide Directly
-
-We may collect information you voluntarily provide, including:
-
-- Name
-- Email address
-- Account credentials
-- Support ticket content
-- Portfolio data you enter
-- Transaction import data
-- Communications with support
-- Feedback submissions
-- Preferences and settings
+By using the Services, you acknowledge the practices described in this Privacy Policy.
 
 ---
 
-## Automatically Collected Information
+## 2. No Accounts or Registration
 
-When you use the Services, we may automatically collect certain information, including:
+The Services are available to the public without an account.
+
+ETF Rocket does not offer user registration. The only accounts on the Services are administrative accounts used by ETF Rocket’s operator to manage the site. Visitors cannot create accounts, and no account information is collected from visitors.
+
+---
+
+## 3. Information We Do Not Collect
+
+Because the Services do not require or offer accounts and do not include forms for visitors to submit information, we do not collect:
+
+- Names
+- Email addresses
+- Phone numbers or mailing addresses
+- Account usernames or passwords
+- Payment or billing information
+- Portfolio, holdings, or brokerage information
+- Investment preferences or financial profiles
+- Messages, comments, or other submitted content
+
+Please do not attempt to send us personal or sensitive information.
+
+---
+
+## 4. Information Collected Automatically
+
+When your browser loads pages or data from the Services, our hosting and infrastructure providers automatically receive and may log standard technical information, including:
 
 - IP address
-- Browser type
-- Device information
-- Operating system
-- Usage activity
-- Referral URLs
-- Session data
-- Log files
-- Error reports
-- Analytics data
+- Browser type and version
+- Device type and operating system
+- The pages, files, and data requested
+- Referring website address
+- Date and time of the request
+- Error and diagnostic information
+
+This information is used only to:
+
+- Deliver the Services to your browser
+- Keep the Services secure and available
+- Detect, prevent, and investigate abuse or attacks
+- Apply rate limits that protect the Services from excessive automated requests
+- Diagnose technical problems
+
+We do not use this information to identify you personally, build profiles, or track you across other websites.
 
 ---
 
-## Financial and Portfolio Data
+## 5. Cookies, Local Storage, and Tracking
 
-If you use portfolio-related features, ETF Rocket may store:
+The public Services do not set cookies and do not use analytics, advertising, or tracking technologies.
 
-- Holdings
-- Transactions
-- Portfolio allocations
-- Watchlists
-- ETF selections
-- Import files
-- Analytics preferences
+We do not engage in cross-site tracking, targeted advertising, or the sale of browsing data.
 
-This information is used solely to provide portfolio functionality and related analytics.
+Your browser’s local storage is used only when an administrator signs in, to keep that administrator signed in. Nothing is stored in a visitor’s browser by the public Services.
+
+Because we do not track visitors, we do not change our practices in response to “Do Not Track” or Global Privacy Control signals; there is no tracking to turn off.
 
 ---
 
-# 3. How We Use Information
+## 6. Third-Party Services
 
-We may use information to:
+### Hosting and Infrastructure
 
-- Provide and maintain the Services
-- Authenticate accounts
-- Operate support systems
-- Improve platform functionality
-- Personalize user experience
-- Analyze usage trends
-- Detect fraud or abuse
-- Secure accounts and infrastructure
-- Respond to inquiries
-- Communicate service updates
-- Monitor system performance
-- Develop new features
+The Services are hosted by third-party hosting and infrastructure providers, which process the technical information described in Section 4 on our behalf in order to operate the Services. Their handling of that information is governed by their own privacy policies.
 
-We do not sell personal information to advertisers.
+### Web Fonts
+
+The Services load fonts from Google Fonts. When your browser requests these fonts, Google receives technical information such as your IP address and browser details. Google’s use of this information is governed by Google’s privacy policy.
+
+### Links to Other Websites
+
+The Services link to third-party websites, including ETF issuer websites. When you follow those links, the third party’s privacy practices apply. ETF Rocket is not responsible for the content or privacy practices of other websites.
 
 ---
 
-# 4. Financial Information Disclaimer
+## 7. How Information Is Used and Shared
 
-ETF Rocket is an informational and educational platform.
+We use the limited technical information described above solely to operate, secure, and maintain the Services.
 
-ETF Rocket is not a bank, broker-dealer, investment adviser, or financial institution.
+We do **not**:
 
-Portfolio and financial information you provide is used solely for providing the Services and associated analytics.
+- Sell personal information
+- Share personal information for advertising or marketing
+- Rent, trade, or license visitor information to others
 
-You are responsible for verifying the accuracy of any financial information entered into the platform.
+Technical information may be disclosed:
 
----
-
-# 5. Cookies and Tracking Technologies
-
-ETF Rocket may use cookies, local storage, session storage, and similar technologies to:
-
-- Maintain sessions
-- Improve usability
-- Remember preferences
-- Analyze traffic
-- Improve performance
-- Support authentication
-
-You may disable cookies through your browser settings, though some functionality may not operate properly.
+- To hosting and infrastructure providers that operate the Services
+- When required by law, regulation, subpoena, or other legal process
+- To protect the rights, property, or safety of ETF Rocket, its users, or the public
+- To investigate fraud, abuse, or security incidents
+- In connection with a merger, acquisition, or transfer of the Services
 
 ---
 
-# 6. Data Sharing and Disclosure
+## 8. Data Retention
 
-We may share information with:
+Technical logs are kept by our hosting and infrastructure providers for limited periods under their standard practices, and as needed for security, troubleshooting, and legal compliance.
 
-- Service providers
-- Hosting providers
-- Analytics providers
-- Security providers
-- Infrastructure providers
-
-solely for purposes necessary to operate the Services.
-
-We may also disclose information:
-
-- To comply with legal obligations
-- To protect rights or safety
-- To investigate abuse or fraud
-- During corporate restructuring or acquisition
-
-We do not sell user personal information.
+Market data shown on the Services, such as fund assets and net asset values, is information about ETFs, not about you.
 
 ---
 
-# 7. Third-Party Services
+## 9. Data Security
 
-ETF Rocket may integrate with or rely upon third-party services, APIs, analytics providers, financial data providers, or infrastructure vendors.
+ETF Rocket and its providers use reasonable administrative, technical, and organizational safeguards to protect the Services and the information they process.
 
-Your use of third-party services may also be governed by their respective privacy policies and terms.
-
-ETF Rocket is not responsible for third-party privacy practices.
+However, no system can guarantee absolute security. Internet transmissions may not be secure, and unauthorized access may occur despite safeguards. You use the Services at your own risk.
 
 ---
 
-# 8. Data Security
+## 10. Your Privacy Rights
 
-ETF Rocket uses reasonable administrative, technical, and organizational safeguards intended to protect user information.
+Depending on where you live, you may have rights under applicable privacy laws, such as rights to access, correct, delete, or restrict the use of personal information about you.
 
-However, no system can guarantee absolute security.
+Because ETF Rocket does not collect personal information from visitors beyond the technical information described in Section 4, which is not linked to your identity, we generally do not hold personal information that can be associated with you.
 
-You acknowledge that:
+### California Residents
 
-- Internet transmissions may not be secure
-- Data breaches may occur
-- Unauthorized access may occur despite safeguards
-
-You use the Services at your own risk.
+If you are a California resident, you may have rights under the California Consumer Privacy Act (CCPA), as amended. ETF Rocket does not sell or share personal information, as those terms are defined under California law, and does not use personal information for targeted advertising.
 
 ---
 
-# 9. Account Security
-
-You are responsible for maintaining the confidentiality of your account credentials.
-
-You agree to notify ETF Rocket promptly of any unauthorized access or suspected compromise.
-
----
-
-# 10. Data Retention
-
-ETF Rocket may retain information:
-
-- As long as necessary to provide the Services
-- To comply with legal obligations
-- To resolve disputes
-- To enforce agreements
-- For backup and recovery purposes
-
-We may delete inactive or abandoned data at our discretion.
-
----
-
-# 11. User Rights
-
-Depending on your jurisdiction, you may have rights regarding your personal information, including:
-
-- Access
-- Correction
-- Deletion
-- Restriction
-- Objection
-- Data portability
-
-Requests may be subject to verification and legal limitations.
-
----
-
-# 12. California Privacy Rights
-
-If you are a California resident, you may have rights under the California Consumer Privacy Act (CCPA) and related laws.
-
-ETF Rocket does not sell personal information.
-
-California residents may request:
-
-- Disclosure of collected information
-- Deletion of eligible data
-- Correction of inaccurate information
-
-subject to applicable exceptions.
-
----
-
-# 13. International Users
+## 11. International Users
 
 ETF Rocket operates from the United States.
 
-If you access the Services from outside the United States, you acknowledge that your information may be transferred to and processed in the United States.
+If you access the Services from outside the United States, the technical information described in this Privacy Policy may be processed in the United States or other countries where our providers operate.
 
 ---
 
-# 14. Children’s Privacy
+## 12. Children’s Privacy
 
-ETF Rocket is not intended for children under the age of 13.
+The Services are not directed to children under the age of 13, and we do not knowingly collect personal information from children under 13.
 
-We do not knowingly collect personal information from children under 13.
-
-If we learn that such information has been collected, we may delete it.
+If we learn that such information has been collected, we will delete it.
 
 ---
 
-# 15. Support Communications
+## 13. Changes to This Privacy Policy
 
-Support tickets and communications may be stored to:
+ETF Rocket may update this Privacy Policy from time to time. If we introduce features that collect personal information, such as optional accounts, we will update this Privacy Policy before those features become available.
 
-- Resolve issues
-- Improve support quality
-- Train internal systems
-- Maintain service records
-
-Users should avoid submitting highly sensitive information through support channels.
+Updated versions become effective when posted, and the “Last Updated” date above will change. Continued use of the Services after an update constitutes acceptance of the revised Privacy Policy.
 
 ---
 
-# 16. Analytics and Performance Monitoring
+## 14. Contact
 
-ETF Rocket may use analytics and monitoring tools to:
-
-- Understand feature usage
-- Improve performance
-- Diagnose issues
-- Measure engagement
-- Prevent abuse
-
-Collected analytics may include aggregated or anonymized information.
-
----
-
-# 17. Changes to This Privacy Policy
-
-ETF Rocket may update this Privacy Policy periodically.
-
-Updated versions become effective upon posting.
-
-Continued use of the Services constitutes acceptance of revised policies.
-
----
-
-# 18. Contact Information
-
-Questions regarding this Privacy Policy may be submitted through the ETF Rocket Help Center or Support system.
+ETF Rocket does not currently provide a public contact channel. If one becomes available, it will be listed here.
